@@ -40,11 +40,12 @@ export const defaultDealCategories = [
   { value: "website-design", label: "Website design" },
 ];
 
+// Prospecting statuses for the padel-prospecting workflow (mirrors the
+// spreadsheet's colored "Statut" dropdown column). User-extendable via
+// Settings -> Notes.
 export const defaultNoteStatuses = [
-  { value: "cold", label: "Cold", color: "#7dbde8" },
-  { value: "warm", label: "Warm", color: "#e8cb7d" },
-  { value: "hot", label: "Hot", color: "#e88b7d" },
-  { value: "in-contract", label: "In Contract", color: "#a4e87d" },
+  { value: "a_recontacter", label: "A recontacter", color: "#7dbde8" },
+  { value: "visio", label: "Visio", color: "#e88b7d" },
 ];
 
 export const defaultTaskTypes = [
