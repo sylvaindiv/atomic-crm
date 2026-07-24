@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS contacts (
     status         TEXT,
     tags           TEXT,          -- JSON array of tag ids
     company_id     INTEGER REFERENCES companies(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    referred_by_id INTEGER REFERENCES contacts(id) ON UPDATE CASCADE ON DELETE SET NULL, -- referral source (self-FK)
+    -- See adr/ADR-c7993f35-TASK-001-referred-by-self-fk.md
+    referred_by_id INTEGER REFERENCES contacts(id) ON UPDATE CASCADE ON DELETE SET NULL,
     sales_id       INTEGER REFERENCES sales(id),
     linkedin_url   TEXT,
     email_jsonb    TEXT,          -- JSON array of {email,type}
