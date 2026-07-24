@@ -27,6 +27,9 @@ const getRandomContactDetailsType = () =>
 export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
   const nbAvailblePictures = 223;
   let numberOfContacts = 0;
+  // Contacts generated so far in this run, used to pick a realistic referrer
+  // (a contact can only be referred by one already created before it).
+  const generatedContacts: Required<Contact>[] = [];
 
   return Array.from(Array(size).keys()).map((id) => {
     const has_avatar =
@@ -73,7 +76,18 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
     const first_seen = randomDate(new Date(company.created_at)).toISOString();
     const last_seen = first_seen;
 
-    return {
+    // Occasionally attribute the contact to an already-generated referrer,
+    // denormalizing referred_by_name the same way company_name is denormalized
+    // above, since FakeRest has no SQL self-join to compute it on read.
+    let referred_by_id: Required<Contact>["referred_by_id"] = null;
+    let referred_by_name = "";
+    if (generatedContacts.length > 0 && weightedBoolean(15)) {
+      const referrer = random.arrayElement(generatedContacts);
+      referred_by_id = referrer.id;
+      referred_by_name = `${referrer.first_name} ${referrer.last_name}`;
+    }
+
+    const contact = {
       id,
       first_name,
       last_name,
@@ -81,8 +95,8 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       title: title.charAt(0).toUpperCase() + title.substr(1),
       company_id: company.id,
       company_name: company.name,
-      referred_by_id: null,
-      referred_by_name: "",
+      referred_by_id,
+      referred_by_name,
       email_jsonb,
       phone_jsonb,
       background: lorem.sentence(),
@@ -99,5 +113,8 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       nb_tasks: 0,
       linkedin_url: null,
     };
+
+    generatedContacts.push(contact);
+    return contact;
   });
 };
