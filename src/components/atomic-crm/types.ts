@@ -86,6 +86,7 @@ export type Contact = {
   last_name: string;
   title: string;
   company_id?: Identifier | null;
+  referred_by_id?: Identifier | null;
   email_jsonb: EmailAndType[];
   avatar?: Partial<RAFile>;
   linkedin_url?: string | null;
@@ -100,6 +101,7 @@ export type Contact = {
   phone_jsonb: PhoneNumberAndType[];
   nb_tasks?: number;
   company_name?: string;
+  referred_by_name?: string;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {

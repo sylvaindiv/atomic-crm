@@ -53,6 +53,8 @@ CREATE TABLE IF NOT EXISTS contacts (
     status         TEXT,
     tags           TEXT,          -- JSON array of tag ids
     company_id     INTEGER REFERENCES companies(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    -- See adr/ADR-c7993f35-TASK-001-referred-by-self-fk.md
+    referred_by_id INTEGER REFERENCES contacts(id) ON UPDATE CASCADE ON DELETE SET NULL,
     sales_id       INTEGER REFERENCES sales(id),
     linkedin_url   TEXT,
     email_jsonb    TEXT,          -- JSON array of {email,type}
@@ -158,8 +160,8 @@ SELECT
     (SELECT count(*) FROM contacts co WHERE co.company_id = c.id) AS nb_contacts
 FROM companies c;
 
--- contacts_summary: adds company_name, open-task count, and full-text search
--- helper columns extracted from the email/phone JSON arrays.
+-- contacts_summary: adds company_name, referred_by_name, open-task count, and
+-- full-text search helper columns extracted from the email/phone JSON arrays.
 DROP VIEW IF EXISTS contacts_summary;
 CREATE VIEW contacts_summary AS
 SELECT
@@ -171,5 +173,8 @@ SELECT
        FROM json_each(CASE WHEN json_valid(co.phone_jsonb) THEN co.phone_jsonb ELSE '[]' END) je
     ) AS phone_fts,
     (SELECT cmp.name FROM companies cmp WHERE cmp.id = co.company_id) AS company_name,
+    (SELECT trim(coalesce(r.first_name, '') || ' ' || coalesce(r.last_name, ''))
+       FROM contacts r WHERE r.id = co.referred_by_id
+    ) AS referred_by_name,
     (SELECT count(*) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS nb_tasks
 FROM contacts co;
