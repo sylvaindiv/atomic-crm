@@ -80,6 +80,7 @@ export const frenchCrmMessages = {
         last_seen: "Dernière activité",
         title: "Titre",
         company_id: "Entreprise",
+        referred_by_id: "Connu par",
         email_jsonb: "Adresses e-mail",
         email: "E-mail",
         phone_jsonb: "Numéros de téléphone",
@@ -191,7 +192,7 @@ export const frenchCrmMessages = {
       hot: {
         empty_change_status:
           'Changez le statut d\'un contact en ajoutant une note à ce contact et en cliquant sur "afficher les options".',
-        empty_hint: 'Les contacts avec un statut "chaud" apparaîtront ici.',
+        empty_hint: 'Les contacts avec un statut "Visio" apparaîtront ici.',
         title: "Contacts chauds",
       },
     },

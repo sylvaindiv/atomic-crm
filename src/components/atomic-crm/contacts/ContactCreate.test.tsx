@@ -126,4 +126,35 @@ describe("ContactCreate", () => {
       }),
     );
   });
+
+  it("submits the selected referrer as referred_by_id", async () => {
+    const createMock = vi.fn().mockResolvedValue({ data: {} });
+
+    const screen = await render(
+      <ContactCreateBasic silent dataProvider={{ create: createMock }} />,
+    );
+
+    await expect.element(screen.getByPlaceholder("Email")).toBeInTheDocument();
+
+    // Fill required fields
+    await screen.getByLabelText(/first name/i).fill("Grace");
+    await screen.getByLabelText(/last name/i).fill("Hopper");
+
+    // Select the seeded contact as the referrer
+    await screen.getByLabelText(/referred by/i).click();
+    await screen.getByText("Ada Lovelace").click();
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => createMock).toBeCalledTimes(1);
+
+    expect(createMock).toBeCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        data: expect.objectContaining({
+          referred_by_id: 1,
+        }),
+      }),
+    );
+  });
 });

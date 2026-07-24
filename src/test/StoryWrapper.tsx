@@ -69,7 +69,7 @@ export const buildContact = (overrides: Partial<Contact> = {}): Contact => ({
   nb_tasks: 0,
   phone_jsonb: [],
   sales_id: 0,
-  status: "warm",
+  status: "a_recontacter",
   tags: [],
   title: "CTO",
   ...overrides,

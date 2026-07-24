@@ -1,4 +1,5 @@
 import { render } from "vitest-browser-react";
+import { Route, Routes } from "react-router";
 import {
   ContactEditBasic,
   ContactEditWithEmailsAndPhones,
@@ -8,6 +9,8 @@ import {
   ContactEditWithEmailsAndPhones as ContactEditMobileWithEmailsAndPhones,
 } from "./ContactEdit.mobile.stories";
 import { page } from "vitest/browser";
+import { buildContact, StoryWrapper } from "@/test/StoryWrapper";
+import { ContactEdit } from "./ContactEdit";
 
 describe("ContactEdit", () => {
   describe("desktop", () => {
@@ -141,6 +144,60 @@ describe("ContactEdit", () => {
           data: expect.objectContaining({
             email_jsonb: [{ email: "ada@example.com", type: "Work" }],
             phone_jsonb: [{ number: "0123456789", type: "Work" }],
+          }),
+        }),
+      );
+    });
+
+    it("carries the existing referrer through to the update payload", async () => {
+      const updateMock = vi.fn().mockResolvedValue({ data: {} });
+      const screen = await render(
+        <StoryWrapper
+          initialEntries={["/contacts/1"]}
+          data={{
+            contacts: [
+              buildContact({
+                id: 1,
+                email_jsonb: [],
+                phone_jsonb: [],
+                referred_by_id: 2,
+                referred_by_name: "Grace Hopper",
+              }),
+              buildContact({
+                id: 2,
+                first_name: "Grace",
+                last_name: "Hopper",
+              }),
+            ],
+          }}
+          dataProvider={{ update: updateMock }}
+          silent
+        >
+          <Routes>
+            <Route path="/contacts/:id" element={<ContactEdit />} />
+          </Routes>
+        </StoryWrapper>,
+      );
+
+      // Wait for the form to load with the pre-selected referrer
+      await expect
+        .element(screen.getByText("Grace Hopper"))
+        .toBeInTheDocument();
+
+      // Submit without changing the referrer
+      await screen.getByRole("button", { name: /^save$/i }).click();
+      await expect
+        .poll(() => screen.getByText("Element updated"))
+        .toBeInTheDocument();
+
+      await screen.getByLabelText("Close toast").click();
+
+      expect(updateMock).toBeCalledTimes(1);
+      expect(updateMock).toBeCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          data: expect.objectContaining({
+            referred_by_id: 2,
           }),
         }),
       );

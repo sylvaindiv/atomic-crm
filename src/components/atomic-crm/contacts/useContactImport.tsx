@@ -1,7 +1,7 @@
 import { useDataProvider, useGetIdentity, type DataProvider } from "ra-core";
 import { useCallback, useMemo } from "react";
 
-import type { Company, Tag } from "../types";
+import type { Company, Contact, ContactNote, Tag } from "../types";
 
 export type ContactImportSchema = {
   first_name: string;
@@ -9,6 +9,8 @@ export type ContactImportSchema = {
   gender: string;
   title: string;
   company: string;
+  zipcode: string;
+  city: string;
   email_work: string;
   email_home: string;
   email_other: string;
@@ -23,6 +25,17 @@ export type ContactImportSchema = {
   status: string;
   tags: string;
   linkedin_url: string;
+  known_via: string;
+  comment: string;
+  comment_2: string;
+};
+
+// The subset of a batch row needed to create a company, when its name doesn't
+// match an existing one.
+type CompanyImportInfo = {
+  name: string;
+  zipcode?: string;
+  city?: string;
 };
 
 export function useContactImport() {
@@ -38,18 +51,26 @@ export function useContactImport() {
     [dataProvider],
   );
   const getCompanies = useCallback(
-    async (names: string[]) =>
-      fetchRecordsWithCache<Company>(
+    async (companies: CompanyImportInfo[]) => {
+      // Only used for companies actually being created (never for a company
+      // that already matched by name), so a matched company's address is
+      // never overwritten.
+      const addressByName = new Map(
+        companies.map(({ name, zipcode, city }) => [name, { zipcode, city }]),
+      );
+      return fetchRecordsWithCache<Company>(
         "companies",
         companiesCache,
-        names,
+        companies.map(({ name }) => name),
         (name) => ({
           name,
           created_at: new Date().toISOString(),
           sales_id: user?.identity?.id,
+          ...addressByName.get(name),
         }),
         dataProvider,
-      ),
+      );
+    },
     [companiesCache, user?.identity?.id, dataProvider],
   );
 
@@ -72,15 +93,85 @@ export function useContactImport() {
     [tagsCache, dataProvider],
   );
 
+  // Contact cache for resolving known_via -> referred_by_id. Unlike
+  // companies/tags, contacts have no single filterable "name" column
+  // (first_name/last_name are split, and the backend filter layer only
+  // matches real columns), so we can't reuse fetchRecordsWithCache's
+  // server-side `name@in` lookup. Instead, any call with an unresolved name
+  // re-fetches the current contacts snapshot and matches client-side,
+  // case-insensitively, on the exact "first_name last_name" concatenation.
+  // Matches are cached (a referrer named in several rows/batches is only
+  // ever looked up once); unmatched names are re-checked on the next batch
+  // that needs them, so a referrer created by an earlier batch in the same
+  // import still resolves. Never creates a stub contact for an unmatched
+  // name -- referred_by_id is simply left null.
+  // v1 limitation: a referrer created earlier in the SAME batch is not
+  // visible yet, since every row in a batch resolves referrers before any
+  // of that batch's contacts are created -- it resolves to null, same as an
+  // unknown name.
+  // See adr/ADR-c7993f35-TASK-004-contact-referral-full-table-lookup.md.
+  const contactsByNameCache = useMemo(
+    () => new Map<string, Contact>(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dataProvider],
+  );
+  const getContactsByName = useCallback(
+    async (names: string[]) => {
+      const normalizedNames = [
+        ...new Set(
+          names.map((name) => name.trim().toLowerCase()).filter((name) => name),
+        ),
+      ];
+      const unresolvedNames = normalizedNames.filter(
+        (name) => !contactsByNameCache.has(name),
+      );
+
+      if (unresolvedNames.length > 0) {
+        const { data: contacts } = await dataProvider.getList<Contact>(
+          "contacts",
+          {
+            filter: {},
+            pagination: { page: 1, perPage: 1000 },
+            sort: { field: "id", order: "ASC" },
+          },
+        );
+        for (const contact of contacts) {
+          const fullName = `${contact.first_name} ${contact.last_name}`
+            .trim()
+            .toLowerCase();
+          if (!contactsByNameCache.has(fullName)) {
+            contactsByNameCache.set(fullName, contact);
+          }
+        }
+      }
+
+      return normalizedNames.reduce((acc, name) => {
+        const contact = contactsByNameCache.get(name);
+        if (contact) acc.set(name, contact);
+        return acc;
+      }, new Map<string, Contact>());
+    },
+    [contactsByNameCache, dataProvider],
+  );
+
   const processBatch = useCallback(
     async (batch: ContactImportSchema[]) => {
-      const [companies, tags] = await Promise.all([
+      const [companies, tags, referrers] = await Promise.all([
         getCompanies(
           batch
-            .map((contact) => contact.company?.trim())
-            .filter((name) => name),
+            .map((contact) => ({
+              name: contact.company?.trim(),
+              zipcode: contact.zipcode?.trim(),
+              city: contact.city?.trim(),
+            }))
+            .filter((company) => company.name),
         ),
         getTags(batch.flatMap((batch) => parseTags(batch.tags))),
+        getContactsByName(
+          batch
+            .map((contact) => contact.known_via?.trim())
+            .filter((name) => name),
+        ),
       ]);
 
       await Promise.all(
@@ -104,6 +195,9 @@ export function useContactImport() {
             company: companyName,
             tags: tagNames,
             linkedin_url,
+            known_via,
+            comment,
+            comment_2,
           }) => {
             const email_jsonb = [
               { email: email_work, type: "Work" },
@@ -121,35 +215,65 @@ export function useContactImport() {
             const tagList = parseTags(tagNames)
               .map((name) => tags.get(name))
               .filter((tag): tag is Tag => !!tag);
+            const referrer = referrers.get(known_via?.trim().toLowerCase());
 
-            return dataProvider.create("contacts", {
-              data: {
-                first_name,
-                last_name,
-                gender,
-                title,
-                email_jsonb,
-                phone_jsonb,
-                background,
-                first_seen: first_seen
-                  ? new Date(first_seen).toISOString()
-                  : today,
-                last_seen: last_seen
-                  ? new Date(last_seen).toISOString()
-                  : today,
-                has_newsletter,
-                status,
-                company_id: company?.id,
-                tags: tagList.map((tag) => tag.id),
-                sales_id: user?.identity?.id,
-                linkedin_url,
+            const { data: createdContact } = await dataProvider.create<Contact>(
+              "contacts",
+              {
+                data: {
+                  first_name,
+                  last_name,
+                  gender,
+                  title,
+                  email_jsonb,
+                  phone_jsonb,
+                  background,
+                  first_seen: first_seen
+                    ? new Date(first_seen).toISOString()
+                    : today,
+                  last_seen: last_seen
+                    ? new Date(last_seen).toISOString()
+                    : today,
+                  // dynamicTyping is off (see usePapaParse), so has_newsletter
+                  // arrives as the literal string "true"/"false", not a boolean.
+                  has_newsletter: has_newsletter === "true",
+                  status,
+                  company_id: company?.id,
+                  referred_by_id: referrer?.id,
+                  tags: tagList.map((tag) => tag.id),
+                  sales_id: user?.identity?.id,
+                  linkedin_url,
+                },
               },
-            });
+            );
+
+            const comments = [comment, comment_2].filter((text) =>
+              text?.trim(),
+            );
+            await Promise.all(
+              comments.map((text) =>
+                dataProvider.create<ContactNote>("contact_notes", {
+                  data: {
+                    contact_id: createdContact.id,
+                    text: text.trim(),
+                    date: today,
+                    sales_id: user?.identity?.id,
+                  },
+                }),
+              ),
+            );
           },
         ),
       );
     },
-    [dataProvider, getCompanies, getTags, user?.identity?.id, today],
+    [
+      dataProvider,
+      getCompanies,
+      getTags,
+      getContactsByName,
+      user?.identity?.id,
+      today,
+    ],
   );
 
   return processBatch;
