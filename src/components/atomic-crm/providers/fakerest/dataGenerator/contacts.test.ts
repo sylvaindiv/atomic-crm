@@ -19,7 +19,10 @@ const makeTags = (): Tag[] => [
 
 describe("generateContacts", () => {
   it("leaves referred_by_id null on the very first generated contact", () => {
-    const db = { companies: [makeCompany(1)], tags: makeTags() } as unknown as Db;
+    const db = {
+      companies: [makeCompany(1)],
+      tags: makeTags(),
+    } as unknown as Db;
 
     const [firstContact] = generateContacts(db, 1);
 
