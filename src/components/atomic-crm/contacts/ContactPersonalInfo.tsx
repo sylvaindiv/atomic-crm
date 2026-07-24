@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useRecordContext, useTranslate, WithRecord } from "ra-core";
+import { Link } from "react-router";
 import { ArrayField } from "@/components/admin/array-field";
 import { SingleFieldList } from "@/components/admin/single-field-list";
 import { TextField } from "@/components/admin/text-field";
 import { EmailField } from "@/components/admin/email-field";
-import { Mail, Phone, Linkedin, Check } from "lucide-react";
+import { Mail, Phone, Linkedin, Check, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
 import {
   contactGender,
@@ -78,6 +79,19 @@ export const ContactPersonalInfo = () => {
           return null;
         })
         .filter(Boolean)}
+      {record.referred_by_name && (
+        <PersonalInfoRow
+          icon={<UserPlus className="w-4 h-4 text-muted-foreground" />}
+          primary={
+            <Link
+              className="underline hover:no-underline text-sm text-muted-foreground"
+              to={`/contacts/${record.referred_by_id}/show`}
+            >
+              {record.referred_by_name}
+            </Link>
+          }
+        />
+      )}
     </div>
   );
 };

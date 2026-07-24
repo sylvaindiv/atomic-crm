@@ -77,6 +77,7 @@ export const englishCrmMessages = {
         last_seen: "Last seen",
         title: "Title",
         company_id: "Company",
+        referred_by_id: "Referred by",
         email_jsonb: "Email addresses",
         email: "Email",
         phone_jsonb: "Phone numbers",

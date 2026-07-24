@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BooleanInput } from "@/components/admin/boolean-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
+import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { TextInput } from "@/components/admin/text-input";
 import { RadioButtonGroupInput } from "@/components/admin/radio-button-group-input";
 import { SelectInput } from "@/components/admin/select-input";
@@ -19,6 +20,7 @@ import { ArrayInput } from "@/components/admin/array-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
+import { contactOptionText } from "../misc/ContactOption";
 import { StatusSelector } from "../notes";
 import type { Sale, Contact } from "../types";
 import { Avatar } from "./Avatar";
@@ -80,6 +82,7 @@ const ContactIdentityInputs = () => {
 
 const ContactPositionInputs = () => {
   const translate = useTranslate();
+  const record = useRecordContext<Contact>();
   return (
     <div className="flex flex-col gap-4">
       <h6 className="text-lg font-semibold">
@@ -88,6 +91,18 @@ const ContactPositionInputs = () => {
       <TextInput source="title" helperText={false} />
       <ReferenceInput source="company_id" reference="companies" perPage={10}>
         <AutocompleteCompanyInput label="resources.contacts.fields.company_id" />
+      </ReferenceInput>
+      <ReferenceInput
+        source="referred_by_id"
+        reference="contacts"
+        // Only meaningful on edit: a new contact being created has no id yet
+        filter={record?.id ? { "id@neq": record.id } : undefined}
+      >
+        <AutocompleteInput
+          label="resources.contacts.fields.referred_by_id"
+          optionText={contactOptionText}
+          helperText={false}
+        />
       </ReferenceInput>
     </div>
   );
