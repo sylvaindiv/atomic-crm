@@ -80,6 +80,7 @@ export const frenchCrmMessages = {
         last_seen: "Dernière activité",
         title: "Titre",
         company_id: "Entreprise",
+        referred_by_id: "Connu par",
         email_jsonb: "Adresses e-mail",
         email: "E-mail",
         phone_jsonb: "Numéros de téléphone",
