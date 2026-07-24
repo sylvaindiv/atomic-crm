@@ -39,7 +39,7 @@ describe("ContactShow", () => {
     mockIsMobile.mockReturnValue(false);
 
     let dataProvider: DataProvider | null = null;
-    const contact = buildContact({ status: "warm" });
+    const contact = buildContact({ status: "a_recontacter" });
 
     const DataProviderListener = () => {
       dataProvider = useDataProvider();
@@ -59,10 +59,10 @@ describe("ContactShow", () => {
 
     await expect
       .element(screen.getByRole("combobox"))
-      .toHaveTextContent("Warm");
+      .toHaveTextContent("A recontacter");
 
     await screen.getByRole("combobox").click();
-    await screen.getByRole("option", { name: /hot/i }).click();
+    await screen.getByRole("option", { name: /visio/i }).click();
 
     await expect
       .poll(async () => {
@@ -71,8 +71,10 @@ describe("ContactShow", () => {
         });
         return data.status;
       })
-      .toBe("hot");
+      .toBe("visio");
 
-    await expect.element(screen.getByRole("combobox")).toHaveTextContent("Hot");
+    await expect
+      .element(screen.getByRole("combobox"))
+      .toHaveTextContent("Visio");
   });
 });
