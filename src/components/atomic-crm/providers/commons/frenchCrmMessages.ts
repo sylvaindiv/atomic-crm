@@ -191,7 +191,7 @@ export const frenchCrmMessages = {
       hot: {
         empty_change_status:
           'Changez le statut d\'un contact en ajoutant une note à ce contact et en cliquant sur "afficher les options".',
-        empty_hint: 'Les contacts avec un statut "chaud" apparaîtront ici.',
+        empty_hint: 'Les contacts avec un statut "Visio" apparaîtront ici.',
         title: "Contacts chauds",
       },
     },

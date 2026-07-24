@@ -186,7 +186,7 @@ export const englishCrmMessages = {
       hot: {
         empty_change_status:
           'Change the status of a contact by adding a note to that contact and clicking on "show options".',
-        empty_hint: 'Contacts with a "hot" status will appear here.',
+        empty_hint: 'Contacts with a "Visio" status will appear here.',
         title: "Hot Contacts",
       },
     },
