@@ -127,7 +127,12 @@ export function usePapaParse<T>({
             error,
           });
         },
-        dynamicTyping: true,
+        // Dynamic typing strips leading zeros from numeric-looking cells,
+        // which corrupts French postal codes in departments 01/02/07/08/09
+        // (e.g. "01120" -> 1120). Every consumer must treat all values as
+        // strings and coerce explicitly where a real type is needed (see
+        // useContactImport's has_newsletter handling).
+        dynamicTyping: false,
       });
     },
     [batchSize, processBatch],

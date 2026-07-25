@@ -10,7 +10,7 @@ const singleNote = {
   date: "2026-03-17T13:50:00.000Z",
   id: 9,
   sales_id: 0,
-  status: "warm",
+  status: "a_recontacter",
   text: "Only note in the list",
 };
 

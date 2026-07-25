@@ -26,7 +26,9 @@ export const HotContacts = () => {
     {
       pagination: { page: 1, perPage: 10 },
       sort: { field: "last_seen", order: "DESC" },
-      filter: { status: "hot", sales_id: identity?.id },
+      // "visio" (a video call already booked) is the most-engaged status in
+      // the prospecting vocabulary, replacing the seeded "hot" value.
+      filter: { status: "visio", sales_id: identity?.id },
     },
     { enabled: Number.isInteger(identity?.id) },
   );
