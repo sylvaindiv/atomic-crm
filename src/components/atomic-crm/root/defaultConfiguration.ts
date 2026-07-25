@@ -46,6 +46,10 @@ export const defaultDealCategories = [
 export const defaultNoteStatuses = [
   { value: "a_recontacter", label: "A recontacter", color: "#7dbde8" },
   { value: "visio", label: "Visio", color: "#e88b7d" },
+  { value: "en_discussion", label: "En discussion", color: "#e8c47d" },
+  { value: "client", label: "Client", color: "#7de88f" },
+  { value: "mort", label: "Mort", color: "#c47de8" },
+  { value: "rdv_sur_place", label: "rdv sur place", color: "#e87da1" },
 ];
 
 export const defaultTaskTypes = [
