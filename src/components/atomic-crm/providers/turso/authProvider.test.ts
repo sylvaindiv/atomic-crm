@@ -1,11 +1,13 @@
 import type { Sale } from "../../types";
 import { getAuthProvider } from "./authProvider";
 
-// Names must start with `mock` so Vitest's hoisting can wire them into the
-// `vi.mock` factory below, which otherwise runs before any of this file's
-// own declarations (see https://vitest.dev/api/vi.html#vi-mock).
-const mockGetList = vi.fn();
-const mockCreate = vi.fn();
+// `vi.mock` factories are hoisted above the rest of the file, so the mocks
+// they reference must be created via `vi.hoisted` (see
+// https://vitest.dev/api/vi.html#vi-hoisted) — this also matches the
+// project's browser-mode test runner, which needs `vi.hoisted` explicitly
+// (a plain top-level `vi.fn()` is not enough there).
+const mockGetList = vi.hoisted(() => vi.fn());
+const mockCreate = vi.hoisted(() => vi.fn());
 
 vi.mock("./internal/httpClient", () => ({
   baseDataProvider: {
