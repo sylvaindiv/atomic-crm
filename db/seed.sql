@@ -25,3 +25,10 @@ INSERT INTO favicons_excluded_domains (domain) VALUES
 
 -- Ensure the configuration singleton row exists.
 INSERT OR IGNORE INTO configuration (id, config) VALUES (1, '{}');
+
+-- Ensure a default sales identity exists. This app has no sign-up flow (see
+-- providers/turso/authProvider.ts): getIdentity() resolves to the first
+-- `sales` row. Edit the placeholder name/email afterwards via the
+-- Profile/Settings page.
+INSERT OR IGNORE INTO sales (id, first_name, last_name, email, administrator, disabled)
+VALUES (1, 'Admin', '', 'admin@atomic-crm.invalid', 1, 0);
