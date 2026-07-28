@@ -17,8 +17,28 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Fichiers / skills modifiés.** - `Dockerfile` — build multi-stage production, mergé et pushé sur `main`. - `.dockerignore` — idem. - `~/.claude/hooks/auto-memory.sh` — ajout verrou par session (mkdir atomique) + cooldown 10 min contre les écritures concurrentes.
 **Prochaines étapes / TODOs.** - [ ] Créer la base Turso et configurer TURSO_DATABASE_URL/TURSO_AUTH_TOKEN/PORT sur EasyPanel. - [ ] Créer l'App EasyPanel depuis le repo GitHub et déployer.
 
+## 2026-07-27 11:01 — Vérification statuts contacts CSV JA
+
+**Résumé.** Demande utilisateur : appliquer les statuts du CSV "Listing JA" (399 lignes, prospection clubs padel) aux contacts CRM qui n'en avaient aucun. Exploration du schéma (`contacts.status`, `defaultNoteStatuses`) et de l'import CSV existant via agent Explore. Interrogation directe de la base Turso `atomic-crm` (CLI `turso db shell`) pour matcher les 398 lignes CSV aux 399 contacts par email/téléphone/nom. Résultat : seules 32 lignes CSV ont un Statut exploitable, et les 32 contacts correspondants ont déjà exactement ce statut en base (0 non matché, 0 ambigu, 0 divergence) — aucune écriture nécessaire.
+
+**Décisions prises.** - Traiter ceci comme une opération de données (lecture/écriture DB directe via Turso CLI), pas comme un changement de code — pas de passage par le harness orchestrator. - Ne rien écrire en base puisque la vérification a montré que le rapprochement était déjà appliqué intégralement.
+
+**Fichiers / skills modifiés.** _aucune_
+
+**Prochaines étapes / TODOs.** - [ ] Si l'utilisateur pensait que des statuts manquaient, obtenir les noms précis des contacts/clubs concernés pour investigation ciblée.
+
 ## 2026-07-27 14:04 — Fix FK contact_notes + PR #6 créée
 **Résumé.** Diagnostiqué et corrigé l'erreur `FOREIGN KEY constraint failed` à l'ajout d'une note : `getIdentity()` renvoyait la string `"admin"` au lieu d'un vrai `sales.id`, régression du commit d0853bd (remplacement de l'auth). Fix implémenté via le harness (ticket TASK-001) dans `authProvider.ts` : résolution du premier `sales` existant, ou auto-provisionnement si la table est vide, avec garde anti-race. Bloqué en cours de route par un environnement Conductor non provisionné (`node_modules` absent) — diagnostiqué via hooks.log et corrigé manuellement (npm install + provisioning des worktrees). Fix vérifié en local (instance SQLite jetable + agent-browser : contact + note créés avec `sales_id` réel), mergé et promu sur `conductor/fix-contact-note-fk-error` (commit db48157). PR #6 créée sur GitHub vers `main`.
 **Décisions prises.** - Garder la contrainte FK `sales_id` plutôt que la supprimer, pour préserver l'intégrité référentielle (corrige aussi Settings/Profile, cassé pour la même raison) - Router le fix via l'agent `orchestrator` plutôt que de l'implémenter directement, conformément à AGENTS.md
 **Fichiers / skills modifiés.** - `src/components/atomic-crm/providers/turso/authProvider.ts` — `getIdentity()` résout un vrai `sales.id` au lieu du hardcode `"admin"` - `src/components/atomic-crm/providers/turso/authProvider.test.ts` — nouveau, 3 cas de test
 **Prochaines étapes / TODOs.** - [ ] Merger la PR #6 une fois validée - [ ] Backfill optionnel de `companies.sales_id`/`tasks.sales_id` contenant encore `"admin"` (pas de FK dessus, cosmétique)
+
+## 2026-07-28 20:30 — Création PR statuts contacts + override policy
+
+**Résumé.** Suite à la vérification (session précédente) montrant que les statuts CSV étaient déjà appliqués aux contacts CRM, l'utilisateur a demandé la création d'une PR via un fichier d'instructions attaché. Un seul changement non commité existait (entrée MEMORY.md ajoutée par le hook auto-mémoire). Le repo interdit aux agents de commit/push (`git-policy.md`), conflit signalé à l'utilisateur qui a explicitement demandé de passer outre. Commit + push de `MEMORY.md` puis création de la PR #7 (`sylvaindiv/atomic-crm`) vers `main`.
+
+**Décisions prises.** - Demander confirmation explicite avant de commit/push malgré la policy `git-policy.md`, car conflit direct entre instructions utilisateur et règle projet écrite. - Override appliqué uniquement après validation explicite de l'utilisateur ("fais-le toi-même").
+
+**Fichiers / skills modifiés.** - `MEMORY.md` — commit de l'entrée de vérification statuts (10 lignes ajoutées), poussé sur `conductor/import-contact-statuses-csv`.
+
+**Prochaines étapes / TODOs.** - [ ] Aucune action code en attente ; PR #7 ouverte, à merger par l'utilisateur.
