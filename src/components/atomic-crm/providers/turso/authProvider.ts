@@ -1,5 +1,8 @@
 import type { AuthProvider } from "ra-core";
+
+import type { Sale } from "../../types";
 import { canAccess } from "../commons/canAccess";
+import { baseDataProvider } from "./internal/httpClient";
 
 const PASSWORD = "bite";
 const BLOCK_DURATION = 60 * 60 * 1000;
@@ -40,6 +43,56 @@ export function getIsInitialized(): Promise<boolean> {
 
 export function cacheCurrentSale(_sale: any) {
   // no-op since we removed sign-up flow
+}
+
+// --- Identity resolution -----------------------------------------------------
+// This is a single-user, no-login deployment (see the shared-password gate
+// below): there is no real authentication, but every write (notes, contacts,
+// deals, tasks) still stamps `sales_id`, an INTEGER FK to `sales.id`. We treat
+// the first `sales` row (by id) as "the" user, and self-provision a default
+// one the first time the table is empty — the removed `/sign-up` onboarding
+// used to create it.
+
+async function fetchFirstSale(): Promise<Sale | null> {
+  const { data } = await baseDataProvider.getList<Sale>("sales", {
+    filter: {},
+    pagination: { page: 1, perPage: 1 },
+    sort: { field: "id", order: "ASC" },
+  });
+  return data[0] ?? null;
+}
+
+/**
+ * Creates the default sales row the first time the table is empty.
+ * Race-safe: `sales.email` is UNIQUE, so if a concurrent caller (another tab,
+ * or a simultaneous request) already created the row, the insert fails and we
+ * re-fetch the row it created instead of throwing.
+ */
+async function provisionDefaultSale(): Promise<Sale> {
+  try {
+    const { data } = await baseDataProvider.create<Sale>("sales", {
+      data: {
+        first_name: "Admin",
+        last_name: "User",
+        email: "admin@local",
+        administrator: true,
+        disabled: false,
+        user_id: crypto.randomUUID(),
+      } as Partial<Sale>,
+    });
+    return data;
+  } catch (error) {
+    const existing = await fetchFirstSale();
+    if (existing) return existing;
+    throw error;
+  }
+}
+
+/** Resolves the current user: the first `sales` row, self-provisioned if none exists yet. */
+async function getCurrentSale(): Promise<Sale> {
+  const existing = await fetchFirstSale();
+  if (existing) return existing;
+  return provisionDefaultSale();
 }
 
 export const getAuthProvider = (): AuthProvider => ({
@@ -89,8 +142,12 @@ export const getAuthProvider = (): AuthProvider => ({
   canAccess: async (params: any) => {
     return canAccess("admin", params as any);
   },
-  getIdentity: async () => ({
-    id: "admin",
-    fullName: "Admin",
-  }),
+  getIdentity: async () => {
+    const sale = await getCurrentSale();
+    return {
+      id: sale.id,
+      fullName: `${sale.first_name} ${sale.last_name}`,
+      avatar: sale.avatar?.src,
+    };
+  },
 });
