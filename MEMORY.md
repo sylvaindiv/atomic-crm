@@ -16,3 +16,13 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Turso managé plutôt que SQLite local sur volume EasyPanel — usage interne mais préférence pour éviter de gérer ses propres sauvegardes. - Image node:22.19.0-bookworm-slim (pas Alpine) — plus sûr pour ce déploiement unique malgré support musl confirmé.
 **Fichiers / skills modifiés.** - `Dockerfile` — build multi-stage production, mergé et pushé sur `main`. - `.dockerignore` — idem. - `~/.claude/hooks/auto-memory.sh` — ajout verrou par session (mkdir atomique) + cooldown 10 min contre les écritures concurrentes.
 **Prochaines étapes / TODOs.** - [ ] Créer la base Turso et configurer TURSO_DATABASE_URL/TURSO_AUTH_TOKEN/PORT sur EasyPanel. - [ ] Créer l'App EasyPanel depuis le repo GitHub et déployer.
+
+## 2026-07-27 11:01 — Vérification statuts contacts CSV JA
+
+**Résumé.** Demande utilisateur : appliquer les statuts du CSV "Listing JA" (399 lignes, prospection clubs padel) aux contacts CRM qui n'en avaient aucun. Exploration du schéma (`contacts.status`, `defaultNoteStatuses`) et de l'import CSV existant via agent Explore. Interrogation directe de la base Turso `atomic-crm` (CLI `turso db shell`) pour matcher les 398 lignes CSV aux 399 contacts par email/téléphone/nom. Résultat : seules 32 lignes CSV ont un Statut exploitable, et les 32 contacts correspondants ont déjà exactement ce statut en base (0 non matché, 0 ambigu, 0 divergence) — aucune écriture nécessaire.
+
+**Décisions prises.** - Traiter ceci comme une opération de données (lecture/écriture DB directe via Turso CLI), pas comme un changement de code — pas de passage par le harness orchestrator. - Ne rien écrire en base puisque la vérification a montré que le rapprochement était déjà appliqué intégralement.
+
+**Fichiers / skills modifiés.** _aucune_
+
+**Prochaines étapes / TODOs.** - [ ] Si l'utilisateur pensait que des statuts manquaient, obtenir les noms précis des contacts/clubs concernés pour investigation ciblée.
