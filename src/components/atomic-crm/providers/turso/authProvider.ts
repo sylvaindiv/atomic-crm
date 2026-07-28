@@ -45,17 +45,13 @@ export function cacheCurrentSale(_sale: any) {
   // no-op since we removed sign-up flow
 }
 
-// This is a single-user, no-login deployment: there is no real
-// authentication, just a shared app password (see PASSWORD above). The rest
-// of the app still needs an "identity" — a real row in `sales` — for record
-// ownership (sales_id foreign keys on contacts/contact_notes/deals/
-// deal_notes) and role checks. There is no sign-up flow anymore to create
-// that row, so getIdentity() resolves the first `sales` row and creates one
-// on the fly if none exists. This makes it self-healing for databases that
-// were already provisioned before a default row existed: db/seed.sql only
-// ever runs once, on a brand-new database, so it can't fix those
-// retroactively.
-const DEFAULT_SALE_EMAIL = "admin@atomic-crm.invalid";
+// --- Identity resolution -----------------------------------------------------
+// This is a single-user, no-login deployment (see the shared-password gate
+// below): there is no real authentication, but every write (notes, contacts,
+// deals, tasks) still stamps `sales_id`, an INTEGER FK to `sales.id`. We treat
+// the first `sales` row (by id) as "the" user, and self-provision a default
+// one the first time the table is empty — the removed `/sign-up` onboarding
+// used to create it.
 
 async function fetchFirstSale(): Promise<Sale | null> {
   const { data } = await baseDataProvider.getList<Sale>("sales", {
@@ -66,37 +62,37 @@ async function fetchFirstSale(): Promise<Sale | null> {
   return data[0] ?? null;
 }
 
-async function createDefaultSale(): Promise<Sale> {
-  const { data } = await baseDataProvider.create<Sale>("sales", {
-    data: {
-      email: DEFAULT_SALE_EMAIL,
-      first_name: "Admin",
-      last_name: "",
-      administrator: true,
-      disabled: false,
-      user_id: crypto.randomUUID(),
-    } as Partial<Sale>,
-  });
-  return data;
+/**
+ * Creates the default sales row the first time the table is empty.
+ * Race-safe: `sales.email` is UNIQUE, so if a concurrent caller (another tab,
+ * or a simultaneous request) already created the row, the insert fails and we
+ * re-fetch the row it created instead of throwing.
+ */
+async function provisionDefaultSale(): Promise<Sale> {
+  try {
+    const { data } = await baseDataProvider.create<Sale>("sales", {
+      data: {
+        first_name: "Admin",
+        last_name: "User",
+        email: "admin@local",
+        administrator: true,
+        disabled: false,
+        user_id: crypto.randomUUID(),
+      } as Partial<Sale>,
+    });
+    return data;
+  } catch (error) {
+    const existing = await fetchFirstSale();
+    if (existing) return existing;
+    throw error;
+  }
 }
 
-/**
- * Resolve the (only) sales row backing the app's identity, creating it if
- * this is the first time the app runs against this database. If two calls
- * race to create it at once, the losing INSERT fails on the email UNIQUE
- * constraint; re-reading the table then returns the winner's row instead of
- * failing the caller.
- */
-async function ensureSale(): Promise<Sale> {
+/** Resolves the current user: the first `sales` row, self-provisioned if none exists yet. */
+async function getCurrentSale(): Promise<Sale> {
   const existing = await fetchFirstSale();
   if (existing) return existing;
-  try {
-    return await createDefaultSale();
-  } catch (err) {
-    const winner = await fetchFirstSale();
-    if (winner) return winner;
-    throw err;
-  }
+  return provisionDefaultSale();
 }
 
 export const getAuthProvider = (): AuthProvider => ({
@@ -147,10 +143,10 @@ export const getAuthProvider = (): AuthProvider => ({
     return canAccess("admin", params as any);
   },
   getIdentity: async () => {
-    const sale = await ensureSale();
+    const sale = await getCurrentSale();
     return {
       id: sale.id,
-      fullName: `${sale.first_name} ${sale.last_name}`.trim() || "Admin",
+      fullName: `${sale.first_name} ${sale.last_name}`,
       avatar: sale.avatar?.src,
     };
   },

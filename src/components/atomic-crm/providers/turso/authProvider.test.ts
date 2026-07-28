@@ -1,81 +1,126 @@
 import type { Sale } from "../../types";
 import { getAuthProvider } from "./authProvider";
-import { baseDataProvider } from "./internal/httpClient";
+
+// `vi.mock` factories are hoisted above the rest of the file, so the mocks
+// they reference must be created via `vi.hoisted` (see
+// https://vitest.dev/api/vi.html#vi-hoisted) — this also matches the
+// project's browser-mode test runner, which needs `vi.hoisted` explicitly
+// (a plain top-level `vi.fn()` is not enough there).
+const mockGetList = vi.hoisted(() => vi.fn());
+const mockCreate = vi.hoisted(() => vi.fn());
 
 vi.mock("./internal/httpClient", () => ({
   baseDataProvider: {
-    getList: vi.fn(),
-    create: vi.fn(),
+    getList: mockGetList,
+    create: mockCreate,
   },
 }));
 
-const mockGetList = vi.mocked(baseDataProvider.getList);
-const mockCreate = vi.mocked(baseDataProvider.create);
-
-/** Minimal valid `sales` row, overridable per test. */
+/** Builds a valid `sales` row fixture, overridable per test. */
 function buildSale(overrides: Partial<Sale> = {}): Sale {
   return {
     id: 1,
     first_name: "Admin",
-    last_name: "",
-    email: "admin@atomic-crm.invalid",
+    last_name: "User",
+    email: "admin@local",
     administrator: true,
     disabled: false,
-    user_id: "user-1",
+    user_id: "user-id-1",
     ...overrides,
   };
 }
 
-describe("getIdentity", () => {
+/** `getIdentity` is optional on `AuthProvider`; this implementation always provides it. */
+async function resolveIdentity() {
+  const identity = await getAuthProvider().getIdentity?.();
+  if (!identity) throw new Error("getIdentity() did not resolve");
+  return identity;
+}
+
+describe("turso authProvider getIdentity", () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    mockGetList.mockReset();
+    mockCreate.mockReset();
   });
 
-  it("returns the existing sales row as-is, without creating one", async () => {
-    const sale = buildSale({ id: 7, first_name: "Jane", last_name: "Doe" });
+  it("returns the first sales row, sorted by id ascending, without creating one", async () => {
+    // Arrange
+    const sale = buildSale({
+      id: 7,
+      first_name: "Jane",
+      last_name: "Doe",
+      avatar: { src: "https://example.com/jane.png" } as Sale["avatar"],
+    });
     mockGetList.mockResolvedValue({ data: [sale], total: 1 });
 
-    const identity = await getAuthProvider().getIdentity!();
+    // Act
+    const identity = await resolveIdentity();
 
+    // Assert
     expect(identity).toEqual({
       id: 7,
       fullName: "Jane Doe",
-      avatar: undefined,
+      avatar: "https://example.com/jane.png",
+    });
+    expect(mockGetList).toHaveBeenCalledWith("sales", {
+      filter: {},
+      pagination: { page: 1, perPage: 1 },
+      sort: { field: "id", order: "ASC" },
     });
     expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it("creates a default sales row with the placeholder email when the table is empty", async () => {
-    const created = buildSale({ id: 1 });
+  it("self-provisions a default sales row when the table is empty", async () => {
+    // Arrange
     mockGetList.mockResolvedValue({ data: [], total: 0 });
-    mockCreate.mockResolvedValue({ data: created });
+    mockCreate.mockResolvedValue({ data: buildSale({ id: 1 }) });
 
-    const identity = await getAuthProvider().getIdentity!();
+    // Act
+    const identity = await resolveIdentity();
 
-    expect(mockCreate).toHaveBeenCalledWith(
-      "sales",
-      expect.objectContaining({
-        data: expect.objectContaining({
-          email: "admin@atomic-crm.invalid",
-        }),
+    // Assert
+    expect(mockCreate).toHaveBeenCalledWith("sales", {
+      data: expect.objectContaining({
+        first_name: "Admin",
+        last_name: "User",
+        email: "admin@local",
+        administrator: true,
+        disabled: false,
+        user_id: expect.any(String),
       }),
-    );
-    expect(identity.id).toBe(1);
-    expect(identity.fullName).toBe("Admin");
+    });
+    expect(identity).toEqual({
+      id: 1,
+      fullName: "Admin User",
+      avatar: undefined,
+    });
   });
 
-  it("refetches and returns the winning row when create rejects on a concurrent unique-email conflict", async () => {
-    const winner = buildSale({ id: 2, user_id: "winner" });
+  it("re-fetches and returns the existing row instead of throwing when a concurrent caller already created it", async () => {
+    // Arrange: the table looked empty, but by the time our insert runs, a
+    // concurrent caller (another tab / request) has already created the
+    // default row, so the UNIQUE constraint on sales.email rejects ours.
+    const raceWinner = buildSale({
+      id: 2,
+      first_name: "Race",
+      last_name: "Winner",
+    });
     mockGetList
       .mockResolvedValueOnce({ data: [], total: 0 })
-      .mockResolvedValueOnce({ data: [winner], total: 1 });
+      .mockResolvedValueOnce({ data: [raceWinner], total: 1 });
     mockCreate.mockRejectedValue(
-      new Error("UNIQUE constraint failed: sales.email"),
+      new Error("SQLITE_CONSTRAINT: UNIQUE constraint failed: sales.email"),
     );
 
-    const identity = await getAuthProvider().getIdentity!();
+    // Act
+    const identity = await resolveIdentity();
 
-    expect(identity.id).toBe(2);
+    // Assert
+    expect(identity).toEqual({
+      id: 2,
+      fullName: "Race Winner",
+      avatar: undefined,
+    });
     expect(mockGetList).toHaveBeenCalledTimes(2);
   });
 });

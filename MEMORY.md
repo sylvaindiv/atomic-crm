@@ -19,10 +19,53 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## 2026-07-28 21:59 — Fix getIdentity FK + doublon PR#6 détecté
 
-**Résumé.** Diagnostiqué `FOREIGN KEY constraint failed` sur contacts/contact_notes : `getIdentity()` dans `authProvider.ts` renvoyait la string `"admin"` au lieu d'un vrai `sales.id`. Fix implémenté via le harness (orchestrator → TASK-001 → developer/reviewer/merger) : résolution du premier `sales` existant, auto-provisionnement si vide, garde anti-race, promu sur `conductor/pwa-simple-password-auth`. L'orchestrator ne s'est jamais auto-réveillé entre les étapes ; relancé manuellement 4 fois via SendMessage après diagnostic disque (ticket, worktree, hooks.log). Avant de créer la PR demandée vers `main`, découvert que ce même bug était déjà corrigé et mergé sur `main` hier (PR #6, autre workspace Conductor) — cette branche avait divergé avant ce fix et a raté 3 PR (#5/#6/#7).
+**Résumé.** Diagnostiqué `FOREIGN KEY constraint failed` sur contacts/contact_notes : `getIdentity()` dans `authProvider.ts` renvoyait la string `"admin"` au lieu d'un vrai `sales.id`. Fix implémenté via le harness (orchestrator → TASK-001 → developer/reviewer/merger) : résolution du premier `sales` existant, auto-provisionnement si vide, garde anti-race, promu sur `conductor/pwa-simple-password-auth`. L'orchestrator ne s'est jamais auto-réveillé entre les étapes ; relancé manuellement 4 fois via SendMessage après diagnostic disque (ticket, worktree, hooks.log). Avant de créer la PR demandée vers `main`, découvert que ce même bug était déjà corrigé et mergé sur `main` la veille (PR #6, autre workspace Conductor) — cette branche avait divergé avant ce fix et a raté 3 PR (#5/#6/#7). Réconciliation : merge de `main` dans la branche, conflit sur `authProvider.ts`/`authProvider.test.ts` résolu en gardant la version déjà validée de la PR #6, en conservant uniquement l'ajout `db/seed.sql` (non couvert par l'autre fix).
 
-**Décisions prises.** - Router le fix via l'agent orchestrator plutôt que l'implémenter directement, conformément à AGENTS.md - PR vers main mise en pause : proposition de garder le fix déjà validé de la PR #6 et de merger seulement l'ajout `db/seed.sql` du mien (en attente de confirmation utilisateur)
+**Décisions prises.** - Router le fix via l'agent orchestrator plutôt que l'implémenter directement, conformément à AGENTS.md - Après découverte du doublon, garder le fix déjà mergé sur `main` (déjà validé en local par l'utilisateur via agent-browser) plutôt que le mien, pour éviter de remplacer du code testé par du code non testé en conditions réelles.
 
-**Fichiers / skills modifiés.** - `src/components/atomic-crm/providers/turso/authProvider.ts` — getIdentity() résout un vrai sales.id - `db/seed.sql` — ligne INSERT OR IGNORE sales par défaut - `src/components/atomic-crm/providers/turso/authProvider.test.ts` — nouveau, 3 cas de test
+**Fichiers / skills modifiés.** - `src/components/atomic-crm/providers/turso/authProvider.ts` — inchangé au final (version PR #6 conservée) - `db/seed.sql` — ligne INSERT OR IGNORE sales par défaut (seul ajout net de cette session) - `src/components/atomic-crm/providers/turso/authProvider.test.ts` — inchangé au final (version PR #6 conservée)
 
-**Prochaines étapes / TODOs.** - [ ] Confirmer la réconciliation avec la PR #6 déjà mergée - [ ] Merger main dans la branche et résoudre le conflit authProvider.ts - [ ] Créer la PR finale vers main
+**Prochaines étapes / TODOs.** - [ ] Aucune action code en attente ; PR ouverte vers `main` avec le seul ajout `db/seed.sql`.
+
+## 2026-07-28 20:30 — Création PR statuts contacts + override policy
+
+**Résumé.** Suite à la vérification (session précédente) montrant que les statuts CSV étaient déjà appliqués aux contacts CRM, l'utilisateur a demandé la création d'une PR via un fichier d'instructions attaché. Un seul changement non commité existait (entrée MEMORY.md ajoutée par le hook auto-mémoire). Le repo interdit aux agents de commit/push (`git-policy.md`), conflit signalé à l'utilisateur qui a explicitement demandé de passer outre. Commit + push de `MEMORY.md` puis création de la PR #7 (`sylvaindiv/atomic-crm`) vers `main`.
+
+**Décisions prises.** - Demander confirmation explicite avant de commit/push malgré la policy `git-policy.md`, car conflit direct entre instructions utilisateur et règle projet écrite. - Override appliqué uniquement après validation explicite de l'utilisateur ("fais-le toi-même").
+
+**Fichiers / skills modifiés.** - `MEMORY.md` — commit de l'entrée de vérification statuts (10 lignes ajoutées), poussé sur `conductor/import-contact-statuses-csv`.
+
+**Prochaines étapes / TODOs.** - [ ] Aucune action code en attente ; PR #7 ouverte, à merger par l'utilisateur.
+
+## 2026-07-27 14:04 — Fix FK contact_notes + PR #6 créée
+**Résumé.** Diagnostiqué et corrigé l'erreur `FOREIGN KEY constraint failed` à l'ajout d'une note : `getIdentity()` renvoyait la string `"admin"` au lieu d'un vrai `sales.id`, régression du commit d0853bd (remplacement de l'auth). Fix implémenté via le harness (ticket TASK-001) dans `authProvider.ts` : résolution du premier `sales` existant, ou auto-provisionnement si la table est vide, avec garde anti-race. Bloqué en cours de route par un environnement Conductor non provisionné (`node_modules` absent) — diagnostiqué via hooks.log et corrigé manuellement (npm install + provisioning des worktrees). Fix vérifié en local (instance SQLite jetable + agent-browser : contact + note créés avec `sales_id` réel), mergé et promu sur `conductor/fix-contact-note-fk-error` (commit db48157). PR #6 créée sur GitHub vers `main`.
+**Décisions prises.** - Garder la contrainte FK `sales_id` plutôt que la supprimer, pour préserver l'intégrité référentielle (corrige aussi Settings/Profile, cassé pour la même raison) - Router le fix via l'agent `orchestrator` plutôt que de l'implémenter directement, conformément à AGENTS.md
+**Fichiers / skills modifiés.** - `src/components/atomic-crm/providers/turso/authProvider.ts` — `getIdentity()` résout un vrai `sales.id` au lieu du hardcode `"admin"` - `src/components/atomic-crm/providers/turso/authProvider.test.ts` — nouveau, 3 cas de test
+**Prochaines étapes / TODOs.** - [ ] Merger la PR #6 une fois validée - [ ] Backfill optionnel de `companies.sales_id`/`tasks.sales_id` contenant encore `"admin"` (pas de FK dessus, cosmétique)
+
+## 2026-07-27 11:01 — Vérification statuts contacts CSV JA
+
+**Résumé.** Demande utilisateur : appliquer les statuts du CSV "Listing JA" (399 lignes, prospection clubs padel) aux contacts CRM qui n'en avaient aucun. Exploration du schéma (`contacts.status`, `defaultNoteStatuses`) et de l'import CSV existant via agent Explore. Interrogation directe de la base Turso `atomic-crm` (CLI `turso db shell`) pour matcher les 398 lignes CSV aux 399 contacts par email/téléphone/nom. Résultat : seules 32 lignes CSV ont un Statut exploitable, et les 32 contacts correspondants ont déjà exactement ce statut en base (0 non matché, 0 ambigu, 0 divergence) — aucune écriture nécessaire.
+
+**Décisions prises.** - Traiter ceci comme une opération de données (lecture/écriture DB directe via Turso CLI), pas comme un changement de code — pas de passage par le harness orchestrator. - Ne rien écrire en base puisque la vérification a montré que le rapprochement était déjà appliqué intégralement.
+
+**Fichiers / skills modifiés.** _aucune_
+
+**Prochaines étapes / TODOs.** - [ ] Si l'utilisateur pensait que des statuts manquaient, obtenir les noms précis des contacts/clubs concernés pour investigation ciblée.
+
+## 2026-07-27 14:04 — Fix FK contact_notes + PR #6 créée
+**Résumé.** Diagnostiqué et corrigé l'erreur `FOREIGN KEY constraint failed` à l'ajout d'une note : `getIdentity()` renvoyait la string `"admin"` au lieu d'un vrai `sales.id`, régression du commit d0853bd (remplacement de l'auth). Fix implémenté via le harness (ticket TASK-001) dans `authProvider.ts` : résolution du premier `sales` existant, ou auto-provisionnement si la table est vide, avec garde anti-race. Bloqué en cours de route par un environnement Conductor non provisionné (`node_modules` absent) — diagnostiqué via hooks.log et corrigé manuellement (npm install + provisioning des worktrees). Fix vérifié en local (instance SQLite jetable + agent-browser : contact + note créés avec `sales_id` réel), mergé et promu sur `conductor/fix-contact-note-fk-error` (commit db48157). PR #6 créée sur GitHub vers `main`.
+**Décisions prises.** - Garder la contrainte FK `sales_id` plutôt que la supprimer, pour préserver l'intégrité référentielle (corrige aussi Settings/Profile, cassé pour la même raison) - Router le fix via l'agent `orchestrator` plutôt que de l'implémenter directement, conformément à AGENTS.md
+**Fichiers / skills modifiés.** - `src/components/atomic-crm/providers/turso/authProvider.ts` — `getIdentity()` résout un vrai `sales.id` au lieu du hardcode `"admin"` - `src/components/atomic-crm/providers/turso/authProvider.test.ts` — nouveau, 3 cas de test
+**Prochaines étapes / TODOs.** - [ ] Merger la PR #6 une fois validée - [ ] Backfill optionnel de `companies.sales_id`/`tasks.sales_id` contenant encore `"admin"` (pas de FK dessus, cosmétique)
+
+## 2026-07-28 20:30 — Création PR statuts contacts + override policy
+
+**Résumé.** Suite à la vérification (session précédente) montrant que les statuts CSV étaient déjà appliqués aux contacts CRM, l'utilisateur a demandé la création d'une PR via un fichier d'instructions attaché. Un seul changement non commité existait (entrée MEMORY.md ajoutée par le hook auto-mémoire). Le repo interdit aux agents de commit/push (`git-policy.md`), conflit signalé à l'utilisateur qui a explicitement demandé de passer outre. Commit + push de `MEMORY.md` puis création de la PR #7 (`sylvaindiv/atomic-crm`) vers `main`.
+
+**Décisions prises.** - Demander confirmation explicite avant de commit/push malgré la policy `git-policy.md`, car conflit direct entre instructions utilisateur et règle projet écrite. - Override appliqué uniquement après validation explicite de l'utilisateur ("fais-le toi-même").
+
+**Fichiers / skills modifiés.** - `MEMORY.md` — commit de l'entrée de vérification statuts (10 lignes ajoutées), poussé sur `conductor/import-contact-statuses-csv`.
+
+**Prochaines étapes / TODOs.** - [ ] Aucune action code en attente ; PR #7 ouverte, à merger par l'utilisateur.
+>>>>>>> origin/main

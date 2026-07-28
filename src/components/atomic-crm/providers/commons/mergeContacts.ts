@@ -94,7 +94,31 @@ export const mergeContacts = async (
       });
     }) || [];
 
-  // 4. Update winner contact with loser data
+  // 4. Repoint contacts referred by the loser to the winner. This must
+  // happen before the loser is deleted, otherwise the `referred_by_id`
+  // foreign key's `ON DELETE SET NULL` silently orphans those references.
+  // The winner itself is excluded so it can never end up referred by itself.
+  const { data: loserReferrals } = await dataProvider.getManyReference<Contact>(
+    "contacts",
+    {
+      target: "referred_by_id",
+      id: loserId,
+      pagination: { page: 1, perPage: 1000 },
+      sort: { field: "id", order: "ASC" },
+      filter: {},
+    },
+  );
+
+  const referralIds = (loserReferrals || [])
+    .filter((contact) => contact.id !== winnerId)
+    .map((contact) => contact.id);
+
+  const referralUpdate = dataProvider.updateMany<Contact>("contacts", {
+    ids: referralIds,
+    data: { referred_by_id: winnerId },
+  });
+
+  // 5. Update winner contact with loser data
   const mergedEmails = mergeObjectArraysUnique(
     winnerContact.email_jsonb || [],
     loserContact.email_jsonb || [],
@@ -119,6 +143,8 @@ export const mergeContacts = async (
       last_name: winnerContact.last_name ?? loserContact.last_name,
       title: winnerContact.title ?? loserContact.title,
       company_id: winnerContact.company_id ?? loserContact.company_id,
+      referred_by_id:
+        winnerContact.referred_by_id ?? loserContact.referred_by_id,
       email_jsonb: mergedEmails,
       phone_jsonb: mergedPhones,
       linkedin_url: winnerContact.linkedin_url || loserContact.linkedin_url,
@@ -144,10 +170,11 @@ export const mergeContacts = async (
     ...taskUpdates,
     ...noteUpdates,
     ...dealUpdates,
+    referralUpdate,
     winnerUpdate,
   ]);
 
-  // 5. Delete the loser contact
+  // 6. Delete the loser contact
   await dataProvider.delete<Contact>("contacts", {
     id: loserId,
     previousData: loserContact,
