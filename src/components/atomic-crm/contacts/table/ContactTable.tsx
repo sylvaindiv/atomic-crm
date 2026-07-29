@@ -23,7 +23,7 @@ import { EditableTextCell } from "./EditableTextCell";
  * count, last/first seen); the rest are the inline-editable cell families
  * built in TASK-005/006/007 (text, reference, list, status, tags), plus
  * `EditableGenderCell` completing that family for the one column it didn't
- * cover. `background` and `gender` start hidden via `defaultHiddenColumns`
+ * cover. `background` and `gender` start hidden via `hiddenColumns`
  * to keep the default view dense — reveal them with `<ColumnsButton />`
  * (wired in `ContactList.tsx`).
  *
@@ -44,7 +44,7 @@ export const ContactTable = () => (
   <DataTable
     rowClick={false}
     bulkActionsToolbar={false}
-    defaultHiddenColumns={["background", "gender"]}
+    hiddenColumns={["background", "gender"]}
   >
     <DataTable.Col label={false}>
       <Avatar width={20} height={20} />
