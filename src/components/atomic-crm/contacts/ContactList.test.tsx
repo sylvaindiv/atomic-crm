@@ -53,7 +53,7 @@ describe("ContactList", () => {
     const screen = await render(<DesktopError />);
 
     await expect
-      .element(screen.getByText("Error loading judges-referees"))
+      .element(screen.getByText("Error loading contacts"))
       .toBeVisible();
   });
 
