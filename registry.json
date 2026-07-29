@@ -748,6 +748,22 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/table/EditableSalesCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableReferredByCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableReferenceCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableCompanyCell.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/contacts/table/EditableBooleanCell.tsx",
           "type": "registry:component"
         },
