@@ -10,6 +10,7 @@ import {
 import { BulkActionsToolbar } from "@/components/admin/bulk-actions-toolbar";
 import { BulkDeleteButton } from "@/components/admin/bulk-delete-button";
 import { BulkExportButton } from "@/components/admin/bulk-export-button";
+import { ColumnsButton } from "@/components/admin/columns-button";
 import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
@@ -21,10 +22,7 @@ import type { Company, Contact, ContactNote, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";
 import { ContactEmpty } from "./ContactEmpty";
 import { ContactImportButton } from "./ContactImportButton";
-import {
-  ContactListContent,
-  ContactListContentMobile,
-} from "./ContactListContent";
+import { ContactListContentMobile } from "./ContactListContent";
 import {
   ContactListFilterSummary,
   ContactListFilter,
@@ -33,6 +31,7 @@ import { TopToolbar } from "../layout/TopToolbar";
 import { InfinitePagination } from "../misc/InfinitePagination";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
+import { ContactTable } from "./table/ContactTable";
 
 export const ContactList = () => {
   const { identity } = useGetIdentity();
@@ -66,7 +65,7 @@ const ContactListLayoutDesktop = () => {
       <ContactListFilter />
       <div className="w-full flex flex-col gap-4">
         <Card className="py-0">
-          <ContactListContent />
+          <ContactTable />
         </Card>
       </div>
       <BulkActionsToolbar>
@@ -88,6 +87,7 @@ const ContactBulkActionButtons = () => (
 const ContactListActions = () => (
   <TopToolbar>
     <SortButton fields={["first_name", "last_name", "last_seen"]} />
+    <ColumnsButton />
     <ContactImportButton />
     <ExportButton exporter={exporter} />
     <CreateButton />
