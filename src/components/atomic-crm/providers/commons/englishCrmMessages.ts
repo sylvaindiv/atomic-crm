@@ -89,6 +89,12 @@ export const englishCrmMessages = {
         background: "Background info (bio, how you met, etc)",
         has_newsletter: "Has newsletter",
         sales_id: "Account manager",
+        gender: "Gender",
+        status: "Status",
+        tags: "Tags",
+        nb_tasks: "Tasks",
+        first_seen: "First seen",
+        name: "Name",
       },
       action: {
         add: "Add judge-referee",
