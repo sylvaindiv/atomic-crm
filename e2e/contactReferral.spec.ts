@@ -49,7 +49,7 @@ test("user selects a referrer for a contact and sees it reflected", async ({
   await expect(
     page.getByRole("heading", { name: "Ada Lovelace" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Edit contact" }).click();
+  await page.getByRole("link", { name: "Edit judge-referee" }).click();
 
   // Select Grace as the referrer
   await page.getByLabel(/referred by/i).click();

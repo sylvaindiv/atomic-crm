@@ -69,7 +69,7 @@ describe("NoteInputs", () => {
       <NoteInputsStory reference="contacts" selectReference />,
     );
 
-    await expect.element(screen.getByText("Contact")).toBeVisible();
+    await expect.element(screen.getByText("Judge-Referee")).toBeVisible();
   });
 
   it("renders the deal reference selector when selectReference is deals", async () => {
@@ -83,7 +83,9 @@ describe("NoteInputs", () => {
   it("does not render a reference selector when selectReference is not set", async () => {
     const screen = await render(<Default />);
 
-    await expect.element(screen.getByText("Contact")).not.toBeInTheDocument();
+    await expect
+      .element(screen.getByText("Judge-Referee"))
+      .not.toBeInTheDocument();
     await expect.element(screen.getByText("Deal")).not.toBeInTheDocument();
   });
 

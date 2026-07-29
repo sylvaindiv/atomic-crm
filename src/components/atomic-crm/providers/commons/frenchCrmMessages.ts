@@ -3,15 +3,15 @@ import type { CrmMessages } from "./englishCrmMessages";
 export const frenchCrmMessages = {
   resources: {
     companies: {
-      name: "Entreprise |||| Entreprises",
-      forcedCaseName: "Entreprise",
+      name: "Club |||| Clubs",
+      forcedCaseName: "Club",
       fields: {
-        name: "Nom de l'entreprise",
+        name: "Nom du club",
         website: "Site web",
         linkedin_url: "LinkedIn",
         phone_number: "Numéro de téléphone",
         created_at: "Date de création",
-        nb_contacts: "Nombre de contacts",
+        nb_contacts: "Nombre de juges-arbitres",
         revenue: "Chiffre d'affaires",
         sector: "Secteur",
         size: "Taille",
@@ -26,26 +26,27 @@ export const frenchCrmMessages = {
         sales_id: "Responsable de compte",
       },
       empty: {
-        description: "Il semble que la liste de vos entreprises soit vide.",
-        title: "Aucune entreprise trouvée",
+        description: "Il semble que la liste de vos clubs soit vide.",
+        title: "Aucun club trouvé",
       },
       field_categories: {
-        contact: "Contact",
+        contact: "Informations du club",
         additional_info: "Informations supplémentaires",
         address: "Adresse",
         context: "Contexte",
       },
       action: {
-        create: "Créer une entreprise",
-        edit: "Modifier l'entreprise",
-        new: "Nouvelle entreprise",
-        show: "Afficher l'entreprise",
+        create: "Créer un club",
+        edit: "Modifier le club",
+        new: "Nouveau club",
+        show: "Afficher le club",
       },
-      added_on: "Ajoutée le %{date}",
-      followed_by: "Suivie par %{name}",
-      followed_by_you: "Suivie par vous",
-      no_contacts: "Aucun contact",
-      nb_contacts: "%{smart_count} contact |||| %{smart_count} contacts",
+      added_on: "Ajouté le %{date}",
+      followed_by: "Suivi par %{name}",
+      followed_by_you: "Suivi par vous",
+      no_contacts: "Aucun juge-arbitre",
+      nb_contacts:
+        "%{smart_count} juge-arbitre |||| %{smart_count} juges-arbitres",
       nb_deals: "%{smart_count} affaire |||| %{smart_count} affaires",
       sizes: {
         one_employee: "1 employé",
@@ -55,18 +56,17 @@ export const frenchCrmMessages = {
         two_hundred_fifty_or_more_employees: "250 employés ou plus",
       },
       autocomplete: {
-        create_error:
-          "Une erreur s'est produite lors de la création de l'entreprise",
+        create_error: "Une erreur s'est produite lors de la création du club",
         create_item: "Créer %{item}",
-        create_label: "Commencez à taper pour créer une nouvelle entreprise",
+        create_label: "Commencez à taper pour créer un nouveau club",
       },
       filters: {
-        only_mine: "Seulement les entreprises que je gère",
+        only_mine: "Seulement les clubs que je gère",
       },
     },
     contacts: {
-      name: "Contact |||| Contacts",
-      forcedCaseName: "Contact",
+      name: "Arbitre |||| Arbitres",
+      forcedCaseName: "Arbitre",
       field_categories: {
         background_info: "Informations complémentaires",
         identity: "Identité",
@@ -79,7 +79,7 @@ export const frenchCrmMessages = {
         last_name: "Nom",
         last_seen: "Dernière activité",
         title: "Titre",
-        company_id: "Entreprise",
+        company_id: "Club",
         referred_by_id: "Connu par",
         email_jsonb: "Adresses e-mail",
         email: "E-mail",
@@ -91,13 +91,13 @@ export const frenchCrmMessages = {
         sales_id: "Responsable de compte",
       },
       action: {
-        add: "Ajouter un contact",
-        add_first: "Ajoutez votre premier contact",
-        create: "Créer un contact",
-        edit: "Modifier le contact",
+        add: "Ajouter un juge-arbitre",
+        add_first: "Ajoutez votre premier juge-arbitre",
+        create: "Créer un juge-arbitre",
+        edit: "Modifier le juge-arbitre",
         export_vcard: "Exporter en vCard",
-        new: "Nouveau contact",
-        show: "Afficher le contact",
+        new: "Nouveau juge-arbitre",
+        show: "Afficher le juge-arbitre",
       },
       background: {
         last_activity_on: "Dernière activité le %{date}",
@@ -109,16 +109,16 @@ export const frenchCrmMessages = {
       position_at: "%{title} chez",
       position_at_company: "%{title} chez %{company}",
       empty: {
-        description: "Il semble que votre liste de contacts soit vide.",
-        title: "Aucun contact trouvé",
+        description: "Il semble que votre liste de juges-arbitres soit vide.",
+        title: "Aucun juge-arbitre trouvé",
       },
       import: {
-        title: "Importer des contacts",
+        title: "Importer des juges-arbitres",
         button: "Importer un fichier CSV",
         complete:
-          "Import des contacts terminé. %{importCount} contacts importés, %{errorCount} erreurs",
+          "Import des juges-arbitres terminé. %{importCount} juges-arbitres importés, %{errorCount} erreurs",
         progress:
-          "%{importCount} / %{rowCount} contacts importés, avec %{errorCount} erreurs.",
+          "%{importCount} / %{rowCount} juges-arbitres importés, avec %{errorCount} erreurs.",
         error:
           "Échec de l'importation de ce fichier. Veuillez vous assurer que vous avez fourni un fichier CSV valide.",
         imported: "Importé",
@@ -129,7 +129,7 @@ export const frenchCrmMessages = {
           "Voici un exemple de fichier CSV que vous pouvez utiliser comme modèle",
         stop: "Arrêter l'importation",
         csv_file: "Fichier CSV",
-        contacts_label: "contact |||| contacts",
+        contacts_label: "juge-arbitre |||| juges-arbitres",
       },
       inputs: {
         genders: {
@@ -144,37 +144,38 @@ export const frenchCrmMessages = {
         },
       },
       list: {
-        error_loading: "Erreur lors du chargement des contacts",
+        error_loading: "Erreur lors du chargement des juges-arbitres",
       },
       bulk_tag: {
         action: "Étiqueter",
         back: "Retour aux étiquettes",
         create_description:
-          "Créez une nouvelle étiquette et appliquez-la aux contacts sélectionnés.",
+          "Créez une nouvelle étiquette et appliquez-la aux juges-arbitres sélectionnés.",
         description:
-          "Choisissez une étiquette existante ou créez-en une pour les contacts sélectionnés.",
+          "Choisissez une étiquette existante ou créez-en une pour les juges-arbitres sélectionnés.",
         empty:
-          "Aucune étiquette pour le moment. Créez-en une pour étiqueter les contacts sélectionnés.",
-        error: "Impossible d'ajouter l'étiquette aux contacts",
-        noop: "Les contacts sélectionnés ont déjà cette étiquette",
+          "Aucune étiquette pour le moment. Créez-en une pour étiqueter les juges-arbitres sélectionnés.",
+        error: "Impossible d'ajouter l'étiquette aux juges-arbitres",
+        noop: "Les juges-arbitres sélectionnés ont déjà cette étiquette",
         success:
-          "Étiquette ajoutée à %{smart_count} contact |||| Étiquette ajoutée à %{smart_count} contacts",
-        title: "Ajouter une étiquette aux contacts",
+          "Étiquette ajoutée à %{smart_count} juge-arbitre |||| Étiquette ajoutée à %{smart_count} juges-arbitres",
+        title: "Ajouter une étiquette aux juges-arbitres",
       },
       merge: {
-        action: "Fusionner avec un autre contact",
-        confirm: "Fusionner les contacts",
-        current_contact: "Contact actuel (sera supprimé)",
-        description: "Fusionnez ce contact avec un autre.",
-        error: "Échec de la fusion des contacts",
+        action: "Fusionner avec un autre juge-arbitre",
+        confirm: "Fusionner les juges-arbitres",
+        current_contact: "Juge-arbitre actuel (sera supprimé)",
+        description: "Fusionnez ce juge-arbitre avec un autre.",
+        error: "Échec de la fusion des juges-arbitres",
         merging: "Fusion...",
         no_additional_data: "Aucune donnée supplémentaire à fusionner",
-        select_target: "Veuillez sélectionner un contact avec lequel fusionner",
-        success: "Contacts fusionnés avec succès",
-        target_contact: "Contact cible (sera conservé)",
-        title: "Fusionner les contacts",
+        select_target:
+          "Veuillez sélectionner un juge-arbitre avec lequel fusionner",
+        success: "Juges-arbitres fusionnés avec succès",
+        target_contact: "Juge-arbitre cible (sera conservé)",
+        title: "Fusionner les juges-arbitres",
         warning_description:
-          "Toutes les données seront transférées au deuxième contact. Cette action ne peut pas être annulée.",
+          "Toutes les données seront transférées au deuxième juge-arbitre. Cette action ne peut pas être annulée.",
         warning_title: "Avertissement : opération destructrice",
         what_will_be_merged: "Ce qui sera fusionné :",
       },
@@ -183,7 +184,7 @@ export const frenchCrmMessages = {
         before_this_month: "Avant ce mois-ci",
         before_this_week: "Avant cette semaine",
         managed_by_me: "Géré par moi",
-        search: "Rechercher nom, entreprise...",
+        search: "Rechercher nom, club...",
         this_week: "Cette semaine",
         today: "Aujourd'hui",
         tags: "Étiquettes",
@@ -191,9 +192,10 @@ export const frenchCrmMessages = {
       },
       hot: {
         empty_change_status:
-          'Changez le statut d\'un contact en ajoutant une note à ce contact et en cliquant sur "afficher les options".',
-        empty_hint: 'Les contacts avec un statut "Visio" apparaîtront ici.',
-        title: "Contacts chauds",
+          'Changez le statut d\'un juge-arbitre en ajoutant une note à ce juge-arbitre et en cliquant sur "afficher les options".',
+        empty_hint:
+          'Les juges-arbitres avec un statut "Visio" apparaîtront ici.',
+        title: "Prospects chauds",
       },
     },
     deals: {
@@ -201,8 +203,8 @@ export const frenchCrmMessages = {
       fields: {
         name: "Nom",
         description: "Description",
-        company_id: "Entreprise",
-        contact_ids: "Contacts",
+        company_id: "Club",
+        contact_ids: "Juges-arbitres",
         category: "Catégorie",
         amount: "Budget",
         expected_closing_date: "Date de clôture prévue",
@@ -247,7 +249,7 @@ export const frenchCrmMessages = {
         status: "Statut",
         date: "Date",
         attachments: "Pièces jointes",
-        contact_id: "Contact",
+        contact_id: "Juge-arbitre",
         deal_id: "Affaire",
       },
       action: {
@@ -274,7 +276,7 @@ export const frenchCrmMessages = {
       },
       note_for_contact: "Note pour %{name}",
       stepper: {
-        hint: "Accédez à une page de contact et ajoutez une note",
+        hint: "Accédez à une page de juge-arbitre et ajoutez une note",
       },
       added: "Note ajoutée",
       inputs: {
@@ -322,7 +324,7 @@ export const frenchCrmMessages = {
         text: "Description",
         due_date: "Date d'échéance",
         type: "Type",
-        contact_id: "Contact",
+        contact_id: "Juge-arbitre",
         due_short: "échéance",
       },
       action: {
@@ -346,7 +348,8 @@ export const frenchCrmMessages = {
         edit_for: "Modifier la tâche pour %{name}",
       },
       empty: "Aucune tâche pour l'instant",
-      empty_list_hint: "Les tâches ajoutées à vos contacts apparaîtront ici.",
+      empty_list_hint:
+        "Les tâches ajoutées à vos juges-arbitres apparaîtront ici.",
       filters: {
         later: "Plus tard",
         overdue: "En retard",
@@ -417,10 +420,10 @@ export const frenchCrmMessages = {
       title: "Notes de version",
     },
     activity: {
-      added_company: "%{name} a ajouté l'entreprise",
-      you_added_company: "Vous avez ajouté l'entreprise",
-      added_contact: "%{name} a ajouté le contact",
-      you_added_contact: "Vous avez ajouté le contact",
+      added_company: "%{name} a ajouté le club",
+      you_added_company: "Vous avez ajouté le club",
+      added_contact: "%{name} a ajouté le juge-arbitre",
+      you_added_contact: "Vous avez ajouté le juge-arbitre",
       added_note: "%{name} a ajouté une note sur",
       you_added_note: "Vous avez ajouté une note sur",
       added_note_about_deal: "%{name} a ajouté une note sur l'affaire",
@@ -468,7 +471,7 @@ export const frenchCrmMessages = {
       },
       idle: {
         description_1:
-          "Vous pouvez importer des ventes, des entreprises, des contacts, des entreprises, des notes et des tâches.",
+          "Vous pouvez importer des ventes, des clubs, des juges-arbitres, des notes et des tâches.",
         description_2:
           "Les données doivent se trouver dans un fichier JSON correspondant à l'exemple suivant :",
       },
@@ -518,7 +521,7 @@ export const frenchCrmMessages = {
         duplicate: "%{display_name} en double : %{items}",
         in_use:
           "Impossible de supprimer %{display_name} encore utilisés par des affaires : %{items}",
-        validating: "Validation\u2026",
+        validating: "Validation…",
         entities: {
           categories: "catégories",
           stages: "étapes",
@@ -538,7 +541,7 @@ export const frenchCrmMessages = {
     profile: {
       inbound: {
         description:
-          "Vous pouvez commencer à envoyer des e-mails vers l'adresse de réception de votre serveur, par exemple en l'ajoutant au champ %{field}. Atomic CRM traitera les e-mails et ajoutera des notes aux contacts correspondants.",
+          "Vous pouvez commencer à envoyer des e-mails vers l'adresse de réception de votre serveur, par exemple en l'ajoutant au champ %{field}. Atomic CRM traitera les e-mails et ajoutera des notes aux juges-arbitres correspondants.",
         title: "E-mail entrant",
       },
       mcp: {

@@ -17,7 +17,7 @@ test("user imports contacts from a CSV including a company address and a comment
   await page.getByLabel("Password").fill("password");
   await page.getByRole("button", { name: "Sign in" }).click();
 
-  await expect(page.getByRole("link", { name: "Contacts" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Referees" })).toBeVisible();
   await menu.goToContacts();
 
   await page.getByRole("button", { name: "Import CSV" }).click();
@@ -39,7 +39,9 @@ test("user imports contacts from a CSV including a company address and a comment
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("button", { name: "Import CSV" }).click();
 
-  await expect(page.getByText(/Contacts import complete/i)).toBeVisible();
+  await expect(
+    page.getByText(/Judges-referees import complete/i),
+  ).toBeVisible();
   await page.keyboard.press("Escape");
 
   await expect(page.getByText("Ada Lovelace")).toBeVisible();
