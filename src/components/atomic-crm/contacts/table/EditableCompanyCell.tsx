@@ -28,7 +28,10 @@ export const EditableCompanyCell = () => {
     name: string,
   ): Promise<Company | undefined> => {
     try {
-      const newCompany = await create(
+      // useCreate's return type doesn't encode returnPromise as a literal,
+      // so it always widens to `ResultRecordType | void` here — but at
+      // runtime `returnPromise: true` guarantees a Company, never void.
+      const newCompany = (await create(
         "companies",
         {
           data: {
@@ -38,7 +41,7 @@ export const EditableCompanyCell = () => {
           },
         },
         { returnPromise: true },
-      );
+      )) as Company;
       return newCompany;
     } catch {
       notify("resources.companies.autocomplete.create_error", {
