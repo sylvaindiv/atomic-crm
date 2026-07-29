@@ -4,9 +4,7 @@ import type { Contact } from "../../types";
 import { EditableListCell, type EditableListEntry } from "./EditableListCell";
 import { useUpdateContactField } from "./useUpdateContactField";
 
-const toEntries = (
-  emails: Contact["email_jsonb"],
-): EditableListEntry[] =>
+const toEntries = (emails: Contact["email_jsonb"]): EditableListEntry[] =>
   (emails ?? []).map((email) => ({ value: email.email, type: email.type }));
 
 const toEmailJsonb = (entries: EditableListEntry[]): Contact["email_jsonb"] =>

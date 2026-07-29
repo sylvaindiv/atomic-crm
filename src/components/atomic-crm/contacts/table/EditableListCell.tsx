@@ -105,12 +105,12 @@ export const EditableListCell = ({
     commit(draft.filter((_, i) => i !== index));
 
   const handleTypeChange = (index: number, type: PersonalInfoType) =>
-    commit(
-      draft.map((entry, i) => (i === index ? { ...entry, type } : entry)),
-    );
+    commit(draft.map((entry, i) => (i === index ? { ...entry, type } : entry)));
 
   const handleValueChange = (index: number, value: string) =>
-    setDraft(draft.map((entry, i) => (i === index ? { ...entry, value } : entry)));
+    setDraft(
+      draft.map((entry, i) => (i === index ? { ...entry, value } : entry)),
+    );
 
   const handleValueBlur = () => {
     if (!sameEntries(draft, entries)) onCommit(draft);
@@ -128,7 +128,9 @@ export const EditableListCell = ({
       // Falls back to the current draft entry (no-op revert) if `entries`
       // hasn't caught up yet with a just-added row at this index.
       setDraft(
-        draft.map((entry, i) => (i === index ? (entries[index] ?? entry) : entry)),
+        draft.map((entry, i) =>
+          i === index ? (entries[index] ?? entry) : entry,
+        ),
       );
       event.currentTarget.blur();
     }
