@@ -16,18 +16,18 @@ export const CompanyEmpty = () => {
       <img
         src="./img/empty.svg"
         alt={translate("resources.companies.empty.title", {
-          _: "No companies found",
+          _: "No clubs found",
         })}
       />
       <div className="flex flex-col gap-0 items-center">
         <h6 className="text-lg font-bold">
           {translate("resources.companies.empty.title", {
-            _: "No companies found",
+            _: "No clubs found",
           })}
         </h6>
         <p className="text-sm text-center text-muted-foreground mb-4">
           {translate("resources.companies.empty.description", {
-            _: "It seems your company list is empty.",
+            _: "It seems your club list is empty.",
           })}
         </p>
       </div>
