@@ -42,10 +42,13 @@ test("user selects a referrer for a contact and sees it reflected", async ({
   await expect(page).toHaveTitle(/Atomic CRM/);
 
   await menu.goToContacts();
-  await expect(page.getByText("Ada Lovelace")).toBeVisible();
+  // The name cell is the only one of the table's ~17 columns that still
+  // renders a real link (every other cell mutates in place and does not
+  // navigate) -- see adr/ADR-66f03297-TASK-008-inline-editable-contact-table.md.
+  await expect(page.getByRole("link", { name: "Ada Lovelace" })).toBeVisible();
 
   // Open Ada's show page, then her edit form
-  await page.getByText("Ada Lovelace").click();
+  await page.getByRole("link", { name: "Ada Lovelace" }).click();
   await expect(
     page.getByRole("heading", { name: "Ada Lovelace" }),
   ).toBeVisible();
