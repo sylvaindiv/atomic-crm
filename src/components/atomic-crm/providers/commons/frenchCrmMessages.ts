@@ -89,6 +89,12 @@ export const frenchCrmMessages = {
         background: "Informations de contexte",
         has_newsletter: "Abonné à la newsletter",
         sales_id: "Responsable de compte",
+        gender: "Genre",
+        status: "Statut",
+        tags: "Étiquettes",
+        nb_tasks: "Tâches",
+        first_seen: "Première activité",
+        name: "Nom",
       },
       action: {
         add: "Ajouter un juge-arbitre",

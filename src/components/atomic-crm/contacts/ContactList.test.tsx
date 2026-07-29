@@ -134,7 +134,12 @@ describe("ContactList", () => {
   });
 });
 
+// Scoped to the table body: `<DataTable>` also renders a "select all"
+// checkbox in its header (same `data-slot="checkbox"`), which isn't one of
+// the per-row selection checkboxes these tests click.
 const getSelectionCheckboxes = (container: HTMLElement) =>
-  Array.from(container.querySelectorAll('[data-slot="checkbox"]')).map(
-    (element) => element as HTMLElement,
-  );
+  Array.from(
+    container.querySelectorAll(
+      '[data-slot="table-body"] [data-slot="checkbox"]',
+    ),
+  ).map((element) => element as HTMLElement);
