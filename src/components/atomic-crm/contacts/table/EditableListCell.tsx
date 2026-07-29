@@ -196,9 +196,12 @@ export const EditableListCell = ({
                 <button
                   type="button"
                   onClick={() => handleRemove(index)}
-                  aria-label={translate("ra.action.remove", {
-                    _: `Remove ${entry.value || placeholder}`,
-                  })}
+                  // `ra.action.remove` is a real ra-core key ("Remove"), so
+                  // the `_` fallback below is only ever used for a locale
+                  // that genuinely lacks a translation — the per-row value
+                  // must be appended outside the translate() call, since a
+                  // resolved key ignores `_` entirely.
+                  aria-label={`${translate("ra.action.remove", { _: "Remove" })} ${entry.value || placeholder}`}
                   className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
