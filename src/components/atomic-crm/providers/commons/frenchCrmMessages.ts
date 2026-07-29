@@ -45,7 +45,8 @@ export const frenchCrmMessages = {
       followed_by: "Suivi par %{name}",
       followed_by_you: "Suivi par vous",
       no_contacts: "Aucun juge-arbitre",
-      nb_contacts: "%{smart_count} juge-arbitre |||| %{smart_count} juges-arbitres",
+      nb_contacts:
+        "%{smart_count} juge-arbitre |||| %{smart_count} juges-arbitres",
       nb_deals: "%{smart_count} affaire |||| %{smart_count} affaires",
       sizes: {
         one_employee: "1 employé",
@@ -55,8 +56,7 @@ export const frenchCrmMessages = {
         two_hundred_fifty_or_more_employees: "250 employés ou plus",
       },
       autocomplete: {
-        create_error:
-          "Une erreur s'est produite lors de la création du club",
+        create_error: "Une erreur s'est produite lors de la création du club",
         create_item: "Créer %{item}",
         create_label: "Commencez à taper pour créer un nouveau club",
       },
