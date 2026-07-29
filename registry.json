@@ -748,6 +748,18 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/table/EditablePhonesCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableListCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableEmailsCell.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/contacts/table/EditableBooleanCell.tsx",
           "type": "registry:component"
         },
