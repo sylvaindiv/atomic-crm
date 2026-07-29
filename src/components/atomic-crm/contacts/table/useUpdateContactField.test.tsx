@@ -93,9 +93,7 @@ describe("useUpdateContactField", () => {
 
     rejectUpdate?.(new Error("Update failed"));
 
-    await expect
-      .element(screen.getByText("Update failed"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Update failed")).toBeInTheDocument();
 
     // Rolled back: the optimistic "CEO" write is reverted after the rejection.
     await expect.element(screen.getByText("CTO")).toBeInTheDocument();
