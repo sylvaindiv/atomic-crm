@@ -199,7 +199,7 @@ const getMenuMethod = ({ page }: { page: Page; isMobile: boolean }) => ({
     await page.waitForLoadState("networkidle");
   },
   goToContacts: async () => {
-    await page.getByRole("link", { name: "Contacts" }).click();
+    await page.getByRole("link", { name: "Referees" }).click();
     await page.waitForLoadState("networkidle");
   },
 });
