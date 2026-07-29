@@ -101,7 +101,7 @@ export const ColumnsButton = (props: ColumnsButtonProps) => {
           )}
         </PopoverTrigger>
         <PopoverPrimitive.Portal forceMount>
-          <div className={open ? "block" : "hidden"}>
+          <div className={open ? "block" : "hidden pointer-events-none"}>
             <PopoverPrimitive.Content
               data-slot="popover-content"
               sideOffset={4}
