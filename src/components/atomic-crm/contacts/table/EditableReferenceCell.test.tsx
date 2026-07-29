@@ -76,9 +76,7 @@ describe("EditableReferenceCell", () => {
       </StoryWrapper>,
     );
 
-    await screen
-      .getByRole("button", { name: "Club: Padel Club A" })
-      .click();
+    await screen.getByRole("button", { name: "Club: Padel Club A" }).click();
     // The leading clear option is the only "—" on screen once the popover
     // is open (the trigger itself reads "Padel Club A", not "—").
     await screen.getByText("—").click();
