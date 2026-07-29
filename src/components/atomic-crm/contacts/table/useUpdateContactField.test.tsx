@@ -60,7 +60,6 @@ describe("useUpdateContactField", () => {
         data: { title: "CEO" },
         previousData: expect.objectContaining({ id: 1, title: "CTO" }),
       }),
-      expect.anything(),
     );
 
     resolveUpdate?.({ data: { ...contact, title: "CEO" } });

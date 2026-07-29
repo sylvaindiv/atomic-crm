@@ -732,6 +732,26 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/table/useUpdateContactField.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableTextCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableTagsCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableStatusCell.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/table/EditableBooleanCell.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/companies/sizes.ts",
           "type": "registry:component"
         },
