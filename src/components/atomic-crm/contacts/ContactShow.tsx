@@ -235,7 +235,7 @@ const ContactShowContentMobile = () => {
   );
 };
 
-const ContactShowContent = () => {
+export const ContactShowContent = () => {
   const translate = useTranslate();
   const { record, isPending } = useShowContext<Contact>();
   if (isPending || !record) return null;

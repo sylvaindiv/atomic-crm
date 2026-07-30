@@ -1,5 +1,5 @@
 import { useRecordContext } from "ra-core";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { DataTable } from "@/components/admin/data-table";
 
 import { RelativeDate } from "../../misc/RelativeDate";
@@ -15,6 +15,7 @@ import { EditableSalesCell } from "./EditableSalesCell";
 import { EditableStatusCell } from "./EditableStatusCell";
 import { EditableTagsCell } from "./EditableTagsCell";
 import { EditableTextCell } from "./EditableTextCell";
+import { LatestNoteCell } from "./LatestNoteCell";
 
 /**
  * Desktop content for the Contacts list: a dense, ~17-column table built on
@@ -64,7 +65,7 @@ export const ContactTable = () => {
       <DataTable
         rowClick={false}
         bulkActionsToolbar={false}
-        hiddenColumns={["background", "gender"]}
+        hiddenColumns={["gender"]}
         rowClassName={(record: Contact) =>
           getStatusTint(record) ? "bg-(--row-status-tint)" : undefined
         }
@@ -91,8 +92,11 @@ export const ContactTable = () => {
         <DataTable.Col source="linkedin_url">
           <EditableTextCell source="linkedin_url" />
         </DataTable.Col>
-        <DataTable.Col source="background">
-          <EditableTextCell source="background" multiline />
+        <DataTable.Col
+          source="latest_note_text"
+          label="resources.contacts.fields.latest_note_text"
+        >
+          <LatestNoteCell />
         </DataTable.Col>
         <DataTable.Col source="gender">
           <EditableGenderCell />
@@ -136,10 +140,13 @@ export const ContactTable = () => {
  */
 const ContactNameCell = () => {
   const record = useRecordContext<Contact>();
+  const [searchParams] = useSearchParams();
   if (!record) return null;
+  const params = new URLSearchParams(searchParams);
+  params.set("show", String(record.id));
   return (
     <Link
-      to={`/contacts/${record.id}/show`}
+      to={`?${params.toString()}`}
       className="block w-full truncate px-2 py-1 font-medium hover:underline"
     >
       {record.first_name} {record.last_name}

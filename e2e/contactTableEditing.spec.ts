@@ -113,9 +113,9 @@ test.describe("contact table inline editing", () => {
     await page.waitForLoadState("networkidle");
     await page.reload();
 
-    await expect(
-      page.getByRole("row", { name: "Ada Lovelace" }),
-    ).toContainText("Visio");
+    await expect(page.getByRole("row", { name: "Ada Lovelace" })).toContainText(
+      "Visio",
+    );
   });
 
   test("adds an email through the list cell and it survives a reload", async ({
@@ -162,9 +162,9 @@ test.describe("contact table inline editing", () => {
     await page.waitForLoadState("networkidle");
     await page.reload();
 
-    await expect(
-      page.getByRole("row", { name: "Ada Lovelace" }),
-    ).toContainText("Padel Prospect");
+    await expect(page.getByRole("row", { name: "Ada Lovelace" })).toContainText(
+      "Padel Prospect",
+    );
   });
 
   test("the name cell navigates to Show while an editable cell mutates in place", async ({
