@@ -44,7 +44,7 @@ test("merging a contact repoints the contacts it referred to the winner", async 
   // Rosalind is referred by Isaac, who will be merged away (the loser)
   await menu.goToContacts();
   await page.getByText("Rosalind Franklin").click();
-  await page.getByRole("link", { name: "Edit contact" }).click();
+  await page.getByRole("link", { name: "Edit judge-referee" }).click();
   await page.getByLabel(/referred by/i).click();
   await page.getByText("Isaac Newton").click();
   await page.getByRole("button", { name: /^save$/i }).click();
@@ -53,9 +53,9 @@ test("merging a contact repoints the contacts it referred to the winner", async 
   // Merge Isaac (loser) into Marie (winner)
   await menu.goToContacts();
   await page.getByText("Isaac Newton").click();
-  await page.getByRole("link", { name: "Edit contact" }).click();
+  await page.getByRole("link", { name: "Edit judge-referee" }).click();
   await page
-    .getByRole("button", { name: "Merge with another contact" })
+    .getByRole("button", { name: "Merge with another judge-referee" })
     .click();
 
   const dialog = page.getByRole("dialog");
@@ -67,8 +67,8 @@ test("merging a contact repoints the contacts it referred to the winner", async 
     dialog.getByText("1 contact referred by this contact will be updated"),
   ).toBeVisible();
 
-  await dialog.getByRole("button", { name: "Merge Contacts" }).click();
-  await dismissToast("Contacts merged successfully");
+  await dialog.getByRole("button", { name: "Merge Judges-Referees" }).click();
+  await dismissToast("Judges-Referees merged successfully");
 
   // Redirected to the winner's page
   await expect(

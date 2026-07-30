@@ -5,10 +5,11 @@
   "scripts": {
     "test:unit:app": "vitest --config vitest.config.ts",
     "test:unit:claude": "vitest --config vitest.config.ts --project claude",
-    "dev": "vite --force",
+    "dev": "npm run dev:all",
+    "dev:app": "vite --force",
     "dev:demo": "vite --config vite.demo.config --force",
     "dev:server": "node --watch --env-file=.env server/index.mjs",
-    "dev:all": "concurrently -k -n api,web -c blue,green \"npm:dev:server\" \"npm:dev\"",
+    "dev:all": "concurrently -k -n api,web -c blue,green \"npm:dev:server\" \"npm:dev:app\"",
     "serve": "NODE_ENV=production node --env-file=.env server/index.mjs",
     "db:apply": "node --env-file=.env db/apply-schema.mjs",
     "build": "tsc && vite build",

@@ -26,7 +26,7 @@ db-apply: ## apply db/schema.sql (+ seed) to the configured Turso database
 	npm run db:apply
 
 start-app: ## start the frontend dev server only
-	npm run dev
+	npm run dev:app
 
 start: ## start the full stack locally (backend API + frontend)
 	npm run dev:all
@@ -35,7 +35,7 @@ start-demo: ## start the app locally in demo mode (in-browser FakeRest data)
 	npm run dev:demo
 
 stop: ## stop the local backend API if it is still running
-	@kill $$(lsof -t -i:$${API_PORT:-3001}) 2>/dev/null || true
+	@kill $$(lsof -t -i:$${PORT:-3001}) 2>/dev/null || true
 
 build: ## build the app
 	npm run build

@@ -250,12 +250,12 @@ const ImportStats = ({
       failed: failedImports.sales.length,
     },
     {
-      entity: "companies",
+      entity: "Clubs",
       imported: stats.companies,
       failed: failedImports.companies.length,
     },
     {
-      entity: "contacts",
+      entity: "Judges-Referees",
       imported: stats.contacts,
       failed: failedImports.contacts.length,
     },

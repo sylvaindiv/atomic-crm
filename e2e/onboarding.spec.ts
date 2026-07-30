@@ -16,16 +16,16 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
   await expect(page.getByText("What's next?")).toBeVisible();
   await expect(page.getByText("1/3 done")).toBeVisible();
   await expect(page.getByText("Install Atomic CRM")).toBeVisible();
-  await expect(page.getByText("Add your first contact")).toBeVisible();
+  await expect(page.getByText("Add your first judge-referee")).toBeVisible();
   await expect(page.getByText("Add your first note")).toBeVisible();
 
-  await page.getByText("New Contact").click();
+  await page.getByText("New Judge-Referee").click();
   await page.waitForLoadState("networkidle");
   await page.getByLabel("She/Her").click();
   await page.getByLabel("First name").fill("Jane");
   await page.getByLabel("Last name").fill("Smith");
   await page.getByLabel("Title").fill("CEO");
-  await page.getByLabel("Company").click();
+  await page.getByLabel("Club").click();
   await page.getByPlaceholder("Search").fill("Smith Corp");
   await page.getByText("Create Smith Corp").click();
   await page
@@ -93,7 +93,7 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
   await expect(page.getByText("Latest Activity")).toBeVisible();
   await expect(
     page.getByText("Latest Activity").locator("xpath=../.."),
-  ).toHaveText(/You added company Smith Corp today at/);
+  ).toHaveText(/You added club Smith Corp today at/);
 
   await expect(
     page.getByText("Latest Activity").locator("xpath=../.."),

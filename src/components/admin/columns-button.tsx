@@ -101,12 +101,27 @@ export const ColumnsButton = (props: ColumnsButtonProps) => {
           )}
         </PopoverTrigger>
         <PopoverPrimitive.Portal forceMount>
-          <div className={open ? "block" : "hidden"}>
+          <div
+            className={open ? "block" : "hidden pointer-events-none"}
+            // Belt-and-suspenders on top of the Tailwind classes above: an
+            // inline style can't be defeated by a missed JIT-scan or a
+            // higher-specificity rule elsewhere, so the closed, forceMount'd
+            // popover is guaranteed inert (invisible, non-interactive) even
+            // if the class-based hiding somehow isn't taking effect.
+            style={
+              open ? undefined : { display: "none", pointerEvents: "none" }
+            }
+          >
             <PopoverPrimitive.Content
               data-slot="popover-content"
               sideOffset={4}
               align="start"
               className="bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 origin-(--radix-popover-content-transform-origin) rounded-md border shadow-md outline-hidden p-0 min-w-[200px]"
+              // Radix's own Content may set its own pointer-events on this
+              // exact element (e.g. for focus/dismiss handling); repeat the
+              // inline style here directly rather than relying only on
+              // inheritance from the wrapper div above.
+              style={open ? undefined : { pointerEvents: "none" }}
             >
               <div id={`${storeKey}-columnsSelector`} className="p-2" />
             </PopoverPrimitive.Content>

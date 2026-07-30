@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, getContrastingTextColor } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -33,10 +33,10 @@ export const StatusSelector = ({
   const noneLabel = translate("resources.contacts.background.status_none", {
     _: "None",
   });
+  const selectedOption = noteStatuses.find((s) => s.value === status);
 
   if (isMobile) {
     // use native select on mobile for better performance and accessibility
-    const selectedOption = noteStatuses.find((s) => s.value === status);
     return (
       <div className={cn("relative", "w-32", triggerClassName)}>
         <div
@@ -44,20 +44,19 @@ export const StatusSelector = ({
           className={cn(
             "border-input flex w-full items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs h-9",
             disabled && "cursor-not-allowed opacity-50",
+            selectedOption && "rounded-full border-transparent font-medium",
           )}
+          style={
+            selectedOption
+              ? {
+                  backgroundColor: selectedOption.color,
+                  color: getContrastingTextColor(selectedOption.color),
+                }
+              : undefined
+          }
         >
           <span className="flex items-center gap-2 line-clamp-1">
-            {selectedOption ? (
-              <>
-                <span
-                  className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-                  style={{ backgroundColor: selectedOption.color }}
-                />
-                {selectedOption.label}
-              </>
-            ) : (
-              noneLabel
-            )}
+            {selectedOption ? selectedOption.label : noneLabel}
           </span>
           <ChevronDownIcon className="size-4 opacity-50 shrink-0" />
         </div>
@@ -95,7 +94,21 @@ export const StatusSelector = ({
       value={status || NONE_VALUE}
       onValueChange={handleValueChange}
     >
-      <SelectTrigger className={cn("w-32", triggerClassName)}>
+      <SelectTrigger
+        className={cn(
+          "w-32",
+          selectedOption && "rounded-full border-transparent font-medium",
+          triggerClassName,
+        )}
+        style={
+          selectedOption
+            ? {
+                backgroundColor: selectedOption.color,
+                color: getContrastingTextColor(selectedOption.color),
+              }
+            : undefined
+        }
+      >
         <SelectValue placeholder={noneLabel} />
       </SelectTrigger>
       <SelectContent>
@@ -106,11 +119,13 @@ export const StatusSelector = ({
         </SelectItem>
         {noteStatuses.map((statusOption) => (
           <SelectItem key={statusOption.value} value={statusOption.value}>
-            <div className="flex items-center gap-2">
-              <span
-                className="inline-block w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: statusOption.color }}
-              />
+            <div
+              className="flex items-center gap-2 rounded-full px-2 py-0.5 font-medium"
+              style={{
+                backgroundColor: statusOption.color,
+                color: getContrastingTextColor(statusOption.color),
+              }}
+            >
               {statusOption.label}
             </div>
           </SelectItem>
