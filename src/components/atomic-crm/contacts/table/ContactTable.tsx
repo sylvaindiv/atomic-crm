@@ -47,7 +47,7 @@ import { EditableTextCell } from "./EditableTextCell";
  * Each row is also tinted 5% by its `status` color: `rowStyle` sets a
  * `--row-status-tint` CSS custom property via `color-mix()`, and
  * `rowClassName` applies it through the static Tailwind arbitrary class
- * `bg-[--row-status-tint]` rather than a raw inline `backgroundColor`, so
+ * `bg-(--row-status-tint)` rather than a raw inline `backgroundColor`, so
  * `TableRow`'s existing `hover:bg-muted/50` and
  * `data-[state=selected]:bg-muted` keep winning by CSS specificity.
  */
@@ -66,7 +66,7 @@ export const ContactTable = () => {
         bulkActionsToolbar={false}
         hiddenColumns={["background", "gender"]}
         rowClassName={(record: Contact) =>
-          getStatusTint(record) ? "bg-[--row-status-tint]" : undefined
+          getStatusTint(record) ? "bg-(--row-status-tint)" : undefined
         }
         rowStyle={(record: Contact) => {
           const statusTint = getStatusTint(record);
