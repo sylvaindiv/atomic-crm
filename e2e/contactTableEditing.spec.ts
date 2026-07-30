@@ -187,6 +187,21 @@ test.describe("contact table inline editing", () => {
       page.getByRole("heading", { name: "Ada Lovelace" }),
     ).toBeVisible();
   });
+
+  test("selects a row via its checkbox even though the row is tinted by status", async ({
+    page,
+  }) => {
+    // Ada is created with a status ("cold"), so this row is tinted through
+    // `rowStyle`/`rowClassName` (TASK-003) -- the tint must not steal the
+    // click from the row's own selection checkbox.
+    const row = page.getByRole("row", { name: "Ada Lovelace" });
+
+    await row.getByRole("checkbox").click();
+
+    await expect(
+      page.getByRole("button", { name: /select all/i }),
+    ).toBeVisible();
+  });
 });
 
 /**
