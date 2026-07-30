@@ -1,0 +1,180 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e6]:
+      - link "Atomic CRM Atomic CRM" [ref=e7] [cursor=pointer]:
+        - /url: "#/"
+        - img "Atomic CRM" [ref=e8]
+        - heading "Atomic CRM" [level=1] [ref=e9]
+      - navigation [ref=e11]:
+        - link "Tableau de bord" [ref=e12] [cursor=pointer]:
+          - /url: "#/"
+        - link "Arbitres" [ref=e13] [cursor=pointer]:
+          - /url: "#/contacts"
+        - link "Clubs" [ref=e14] [cursor=pointer]:
+          - /url: "#/companies"
+        - link "Affaires" [ref=e15] [cursor=pointer]:
+          - /url: "#/deals"
+      - generic [ref=e16]:
+        - button "Toggle theme" [ref=e17] [cursor=pointer]:
+          - img
+          - generic [ref=e18]: Toggle theme
+        - button [ref=e19] [cursor=pointer]:
+          - img
+        - button [ref=e20] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e1314]:
+      - generic [ref=e1317]:
+        - generic [ref=e1318]:
+          - generic [ref=e1320]: LH
+          - generic [ref=e1321]:
+            - heading "Lawrence Hoppe" [level=5] [ref=e1322]
+            - generic [ref=e1323]:
+              - text: World-class chez
+              - link "Wilderman, Morar and Heller" [ref=e1325] [cursor=pointer]:
+                - /url: "#/companies/32/show"
+          - link "Wilderman, Morar and Heller" [ref=e1328] [cursor=pointer]:
+            - /url: "#/companies/32/show"
+            - img "Wilderman, Morar and Heller" [ref=e1330]
+        - generic [ref=e1331]:
+          - generic [ref=e1333]:
+            - generic [ref=e1334]:
+              - group [ref=e1335]:
+                - textbox "Ajouter une note" [ref=e1336]
+              - generic [ref=e1337]:
+                - button "Afficher les options" [ref=e1338] [cursor=pointer]
+                - generic [ref=e1339]: (joindre des fichiers ou modifier les détails)
+              - generic:
+                - generic:
+                  - group:
+                    - generic:
+                      - generic: Statut
+                    - generic:
+                      - combobox "Statut":
+                        - generic:
+                          - generic:
+                            - generic:
+                              - generic: Mort
+                            - text: Mort
+                        - button
+                  - group:
+                    - generic:
+                      - generic: Date
+                    - textbox "Date": 2026-07-30T13:30
+                - group:
+                  - generic:
+                    - generic: Pièces jointes
+                  - generic:
+                    - button "Pièces jointes"
+                    - paragraph: Déposez les fichiers à uploader, ou cliquez pour en sélectionner.
+            - button "Ajouter cette note" [ref=e1341] [cursor=pointer]:
+              - img
+              - text: Ajouter cette note
+          - generic [ref=e1342]:
+            - generic [ref=e1343]:
+              - generic [ref=e1344]:
+                - link "Wilderman, Morar and Heller" [ref=e1346] [cursor=pointer]:
+                  - /url: "#/companies/32/show"
+                  - img "Wilderman, Morar and Heller" [ref=e1348]
+                - generic [ref=e1349]:
+                  - text: Marley Harber a ajouté une note
+                  - generic [ref=e1350]:
+                    - generic: Mort
+                - generic [ref=e1352]: dimanche dernier à 10:50
+              - generic [ref=e1353]:
+                - generic [ref=e1355]:
+                  - paragraph [ref=e1356]: At id vero hic esse quia alias a natus. Nisi aut numquam perferendis qui ut. Vitae eveniet ab porro vitae. Incidunt adipisci soluta culpa voluptas consequatur id veniam. Est nihil quis qui iure minus.
+                  - paragraph [ref=e1357]: Omnis quia ipsa omnis atque accusamus delectus autem. Rerum quas nisi inventore voluptatem sint consequatur inventore. Mollitia necessitatibus accusamus atque doloremque recusandae repellendus dicta rerum. Ut aspernatur consequuntur ut quam fuga minus distinctio soluta.
+                  - paragraph [ref=e1358]: Enim laborum vel omnis facilis qui vel. Laborum similique et labore voluptatem. Unde praesentium ea.
+                  - paragraph [ref=e1359]: Velit et qui possimus ex. Voluptatem quos eos totam. Natus aut natus quam et.
+                - button "En savoir plus" [ref=e1360] [cursor=pointer]
+            - generic [ref=e1361]:
+              - generic [ref=e1362]:
+                - link "Wilderman, Morar and Heller" [ref=e1364] [cursor=pointer]:
+                  - /url: "#/companies/32/show"
+                  - img "Wilderman, Morar and Heller" [ref=e1366]
+                - generic [ref=e1367]:
+                  - text: Marley Harber a ajouté une note
+                  - generic [ref=e1368]:
+                    - generic: A recontacter
+                - generic [ref=e1370]: 18/07/2026
+              - generic [ref=e1373]:
+                - paragraph [ref=e1374]: Corrupti nemo sed. Autem suscipit ducimus veritatis maxime ratione esse sed ad. Et sint dicta. Voluptatum natus aliquam fugiat.
+                - paragraph [ref=e1375]: Dolores est minima quas et aliquam et sed officia dicta. Quam vel magni. Aut doloribus quia autem. Laborum dolor sit delectus culpa numquam dicta perferendis et. Qui necessitatibus corporis voluptatum vel et nihil modi. Eum et aut consectetur quos.
+            - generic [ref=e1376]:
+              - generic [ref=e1377]:
+                - link "Wilderman, Morar and Heller" [ref=e1379] [cursor=pointer]:
+                  - /url: "#/companies/32/show"
+                  - img "Wilderman, Morar and Heller" [ref=e1381]
+                - generic [ref=e1382]:
+                  - text: Marley Harber a ajouté une note
+                  - generic [ref=e1383]:
+                    - generic: Client
+                - generic [ref=e1385]: 04/07/2026
+              - generic [ref=e1386]:
+                - generic [ref=e1388]:
+                  - paragraph [ref=e1389]: Quidem consequuntur rem aliquam aut. Error excepturi et magnam velit. Ut voluptatem iste molestiae ipsum. Veniam qui deleniti neque ea error corrupti. Qui aspernatur quia earum nam pariatur. Totam labore tempore non nisi commodi aut iste cumque.
+                  - paragraph [ref=e1390]: Sit rerum ab nemo voluptatem odit. Fugit quos atque. Commodi sint quibusdam non aut laborum qui dicta.
+                  - paragraph [ref=e1391]: Dolorum ut voluptas quasi ab provident. Temporibus quia et et suscipit nostrum aliquid omnis totam unde. Velit rem est odit est ullam dolores nihil occaecati ut. Est enim alias quasi. Laborum aliquid et necessitatibus dolorum voluptates. Atque soluta eum eius accusamus.
+                  - paragraph [ref=e1392]: Mollitia aspernatur quis est fugiat sed repellendus. Aut sit vel et et beatae rem mollitia. Consectetur sit eius aliquam dolore nobis in. Libero eos dicta et impedit asperiores unde quidem nulla non.
+                - button "En savoir plus" [ref=e1393] [cursor=pointer]
+      - generic [ref=e1398]:
+        - link "Modifier le juge-arbitre" [ref=e1400] [cursor=pointer]:
+          - /url: "#/contacts/1"
+          - img
+          - text: Modifier le juge-arbitre
+        - generic [ref=e1401]:
+          - heading "Statut" [level=3] [ref=e1402]
+          - combobox [ref=e1405] [cursor=pointer]:
+            - generic:
+              - generic: Mort
+            - img
+        - generic [ref=e1406]:
+          - heading "Informations personnelles" [level=3] [ref=e1407]
+          - generic [ref=e1409]:
+            - generic [ref=e1411]:
+              - button "Copier" [ref=e1412] [cursor=pointer]:
+                - img [ref=e1413]
+              - link "Lawrence.Hoppe@gmail.com" [ref=e1417] [cursor=pointer]:
+                - /url: mailto:Lawrence.Hoppe@gmail.com
+            - paragraph [ref=e1418]: Abonné à la newsletter
+            - generic [ref=e1419]:
+              - generic [ref=e1420]:
+                - img [ref=e1421]
+                - generic [ref=e1423]:
+                  - generic [ref=e1424]: 1-925-617-7462
+                  - generic [ref=e1425]: Pro
+              - generic [ref=e1426]:
+                - img [ref=e1427]
+                - generic [ref=e1429]:
+                  - generic [ref=e1430]: 622-565-0224 x816
+                  - generic [ref=e1431]: Perso
+            - generic [ref=e1432]:
+              - img [ref=e1433]
+              - generic [ref=e1438]: Indéterminé
+            - generic [ref=e1439]:
+              - img [ref=e1440]
+              - link "Leigh Funk" [ref=e1444] [cursor=pointer]:
+                - /url: "#/contacts/0/show"
+        - generic [ref=e1445]:
+          - heading "Informations complémentaires" [level=3] [ref=e1446]
+          - generic [ref=e1448]:
+            - generic [ref=e1449]: Dolores molestiae atque.
+            - generic [ref=e1450]: Ajouté le 27 mai 2026
+            - generic [ref=e1451]: Dernière activité le 26 juillet 2026
+            - generic [ref=e1452]: Suivi par Marley Harber
+        - generic [ref=e1453]:
+          - heading "Étiquettes" [level=3] [ref=e1454]
+          - generic [ref=e1456]:
+            - generic [ref=e1458] [cursor=pointer]:
+              - text: vip
+              - button [ref=e1459]:
+                - img [ref=e1460]
+            - button "Ajouter une étiquette" [ref=e1464] [cursor=pointer]:
+              - img
+              - text: Ajouter une étiquette
+        - generic [ref=e1465]:
+          - heading "Tâches" [level=3] [ref=e1466]
+          - button "Ajouter une tâche" [ref=e1469] [cursor=pointer]:
+            - img
+            - text: Ajouter une tâche
+  - region "Notifications alt+T"

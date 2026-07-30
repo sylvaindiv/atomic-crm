@@ -1,0 +1,17 @@
+[     326ms] [LOG] {data: Array(1), total: 500, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     326ms] [LOG] {data: Array(1), total: 1200, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     326ms] [LOG] {data: Array(1), total: 50, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     644ms] [LOG] {data: Array(10), total: 26, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     644ms] [LOG] {data: Array(25), total: 25, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     644ms] [LOG] {data: Array(400), total: 400, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1066ms] [LOG] {data: Array(55), total: 55, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1066ms] [LOG] {data: Array(250), total: 500, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1067ms] [LOG] {data: Array(50), total: 50, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1368ms] [LOG] {data: Array(250), total: 1200, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1368ms] [LOG] {data: Array(250), total: 300, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1437ms] [LOG] {data: Array(278), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1718ms] [LOG] {data: Array(4), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1718ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1718ms] [LOG] {data: Array(5), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    1718ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[    2042ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
