@@ -26,7 +26,7 @@ db-apply: ## apply db/schema.sql (+ seed) to the configured Turso database
 	npm run db:apply
 
 start-app: ## start the frontend dev server only
-	npm run dev
+	npm run dev:app
 
 start: ## start the full stack locally (backend API + frontend)
 	npm run dev:all
