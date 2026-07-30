@@ -93,6 +93,7 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
     children,
     className,
     rowClassName,
+    rowStyle,
     bulkActionButtons = defaultBulkActionButtons,
     bulkActionsToolbar,
     ...rest
@@ -117,7 +118,10 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
           <DataTableRenderContext.Provider value="header">
             <DataTableHead>{columns}</DataTableHead>
           </DataTableRenderContext.Provider>
-          <DataTableBody<RecordType> rowClassName={rowClassName}>
+          <DataTableBody<RecordType>
+            rowClassName={rowClassName}
+            rowStyle={rowStyle}
+          >
             {columns}
           </DataTableBody>
         </Table>
@@ -187,9 +191,11 @@ const DataTableHead = ({ children }: { children: ReactNode }) => {
 const DataTableBody = <RecordType extends RaRecord = RaRecord>({
   children,
   rowClassName,
+  rowStyle,
 }: {
   children: ReactNode;
   rowClassName?: (record: RecordType) => string | undefined;
+  rowStyle?: (record: RecordType) => React.CSSProperties | undefined;
 }) => {
   const data = useDataTableDataContext();
   return (
@@ -199,7 +205,10 @@ const DataTableBody = <RecordType extends RaRecord = RaRecord>({
           value={record}
           key={record.id ?? `row${rowIndex}`}
         >
-          <DataTableRow className={rowClassName?.(record)}>
+          <DataTableRow
+            className={rowClassName?.(record)}
+            style={rowStyle?.(record)}
+          >
             {children}
           </DataTableRow>
         </RecordContextProvider>
@@ -211,9 +220,11 @@ const DataTableBody = <RecordType extends RaRecord = RaRecord>({
 const DataTableRow = ({
   children,
   className,
+  style,
 }: {
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }) => {
   const { rowClick, handleToggleItem } = useDataTableCallbacksContext();
   const selectedIds = useDataTableSelectedIdsContext();
@@ -267,6 +278,7 @@ const DataTableRow = ({
       key={record.id}
       onClick={handleClick}
       className={cn(rowClick !== false && "cursor-pointer", className)}
+      style={style}
     >
       {hasBulkActions ? (
         <TableCell className="flex w-8" onClick={handleToggle}>
@@ -298,6 +310,7 @@ export interface DataTableProps<RecordType extends RaRecord = RaRecord>
   children: ReactNode;
   className?: string;
   rowClassName?: (record: RecordType) => string | undefined;
+  rowStyle?: (record: RecordType) => React.CSSProperties | undefined;
   bulkActionButtons?: ReactNode;
   bulkActionsToolbar?: ReactNode;
 }

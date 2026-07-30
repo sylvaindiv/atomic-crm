@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { DataTable } from "@/components/admin/data-table";
 
 import { RelativeDate } from "../../misc/RelativeDate";
+import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
 import { Avatar } from "../Avatar";
 import { EditableCompanyCell } from "./EditableCompanyCell";
@@ -39,61 +40,95 @@ import { EditableTextCell } from "./EditableTextCell";
  * the CRM-specific `ContactBulkActionButtons`, as a sibling of this table's
  * `<Card>`. `bulkActionButtons` is left at its default so the row/select-all
  * checkbox column keeps rendering.
+ *
+ * The wrapping `<div>` tightens font size and cell padding for a denser
+ * view, scoped to this table via descendant selectors (the shared
+ * `admin/data-table.tsx` / `ui/table.tsx` primitives are left untouched).
+ * Each row is also tinted 5% by its `status` color: `rowStyle` sets a
+ * `--row-status-tint` CSS custom property via `color-mix()`, and
+ * `rowClassName` applies it through the static Tailwind arbitrary class
+ * `bg-(--row-status-tint)` rather than a raw inline `backgroundColor`, so
+ * `TableRow`'s existing `hover:bg-muted/50` and
+ * `data-[state=selected]:bg-muted` keep winning by CSS specificity.
  */
-export const ContactTable = () => (
-  <DataTable
-    rowClick={false}
-    bulkActionsToolbar={false}
-    hiddenColumns={["background", "gender"]}
-  >
-    <DataTable.Col label={false}>
-      <Avatar width={20} height={20} />
-    </DataTable.Col>
-    <DataTable.Col source="last_name" label="resources.contacts.fields.name">
-      <ContactNameCell />
-    </DataTable.Col>
-    <DataTable.Col source="title">
-      <EditableTextCell source="title" />
-    </DataTable.Col>
-    <DataTable.Col source="linkedin_url">
-      <EditableTextCell source="linkedin_url" />
-    </DataTable.Col>
-    <DataTable.Col source="background">
-      <EditableTextCell source="background" multiline />
-    </DataTable.Col>
-    <DataTable.Col source="gender">
-      <EditableGenderCell />
-    </DataTable.Col>
-    <DataTable.Col source="company_id">
-      <EditableCompanyCell />
-    </DataTable.Col>
-    <DataTable.Col source="referred_by_id">
-      <EditableReferredByCell />
-    </DataTable.Col>
-    <DataTable.Col source="sales_id">
-      <EditableSalesCell />
-    </DataTable.Col>
-    <DataTable.Col source="status">
-      <EditableStatusCell />
-    </DataTable.Col>
-    <DataTable.Col source="email_jsonb">
-      <EditableEmailsCell />
-    </DataTable.Col>
-    <DataTable.Col source="phone_jsonb">
-      <EditablePhonesCell />
-    </DataTable.Col>
-    <DataTable.Col source="tags">
-      <EditableTagsCell />
-    </DataTable.Col>
-    <DataTable.NumberCol source="nb_tasks" />
-    <DataTable.Col source="last_seen">
-      <ContactLastSeenCell />
-    </DataTable.Col>
-    <DataTable.Col source="first_seen">
-      <ContactFirstSeenCell />
-    </DataTable.Col>
-  </DataTable>
-);
+export const ContactTable = () => {
+  const { noteStatuses } = useConfigurationContext();
+
+  const getStatusTint = (record: Contact) => {
+    if (!record.status) return undefined;
+    return noteStatuses.find((status) => status.value === record.status);
+  };
+
+  return (
+    <div className="text-xs [&_td]:px-1.5 [&_td]:py-1 [&_th]:px-1.5 [&_th]:h-8">
+      <DataTable
+        rowClick={false}
+        bulkActionsToolbar={false}
+        hiddenColumns={["background", "gender"]}
+        rowClassName={(record: Contact) =>
+          getStatusTint(record) ? "bg-(--row-status-tint)" : undefined
+        }
+        rowStyle={(record: Contact) => {
+          const statusTint = getStatusTint(record);
+          if (!statusTint) return undefined;
+          return {
+            "--row-status-tint": `color-mix(in srgb, ${statusTint.color} 5%, transparent)`,
+          } as React.CSSProperties;
+        }}
+      >
+        <DataTable.Col label={false}>
+          <Avatar width={20} height={20} />
+        </DataTable.Col>
+        <DataTable.Col
+          source="last_name"
+          label="resources.contacts.fields.name"
+        >
+          <ContactNameCell />
+        </DataTable.Col>
+        <DataTable.Col source="title">
+          <EditableTextCell source="title" />
+        </DataTable.Col>
+        <DataTable.Col source="linkedin_url">
+          <EditableTextCell source="linkedin_url" />
+        </DataTable.Col>
+        <DataTable.Col source="background">
+          <EditableTextCell source="background" multiline />
+        </DataTable.Col>
+        <DataTable.Col source="gender">
+          <EditableGenderCell />
+        </DataTable.Col>
+        <DataTable.Col source="company_id">
+          <EditableCompanyCell />
+        </DataTable.Col>
+        <DataTable.Col source="referred_by_id">
+          <EditableReferredByCell />
+        </DataTable.Col>
+        <DataTable.Col source="sales_id">
+          <EditableSalesCell />
+        </DataTable.Col>
+        <DataTable.Col source="status">
+          <EditableStatusCell />
+        </DataTable.Col>
+        <DataTable.Col source="email_jsonb">
+          <EditableEmailsCell />
+        </DataTable.Col>
+        <DataTable.Col source="phone_jsonb">
+          <EditablePhonesCell />
+        </DataTable.Col>
+        <DataTable.Col source="tags">
+          <EditableTagsCell />
+        </DataTable.Col>
+        <DataTable.NumberCol source="nb_tasks" />
+        <DataTable.Col source="last_seen">
+          <ContactLastSeenCell />
+        </DataTable.Col>
+        <DataTable.Col source="first_seen">
+          <ContactFirstSeenCell />
+        </DataTable.Col>
+      </DataTable>
+    </div>
+  );
+};
 
 /**
  * The table's sole navigation trigger (see module doc). `first_name` /
