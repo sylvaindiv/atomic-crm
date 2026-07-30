@@ -102,6 +102,7 @@ export type Contact = {
   nb_tasks?: number;
   company_name?: string;
   referred_by_name?: string;
+  latest_note_text?: string;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {

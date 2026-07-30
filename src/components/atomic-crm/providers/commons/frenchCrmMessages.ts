@@ -65,8 +65,8 @@ export const frenchCrmMessages = {
       },
     },
     contacts: {
-      name: "Arbitre |||| Arbitres",
-      forcedCaseName: "Arbitre",
+      name: "Juge-arbitre |||| Juges-arbitres",
+      forcedCaseName: "Juge-arbitre",
       field_categories: {
         background_info: "Informations complémentaires",
         identity: "Identité",
@@ -94,6 +94,7 @@ export const frenchCrmMessages = {
         tags: "Étiquettes",
         nb_tasks: "Tâches",
         first_seen: "Première activité",
+        latest_note_text: "Dernière note",
         name: "Nom",
       },
       action: {

@@ -176,5 +176,6 @@ SELECT
     (SELECT trim(coalesce(r.first_name, '') || ' ' || coalesce(r.last_name, ''))
        FROM contacts r WHERE r.id = co.referred_by_id
     ) AS referred_by_name,
-    (SELECT count(*) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS nb_tasks
+    (SELECT count(*) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS nb_tasks,
+    (SELECT text FROM contact_notes cn WHERE cn.contact_id = co.id ORDER BY date DESC LIMIT 1) AS latest_note_text
 FROM contacts co;

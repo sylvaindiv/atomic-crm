@@ -8,11 +8,10 @@ import {
   useTranslate,
   useUpdate,
 } from "ra-core";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { FieldValues, SubmitHandler } from "react-hook-form";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -39,9 +38,6 @@ export const Note = ({
 }) => {
   const [isHover, setHover] = useState(false);
   const [isEditing, setEditing] = useState(false);
-  const [isExpanded, setExpanded] = useState(false);
-  const [isTruncated, setTruncated] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
   const resource = useResourceContext();
   const notify = useNotify();
   const translate = useTranslate();
@@ -50,14 +46,6 @@ export const Note = ({
   const salesName = useGetSalesName(note.sales_id, {
     enabled: !isCurrentUser,
   });
-
-  // Detect if content is truncated
-  useEffect(() => {
-    const el = contentRef.current;
-    if (el) {
-      setTruncated(el.scrollHeight > el.clientHeight);
-    }
-  }, [note.text]);
 
   const [update, { isPending }] = useUpdate();
 
@@ -187,31 +175,7 @@ export const Note = ({
         </Form>
       ) : (
         <div className="pt-2 text-sm max-w-150">
-          {note.text && (
-            <div
-              ref={contentRef}
-              className={cn(
-                "overflow-hidden transition-[max-height] duration-300 ease-in-out",
-                isExpanded ? "max-h-[5000px]" : "max-h-46",
-              )}
-            >
-              <Markdown>{note.text}</Markdown>
-            </div>
-          )}
-          {isTruncated && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setExpanded(!isExpanded);
-              }}
-              className="text-primary text-sm mt-1 underline hover:no-underline cursor-pointer"
-            >
-              {isExpanded
-                ? translate("crm.common.show_less")
-                : translate("crm.common.read_more")}
-            </button>
-          )}
-
+          {note.text && <Markdown>{note.text}</Markdown>}
           {note.attachments && <NoteAttachments note={note} />}
         </div>
       )}

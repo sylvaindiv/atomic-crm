@@ -94,6 +94,7 @@ export const englishCrmMessages = {
         tags: "Tags",
         nb_tasks: "Tasks",
         first_seen: "First seen",
+        latest_note_text: "Latest note",
         name: "Name",
       },
       action: {

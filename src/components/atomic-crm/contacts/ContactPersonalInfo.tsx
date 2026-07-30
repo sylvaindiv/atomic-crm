@@ -5,18 +5,13 @@ import { ArrayField } from "@/components/admin/array-field";
 import { SingleFieldList } from "@/components/admin/single-field-list";
 import { TextField } from "@/components/admin/text-field";
 import { EmailField } from "@/components/admin/email-field";
-import { Mail, Phone, Linkedin, Check, UserPlus } from "lucide-react";
+import { Mail, Phone, Check, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
-import {
-  contactGender,
-  translateContactGenderLabel,
-  translatePersonalInfoTypeLabel,
-} from "./contactModel";
+import { translatePersonalInfoTypeLabel } from "./contactModel";
 import type { Contact } from "../types";
 
 export const ContactPersonalInfo = () => {
   const record = useRecordContext<Contact>();
-  const translate = useTranslate();
 
   if (!record) return null;
 
@@ -28,28 +23,6 @@ export const ContactPersonalInfo = () => {
         </SingleFieldList>
       </ArrayField>
 
-      {record.has_newsletter && (
-        <p className="pl-6 py-1 text-sm text-muted-foreground">
-          {translate("resources.contacts.fields.has_newsletter")}
-        </p>
-      )}
-
-      {record.linkedin_url && (
-        <PersonalInfoRow
-          icon={<Linkedin className="w-4 h-4 text-muted-foreground" />}
-          primary={
-            <a
-              className="underline hover:no-underline text-sm text-muted-foreground"
-              href={record.linkedin_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={record.linkedin_url}
-            >
-              LinkedIn
-            </a>
-          }
-        />
-      )}
       <ArrayField source="phone_jsonb">
         <SingleFieldList className="flex-col gap-y-0">
           <PersonalInfoRow
@@ -59,26 +32,6 @@ export const ContactPersonalInfo = () => {
           />
         </SingleFieldList>
       </ArrayField>
-      {contactGender
-        .map((genderOption) => {
-          if (record.gender === genderOption.value) {
-            return (
-              <PersonalInfoRow
-                key={genderOption.value}
-                icon={
-                  <genderOption.icon className="w-4 h-4 text-muted-foreground" />
-                }
-                primary={
-                  <div>
-                    {translateContactGenderLabel(genderOption, translate)}
-                  </div>
-                }
-              />
-            );
-          }
-          return null;
-        })
-        .filter(Boolean)}
       {record.referred_by_name && (
         <PersonalInfoRow
           icon={<UserPlus className="w-4 h-4 text-muted-foreground" />}

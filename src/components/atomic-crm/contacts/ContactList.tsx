@@ -7,6 +7,7 @@ import {
   type Exporter,
   type Identifier,
 } from "ra-core";
+import { useSearchParams } from "react-router";
 import { BulkActionsToolbar } from "@/components/admin/bulk-actions-toolbar";
 import { BulkDeleteButton } from "@/components/admin/bulk-delete-button";
 import { BulkExportButton } from "@/components/admin/bulk-export-button";
@@ -27,6 +28,7 @@ import {
   ContactListFilterSummary,
   ContactListFilter,
 } from "./ContactListFilter";
+import { ContactShowSheet } from "./ContactShowSheet";
 import { TopToolbar } from "../layout/TopToolbar";
 import { InfinitePagination } from "../misc/InfinitePagination";
 import MobileHeader from "../layout/MobileHeader";
@@ -35,6 +37,8 @@ import { ContactTable } from "./table/ContactTable";
 
 export const ContactList = () => {
   const { identity } = useGetIdentity();
+  const [searchParams] = useSearchParams();
+  const showId = searchParams.get("show");
 
   if (!identity) return null;
 
@@ -47,6 +51,7 @@ export const ContactList = () => {
       exporter={exporter}
     >
       <ContactListLayoutDesktop />
+      <ContactShowSheet open={!!showId} id={showId ?? undefined} />
     </List>
   );
 };

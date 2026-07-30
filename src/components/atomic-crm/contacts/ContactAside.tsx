@@ -13,7 +13,6 @@ import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
 import { AsideSection } from "../misc/AsideSection";
 import type { Contact } from "../types";
 import { ContactMergeButton } from "./ContactMergeButton";
-import { ExportVCardButton } from "./ExportVCardButton";
 
 export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
   const record = useRecordContext<Contact>();
@@ -70,7 +69,6 @@ export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
       {link !== "edit" && (
         <>
           <div className="mt-6 pt-6 border-t hidden sm:flex flex-col gap-2 items-start">
-            <ExportVCardButton />
             <ContactMergeButton />
           </div>
           <div className="mt-6 pt-6 border-t hidden sm:flex flex-col gap-2 items-start">
