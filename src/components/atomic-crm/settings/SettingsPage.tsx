@@ -37,7 +37,7 @@ const SECTIONS = [
   {
     id: "companies",
     label: "resources.companies.name",
-    fallback: "Companies",
+    fallback: "Clubs",
   },
   { id: "deals", label: "resources.deals.name", fallback: "Deals" },
   { id: "notes", label: "resources.notes.name", fallback: "Notes" },

@@ -80,7 +80,7 @@ export const DashboardStepper = ({
                 <div className="flex flex-col gap-4">
                   <h4 className="font-bold">
                     {translate("resources.contacts.action.add_first", {
-                      _: "Add your first contact",
+                      _: "Add your first judge-referee",
                     })}
                   </h4>
 
@@ -93,7 +93,7 @@ export const DashboardStepper = ({
                       >
                         <Plus className="h-4 w-4" />
                         {translate("resources.contacts.action.new", {
-                          _: "New Contact",
+                          _: "New Judge-Referee",
                         })}
                       </Button>
                     ) : (

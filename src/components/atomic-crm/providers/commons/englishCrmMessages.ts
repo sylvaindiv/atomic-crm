@@ -1,15 +1,15 @@
 export const englishCrmMessages = {
   resources: {
     companies: {
-      name: "Company |||| Companies",
-      forcedCaseName: "Company",
+      name: "Club |||| Clubs",
+      forcedCaseName: "Club",
       fields: {
-        name: "Company name",
+        name: "Club name",
         website: "Website",
         linkedin_url: "LinkedIn URL",
         phone_number: "Phone number",
         created_at: "Created at",
-        nb_contacts: "Number of contacts",
+        nb_contacts: "Number of judges-referees",
         revenue: "Revenue",
         sector: "Sector",
         size: "Size",
@@ -24,26 +24,27 @@ export const englishCrmMessages = {
         sales_id: "Account manager",
       },
       empty: {
-        description: "It seems your company list is empty.",
-        title: "No companies found",
+        description: "It seems your club list is empty.",
+        title: "No clubs found",
       },
       field_categories: {
-        contact: "Contact",
+        contact: "Club info",
         additional_info: "Additional information",
         address: "Address",
         context: "Context",
       },
       action: {
-        create: "Create Company",
-        edit: "Edit company",
-        new: "New Company",
-        show: "Show company",
+        create: "Create Club",
+        edit: "Edit club",
+        new: "New Club",
+        show: "Show club",
       },
       added_on: "Added on %{date}",
       followed_by: "Followed by %{name}",
       followed_by_you: "Followed by you",
-      no_contacts: "No contact",
-      nb_contacts: "%{smart_count} contact |||| %{smart_count} contacts",
+      no_contacts: "No judge-referee",
+      nb_contacts:
+        "%{smart_count} judge-referee |||| %{smart_count} judges-referees",
       nb_deals: "%{smart_count} deal |||| %{smart_count} deals",
       sizes: {
         one_employee: "1 employee",
@@ -53,17 +54,19 @@ export const englishCrmMessages = {
         two_hundred_fifty_or_more_employees: "250 or more employees",
       },
       autocomplete: {
-        create_error: "An error occurred while creating the company",
+        create_error: "An error occurred while creating the club",
         create_item: "Create %{item}",
-        create_label: "Start typing to create a new company",
+        create_label: "Start typing to create a new club",
       },
       filters: {
-        only_mine: "Only companies I manage",
+        only_mine: "Only clubs I manage",
       },
     },
     contacts: {
-      name: "Contact |||| Contacts",
-      forcedCaseName: "Contact",
+      // Short form here (not "Judge-Referee"): fits the fixed-width mobile
+      // bottom nav. See adr/ADR-66f03297-TASK-001-contacts-nav-label-fallback.md
+      name: "Referee |||| Referees",
+      forcedCaseName: "Referee",
       field_categories: {
         background_info: "Background info",
         identity: "Identity",
@@ -76,7 +79,7 @@ export const englishCrmMessages = {
         last_name: "Last name",
         last_seen: "Last seen",
         title: "Title",
-        company_id: "Company",
+        company_id: "Club",
         referred_by_id: "Referred by",
         email_jsonb: "Email addresses",
         email: "Email",
@@ -86,15 +89,21 @@ export const englishCrmMessages = {
         background: "Background info (bio, how you met, etc)",
         has_newsletter: "Has newsletter",
         sales_id: "Account manager",
+        gender: "Gender",
+        status: "Status",
+        tags: "Tags",
+        nb_tasks: "Tasks",
+        first_seen: "First seen",
+        name: "Name",
       },
       action: {
-        add: "Add contact",
-        add_first: "Add your first contact",
-        create: "Create contact",
-        edit: "Edit contact",
+        add: "Add judge-referee",
+        add_first: "Add your first judge-referee",
+        create: "Create judge-referee",
+        edit: "Edit judge-referee",
         export_vcard: "Export to vCard",
-        new: "New Contact",
-        show: "Show contact",
+        new: "New Judge-Referee",
+        show: "Show judge-referee",
       },
       background: {
         last_activity_on: "Last activity on %{date}",
@@ -106,16 +115,16 @@ export const englishCrmMessages = {
       position_at: "%{title} at",
       position_at_company: "%{title} at %{company}",
       empty: {
-        description: "It seems your contact list is empty.",
-        title: "No contacts found",
+        description: "It seems your judge-referee list is empty.",
+        title: "No judges-referees found",
       },
       import: {
-        title: "Import contacts",
+        title: "Import judges-referees",
         button: "Import CSV",
         complete:
-          "Contacts import complete. Imported %{importCount} contacts, with %{errorCount} errors",
+          "Judges-referees import complete. Imported %{importCount} judges-referees, with %{errorCount} errors",
         progress:
-          "Imported %{importCount} / %{rowCount} contacts, with %{errorCount} errors.",
+          "Imported %{importCount} / %{rowCount} judges-referees, with %{errorCount} errors.",
         error:
           "Failed to import this file, please make sure your provided a valid CSV file.",
         imported: "Imported",
@@ -125,7 +134,7 @@ export const englishCrmMessages = {
         sample_hint: "Here is a sample CSV file you can use as a template",
         stop: "Stop import",
         csv_file: "CSV File",
-        contacts_label: "contact |||| contacts",
+        contacts_label: "judge-referee |||| judges-referees",
       },
       inputs: {
         genders: {
@@ -140,36 +149,36 @@ export const englishCrmMessages = {
         },
       },
       list: {
-        error_loading: "Error loading contacts",
+        error_loading: "Error loading judges-referees",
       },
       bulk_tag: {
         action: "Tag",
         back: "Back to tags",
         create_description:
-          "Create a new tag and apply it to the selected contacts.",
+          "Create a new tag and apply it to the selected judges-referees.",
         description:
-          "Choose an existing tag or create a new one for the selected contacts.",
-        empty: "No tags yet. Create one to tag the selected contacts.",
-        error: "Failed to add tag to contacts",
-        noop: "Selected contacts already have this tag",
+          "Choose an existing tag or create a new one for the selected judges-referees.",
+        empty: "No tags yet. Create one to tag the selected judges-referees.",
+        error: "Failed to add tag to judges-referees",
+        noop: "Selected judges-referees already have this tag",
         success:
-          "Tag added to %{smart_count} contact |||| Tag added to %{smart_count} contacts",
-        title: "Add tag to contacts",
+          "Tag added to %{smart_count} judge-referee |||| Tag added to %{smart_count} judges-referees",
+        title: "Add tag to judges-referees",
       },
       merge: {
-        action: "Merge with another contact",
-        confirm: "Merge Contacts",
-        current_contact: "Current Contact (will be deleted)",
-        description: "Merge this contact with another one.",
-        error: "Failed to merge contacts",
+        action: "Merge with another judge-referee",
+        confirm: "Merge Judges-Referees",
+        current_contact: "Current Judge-Referee (will be deleted)",
+        description: "Merge this judge-referee with another one.",
+        error: "Failed to merge judges-referees",
         merging: "Merging...",
         no_additional_data: "No additional data to merge",
-        select_target: "Please select a contact to merge with",
-        success: "Contacts merged successfully",
-        target_contact: "Target Contact (will be kept)",
-        title: "Merge Contact",
+        select_target: "Please select a judge-referee to merge with",
+        success: "Judges-Referees merged successfully",
+        target_contact: "Target Judge-Referee (will be kept)",
+        title: "Merge Judge-Referee",
         warning_description:
-          "All data will be transferred to the second contact. This action cannot be undone.",
+          "All data will be transferred to the second judge-referee. This action cannot be undone.",
         warning_title: "Warning: Destructive Operation",
         what_will_be_merged: "What will be merged:",
       },
@@ -178,7 +187,7 @@ export const englishCrmMessages = {
         before_this_month: "Before this month",
         before_this_week: "Before this week",
         managed_by_me: "Managed by me",
-        search: "Search name, company...",
+        search: "Search name, club...",
         this_week: "This week",
         today: "Today",
         tags: "Tags",
@@ -186,9 +195,9 @@ export const englishCrmMessages = {
       },
       hot: {
         empty_change_status:
-          'Change the status of a contact by adding a note to that contact and clicking on "show options".',
-        empty_hint: 'Contacts with a "Visio" status will appear here.',
-        title: "Hot Contacts",
+          'Change the status of a judge-referee by adding a note to that judge-referee and clicking on "show options".',
+        empty_hint: 'Judges-referees with a "Visio" status will appear here.',
+        title: "Hot Prospects",
       },
     },
     deals: {
@@ -196,8 +205,8 @@ export const englishCrmMessages = {
       fields: {
         name: "Name",
         description: "Description",
-        company_id: "Company",
-        contact_ids: "Contacts",
+        company_id: "Club",
+        contact_ids: "Judges-Referees",
         category: "Category",
         amount: "Budget",
         expected_closing_date: "Expected closing date",
@@ -242,7 +251,7 @@ export const englishCrmMessages = {
         status: "Status",
         date: "Date",
         attachments: "Attachments",
-        contact_id: "Contact",
+        contact_id: "Judge-Referee",
         deal_id: "Deal",
       },
       action: {
@@ -269,7 +278,7 @@ export const englishCrmMessages = {
       },
       note_for_contact: "Note for %{name}",
       stepper: {
-        hint: "Go to a contact page and add a note",
+        hint: "Go to a judge-referee's page and add a note",
       },
       added: "Note added",
       inputs: {
@@ -316,7 +325,7 @@ export const englishCrmMessages = {
         text: "Description",
         due_date: "Due date",
         type: "Type",
-        contact_id: "Contact",
+        contact_id: "Judge-Referee",
         due_short: "due",
       },
       action: {
@@ -340,7 +349,7 @@ export const englishCrmMessages = {
         edit_for: "Edit task for %{name}",
       },
       empty: "No tasks yet",
-      empty_list_hint: "Tasks added to your contacts will appear here.",
+      empty_list_hint: "Tasks added to your judges-referees will appear here.",
       filters: {
         later: "Later",
         overdue: "Overdue",
@@ -411,8 +420,8 @@ export const englishCrmMessages = {
       title: "Changelog",
     },
     activity: {
-      added_company: "%{name} added company",
-      you_added_company: "You added company",
+      added_company: "%{name} added club",
+      you_added_company: "You added club",
       added_contact: "%{name} added",
       you_added_contact: "You added",
       added_note: "%{name} added a note about",
@@ -460,7 +469,7 @@ export const englishCrmMessages = {
       },
       idle: {
         description_1:
-          "You can import sales, companies, contacts, companies, notes, and tasks.",
+          "You can import sales, clubs, judges-referees, notes, and tasks.",
         description_2:
           "Data must be in a JSON file matching the following sample:",
       },
@@ -511,7 +520,7 @@ export const englishCrmMessages = {
         duplicate: "Duplicate %{display_name}: %{items}",
         in_use:
           "Cannot remove %{display_name} that are still used by deals: %{items}",
-        validating: "Validating\u2026",
+        validating: "Validating…",
         entities: {
           categories: "categories",
           stages: "stages",
@@ -531,7 +540,7 @@ export const englishCrmMessages = {
     profile: {
       inbound: {
         description:
-          "You can start sending emails to your server's inbound email address, e.g. by adding it to the %{field} field. Atomic CRM will process the emails and add notes to the corresponding contacts.",
+          "You can start sending emails to your server's inbound email address, e.g. by adding it to the %{field} field. Atomic CRM will process the emails and add notes to the corresponding judges-referees.",
         title: "Inbound email",
       },
       mcp: {
