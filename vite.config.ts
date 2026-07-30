@@ -14,7 +14,7 @@ export default defineConfig({
     proxy: {
       // Forward API calls to the backend (server/index.mjs) during development.
       "/api": {
-        target: `http://localhost:${process.env.API_PORT ?? 3001}`,
+        target: `http://localhost:${process.env.PORT ?? 3001}`,
         changeOrigin: true,
       },
     },
