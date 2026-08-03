@@ -10,9 +10,15 @@ import { test, expect } from "./fixtures";
  */
 test("clubs list renders as a table and a row navigates to the club's Show page", async ({
   page,
+  isMobile,
   createSales,
   createCompany,
 }) => {
+  test.skip(
+    isMobile,
+    "The Clubs table only renders on desktop; mobile has no companies list.",
+  );
+
   const sales = await createSales({
     email: "john@doe.com",
     first_name: "John",
