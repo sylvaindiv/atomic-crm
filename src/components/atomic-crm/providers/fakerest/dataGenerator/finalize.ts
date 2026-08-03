@@ -19,7 +19,8 @@ const setLinkedDealIds = (db: Db) => {
   const judgeDeals = db.deals
     .filter((deal) => deal.case_type === "judge" && !deal.archived_at)
     .sort(
-      (a, b) => new Date(b.created_at).valueOf() - new Date(a.created_at).valueOf(),
+      (a, b) =>
+        new Date(b.created_at).valueOf() - new Date(a.created_at).valueOf(),
     );
 
   db.contacts.forEach((contact) => {

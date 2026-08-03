@@ -15,7 +15,7 @@ const makeDeal = (overrides: Partial<Deal> & Pick<Deal, "id">): Deal =>
   }) as unknown as Deal;
 
 const makeDb = (contacts: Contact[], deals: Deal[]): Db =>
-  ({ contacts, contact_notes: [], deals } as unknown as Db);
+  ({ contacts, contact_notes: [], deals }) as unknown as Db;
 
 describe("finalize", () => {
   it("leaves linked_deal_id null when the contact is party to no 'judge' deal", () => {
