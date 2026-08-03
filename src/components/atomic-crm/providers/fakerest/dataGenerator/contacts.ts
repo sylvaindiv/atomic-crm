@@ -113,6 +113,8 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       nb_tasks: 0,
       linkedin_url: null,
       latest_note_text: "",
+      // Computed post-generation in finalize.ts, once deals exist.
+      linked_deal_id: null,
     };
 
     generatedContacts.push(contact);
