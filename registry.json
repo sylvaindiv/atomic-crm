@@ -808,10 +808,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/companies/GridList.tsx",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/companies/CompanyShow.tsx",
           "type": "registry:component"
         },
@@ -840,10 +836,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/companies/CompanyCard.tsx",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/companies/CompanyAvatar.tsx",
           "type": "registry:component"
         },
@@ -853,6 +845,10 @@
         },
         {
           "path": "src/components/atomic-crm/companies/AutocompleteCompanyInput.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/companies/table/CompanyTable.tsx",
           "type": "registry:component"
         },
         {
