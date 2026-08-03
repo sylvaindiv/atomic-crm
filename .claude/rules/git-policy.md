@@ -29,3 +29,15 @@ all branches, commits, merges, and pushes.
 
 Read-only inspection is encouraged whenever it helps catch bugs (e.g.
 fetching the latest base, stashing to compare two states).
+
+## Exception — PR creation flow
+
+When the user explicitly asks to create a PR (e.g. via the "create a PR"
+instruction / the PR-instructions attachment), the agent MAY run
+`git commit` and `git push -u origin HEAD` (or to the branch's existing
+upstream) as part of that flow, strictly to commit the current working-tree
+changes and push the current branch so `gh pr create` has something to
+target. This exception covers only that commit + push pair for the PR
+being created — it does not extend to `git commit --amend`, `git push
+--force`, branch switching, merges, rebases, or any other history-mutating
+command, which remain forbidden.
