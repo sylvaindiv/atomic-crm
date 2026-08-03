@@ -61,7 +61,7 @@ export const ContactTable = () => {
   };
 
   return (
-    <div className="text-xs [&_td]:px-1.5 [&_td]:py-1 [&_th]:px-1.5 [&_th]:h-8">
+    <div className="text-xs [&_td]:px-1.5 [&_td]:py-0.5 [&_th]:px-1.5 [&_th]:h-7">
       <DataTable
         rowClick={false}
         bulkActionsToolbar={false}
@@ -147,7 +147,7 @@ const ContactNameCell = () => {
   return (
     <Link
       to={`?${params.toString()}`}
-      className="block w-full truncate px-2 py-1 font-medium hover:underline"
+      className="block w-full truncate px-2 py-0.5 font-medium hover:underline"
     >
       {record.first_name} {record.last_name}
     </Link>

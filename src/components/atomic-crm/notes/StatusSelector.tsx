@@ -1,4 +1,4 @@
-import { cn, getContrastingTextColor } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -42,15 +42,17 @@ export const StatusSelector = ({
         <div
           aria-hidden="true"
           className={cn(
-            "border-input flex w-full items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs h-9",
+            "flex w-full items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs h-9",
+            selectedOption ? "border" : "border-input",
             disabled && "cursor-not-allowed opacity-50",
-            selectedOption && "rounded-full border-transparent font-medium",
+            selectedOption && "rounded-full font-medium px-2 py-0.5 text-xs",
           )}
           style={
             selectedOption
               ? {
-                  backgroundColor: selectedOption.color,
-                  color: getContrastingTextColor(selectedOption.color),
+                  backgroundColor: `color-mix(in srgb, ${selectedOption.color} 16%, transparent)`,
+                  borderColor: selectedOption.color,
+                  color: selectedOption.color,
                 }
               : undefined
           }
@@ -95,16 +97,20 @@ export const StatusSelector = ({
       onValueChange={handleValueChange}
     >
       <SelectTrigger
+        size="sm"
         className={cn(
           "w-32",
-          selectedOption && "rounded-full border-transparent font-medium",
+          selectedOption
+            ? "border rounded-full font-medium px-2 py-0.5 text-xs focus-visible:ring-0"
+            : "border-input",
           triggerClassName,
         )}
         style={
           selectedOption
             ? {
-                backgroundColor: selectedOption.color,
-                color: getContrastingTextColor(selectedOption.color),
+                backgroundColor: `color-mix(in srgb, ${selectedOption.color} 16%, transparent)`,
+                borderColor: selectedOption.color,
+                color: selectedOption.color,
               }
             : undefined
         }
@@ -118,16 +124,17 @@ export const StatusSelector = ({
           </Translate>
         </SelectItem>
         {noteStatuses.map((statusOption) => (
-          <SelectItem key={statusOption.value} value={statusOption.value}>
-            <div
-              className="flex items-center gap-2 rounded-full px-2 py-0.5 font-medium"
-              style={{
-                backgroundColor: statusOption.color,
-                color: getContrastingTextColor(statusOption.color),
-              }}
-            >
-              {statusOption.label}
-            </div>
+          <SelectItem
+            key={statusOption.value}
+            value={statusOption.value}
+            className="rounded-full border font-medium focus:!bg-transparent focus:!text-current"
+            style={{
+              backgroundColor: `color-mix(in srgb, ${statusOption.color} 16%, transparent)`,
+              borderColor: statusOption.color,
+              color: statusOption.color,
+            }}
+          >
+            {statusOption.label}
           </SelectItem>
         ))}
       </SelectContent>
