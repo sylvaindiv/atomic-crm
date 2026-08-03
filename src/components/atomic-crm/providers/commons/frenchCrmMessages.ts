@@ -24,6 +24,7 @@ export const frenchCrmMessages = {
         description: "Description",
         context_links: "URLs de contexte",
         sales_id: "Responsable de compte",
+        status: "Statut",
       },
       empty: {
         description: "Il semble que la liste de vos clubs soit vide.",
@@ -73,6 +74,7 @@ export const frenchCrmMessages = {
         misc: "Divers",
         personal_info: "Informations personnelles",
         position: "Poste",
+        linked_deal: "Affaire liée",
       },
       fields: {
         first_name: "Prénom",
@@ -216,6 +218,11 @@ export const frenchCrmMessages = {
         amount: "Budget",
         expected_closing_date: "Date de clôture prévue",
         stage: "Étape",
+        case_type: "Type d'affaire",
+      },
+      case_types: {
+        judge: "Juge",
+        club: "Club",
       },
       action: {
         back_to_deal: "Retour à l'affaire",
@@ -510,6 +517,7 @@ export const frenchCrmMessages = {
       light_mode_logo: "Logo du mode clair",
       notes: {
         statuses: "Statuts",
+        visible_in_kanban: "Visible dans le Kanban des affaires",
       },
       reset_defaults: "Réinitialiser aux valeurs par défaut",
       save_error: "Échec de l'enregistrement de la configuration",
