@@ -1,7 +1,10 @@
 import { composeStories } from "@storybook/react-vite";
 import { render } from "vitest-browser-react";
 import * as stories from "./DealInputs.stories";
-import { DealInputsStory } from "./DealInputs.stories";
+import {
+  DealInputsStory,
+  EditJudgeDealFromRealRecord,
+} from "./DealInputs.stories";
 
 const { Create, EditJudgeDeal, EditClubDeal } = composeStories(stories);
 
@@ -71,6 +74,16 @@ describe("DealInputs", () => {
       .element(screen.getByText("Judges-Referees"))
       .toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
+  });
+
+  it("resolves case_type from the real fetched record on edit, showing the judge input and hiding the club input", async () => {
+    const screen = await render(<EditJudgeDealFromRealRecord />);
+
+    await expect
+      .element(screen.getByText("Judges-Referees"))
+      .toBeInTheDocument();
+    await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
+    await expect.element(screen.getByText("Case type")).not.toBeInTheDocument();
   });
 
   it("lists every note status in the stage select, including the ones hidden from the Kanban", async () => {

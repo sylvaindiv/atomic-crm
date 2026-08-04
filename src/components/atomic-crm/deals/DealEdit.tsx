@@ -34,6 +34,17 @@ export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
           <EditBase
             id={id}
             mutationMode="pessimistic"
+            // Without an explicit `loading` element, ra-core's EditBase
+            // renders its children as soon as it mounts, before the record
+            // has been fetched (see ra-core's EditBase: `showLoading` only
+            // gates rendering when `loading` is set). That let DealInputs
+            // mount with an undefined record, so `useDealCaseType()` fell
+            // back to the (also-empty) watched form value and picked the
+            // wrong "Lie a" branch for a beat -- and in fast/cached fetches
+            // it could still be showing that first, wrong render by the
+            // time the dialog is visually settled. Render nothing until the
+            // real record is in context, exactly like DealShowContent does.
+            loading={null}
             mutationOptions={{
               onSuccess: () => {
                 notify("resources.deals.updated", {});

@@ -16,5 +16,16 @@ describe("DealCard", () => {
 
     await expect.element(screen.getByText(/Ada Lovelace/)).toBeInTheDocument();
     await expect.element(screen.getByText("Judge")).toBeInTheDocument();
+
+    // The judge name must render inline inside the title <p>, not wrapped in
+    // a block-level <div> -- a <div> forces its own line (breaking the
+    // single-line title layout) and DOM APIs don't auto-correct invalid
+    // div-inside-p nesting the way HTML string parsing would.
+    const titleParagraph = screen
+      .getByText(/Ada Lovelace/)
+      .element()
+      .closest("p");
+    expect(titleParagraph).not.toBeNull();
+    expect(titleParagraph?.querySelector("div")).toBeNull();
   });
 });

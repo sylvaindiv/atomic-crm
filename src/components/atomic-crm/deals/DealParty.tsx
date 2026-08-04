@@ -1,10 +1,9 @@
 // Shared judge/club rendering for a deal, reused by DealCard, DealEdit and
 // DealShow: a deal is linked to either a company (club case) or a single
 // judge (judge case) -- never both, never neither.
-import { useListContext, useTranslate } from "ra-core";
+import { ReferenceArrayFieldBase, useListContext, useTranslate } from "ra-core";
 import { Link as RouterLink } from "react-router";
 
-import { ReferenceArrayField } from "@/components/admin/reference-array-field";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { Badge } from "@/components/ui/badge";
 
@@ -40,7 +39,7 @@ export const DealPartyAvatar = ({
 }) => {
   if (deal.case_type === "judge") {
     return (
-      <ReferenceArrayField
+      <ReferenceArrayFieldBase
         record={deal}
         resource="deals"
         source="contact_ids"
@@ -51,7 +50,7 @@ export const DealPartyAvatar = ({
           height={height}
           linkToShow={linkToShow}
         />
-      </ReferenceArrayField>
+      </ReferenceArrayFieldBase>
     );
   }
   return (
@@ -70,14 +69,14 @@ export const DealPartyAvatar = ({
 export const DealPartyName = ({ deal }: { deal: Deal }) => {
   if (deal.case_type === "judge") {
     return (
-      <ReferenceArrayField
+      <ReferenceArrayFieldBase
         record={deal}
         resource="deals"
         source="contact_ids"
         reference="contacts_summary"
       >
         <JudgePartyName />
-      </ReferenceArrayField>
+      </ReferenceArrayFieldBase>
     );
   }
   return (
