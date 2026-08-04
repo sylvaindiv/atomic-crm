@@ -88,7 +88,13 @@ describe("DealInputs", () => {
     const onSubmit = vi.fn();
     const screen = await render(
       <DealInputsStory
-        record={{ id: 0, case_type: "club", company_id: 1, contact_ids: [1] }}
+        record={{
+          id: 0,
+          name: "Padel dispute",
+          case_type: "club",
+          company_id: 1,
+          contact_ids: [1],
+        }}
         withSaveButton
         onSubmit={onSubmit}
       />,
