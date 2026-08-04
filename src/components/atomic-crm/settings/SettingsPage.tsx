@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { toSlug } from "@/lib/toSlug";
 import { ArrayInput } from "@/components/admin/array-input";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
+import { BooleanInput } from "@/components/admin/boolean-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 import { TextInput } from "@/components/admin/text-input";
 
@@ -116,7 +117,7 @@ const getCurrencyChoices = () => {
   }));
 };
 
-const transformFormValues = (data: Record<string, any>) => ({
+export const transformFormValues = (data: Record<string, any>) => ({
   config: {
     title: data.title,
     lightModeLogo: data.lightModeLogo,
@@ -191,15 +192,10 @@ const SettingsFormFields = () => {
   const translate = useTranslate();
   const currencyChoices = useMemo(() => getCurrencyChoices(), []);
   const {
-    watch,
-    setValue,
     reset,
     formState: { isSubmitting },
   } = useFormContext();
 
-  const dealStages = watch("dealStages");
-  const dealPipelineStatuses: string[] = watch("dealPipelineStatuses") ?? [];
-  const stageDisplayName = translate("crm.settings.validation.entities.stages");
   const categoryDisplayName = translate(
     "crm.settings.validation.entities.categories",
   );
@@ -207,24 +203,6 @@ const SettingsFormFields = () => {
   const { data: deals } = useGetList("deals", {
     pagination: { page: 1, perPage: 1000 },
   });
-
-  const validateDealStages = useCallback(
-    (stages: { value: string; label: string }[] | undefined) =>
-      validateItemsInUse(stages, deals, "stage", stageDisplayName, {
-        duplicate: (displayName, duplicates) =>
-          translate("crm.settings.validation.duplicate", {
-            display_name: displayName,
-            items: duplicates.join(", "),
-          }),
-        inUse: (displayName, inUse) =>
-          translate("crm.settings.validation.in_use", {
-            display_name: displayName,
-            items: inUse.join(", "),
-          }),
-        validating: translate("crm.settings.validation.validating"),
-      }),
-    [deals, stageDisplayName, translate],
-  );
 
   const validateDealCategories = useCallback(
     (categories: { value: string; label: string }[] | undefined) =>
@@ -352,63 +330,6 @@ const SettingsFormFields = () => {
             <Separator />
 
             <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.deals.stages")}
-            </h3>
-            <ArrayInput
-              source="dealStages"
-              label={false}
-              helperText={false}
-              validate={validateDealStages}
-            >
-              <SimpleFormIterator disableClear>
-                <TextInput source="label" label={false} />
-              </SimpleFormIterator>
-            </ArrayInput>
-
-            <Separator />
-
-            <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.deals.pipeline_statuses")}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {translate("crm.settings.deals.pipeline_help")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {dealStages?.map(
-                (stage: { value: string; label: string }, idx: number) => {
-                  const isSelected = dealPipelineStatuses.includes(stage.value);
-                  return (
-                    <Button
-                      key={idx}
-                      type="button"
-                      variant={isSelected ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        if (isSelected) {
-                          setValue(
-                            "dealPipelineStatuses",
-                            dealPipelineStatuses.filter(
-                              (s) => s !== stage.value,
-                            ),
-                          );
-                        } else {
-                          setValue("dealPipelineStatuses", [
-                            ...dealPipelineStatuses,
-                            stage.value,
-                          ]);
-                        }
-                      }}
-                    >
-                      {stage.label || stage.value}
-                    </Button>
-                  );
-                },
-              )}
-            </div>
-
-            <Separator />
-
-            <h3 className="text-lg font-medium text-muted-foreground">
               {translate("crm.settings.deals.categories")}
             </h3>
             <ArrayInput
@@ -436,9 +357,15 @@ const SettingsFormFields = () => {
               {translate("crm.settings.notes.statuses")}
             </h3>
             <ArrayInput source="noteStatuses" label={false} helperText={false}>
-              <SimpleFormIterator inline disableReordering disableClear>
+              <SimpleFormIterator inline disableClear>
                 <TextInput source="label" label={false} className="flex-1" />
                 <ColorInput source="color" />
+                <BooleanInput
+                  source="visibleInDealsKanban"
+                  label="crm.settings.notes.visible_in_kanban"
+                  helperText={false}
+                  className="shrink-0"
+                />
               </SimpleFormIterator>
             </ArrayInput>
           </CardContent>
