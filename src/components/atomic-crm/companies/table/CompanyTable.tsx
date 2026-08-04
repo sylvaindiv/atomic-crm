@@ -7,6 +7,7 @@ import type { Company } from "../../types";
 import { CompanyAvatar } from "../CompanyAvatar";
 import { getTranslatedCompanySizeLabel } from "../getTranslatedCompanySizeLabel";
 import { sizes } from "../sizes";
+import { EditableStatusCell } from "./EditableStatusCell";
 
 /**
  * Read-only table for the Clubs list, modeled on
@@ -15,16 +16,15 @@ import { sizes } from "../sizes";
  * column density: see the wrapping `<div>` below, copied from
  * `ContactTable`).
  *
- * Deliberately narrower than `ContactTable`: every cell here is read-only
- * (no inline editing, this resource has no editable-cell family), there is
+ * Deliberately narrower than `ContactTable`: every cell is read-only except
+ * `status` (see `EditableStatusCell`, self-contained click-propagation
+ * guard, same pattern as `contacts/table/EditableStatusCell.tsx`), there is
  * no columns picker (the column set is short and fixed), and no
  * bulk-actions toolbar (`bulkActionButtons={false}` also drops the
  * selection checkbox column entirely, unlike `ContactTable`'s
  * `bulkActionsToolbar={false}` which keeps checkboxes for a toolbar
  * rendered by its caller). `rowClick="show"` navigates the whole row to the
- * Club's Show page, so -- also unlike `ContactTable`, which disables row
- * click because its cells mutate on click -- no column needs its own
- * `Link`/click-propagation guard.
+ * Club's Show page.
  */
 export const CompanyTable = () => {
   return (
@@ -34,6 +34,9 @@ export const CompanyTable = () => {
           <CompanyAvatar width={20} height={20} />
         </DataTable.Col>
         <DataTable.Col source="name" />
+        <DataTable.Col source="status">
+          <EditableStatusCell />
+        </DataTable.Col>
         <DataTable.Col source="sector">
           <CompanySectorCell />
         </DataTable.Col>
@@ -54,7 +57,7 @@ export const CompanyTable = () => {
 /**
  * The stored `sector` is a raw value (e.g. `"padel_club"`); resolve it
  * against the configured `companySectors` list for its display label, the
- * same lookup `CompanyCard`/`CompanyListFilter` used.
+ * same lookup `CompanyListFilter` used.
  */
 const CompanySectorCell = () => {
   const record = useRecordContext<Company>();

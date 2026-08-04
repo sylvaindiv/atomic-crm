@@ -9,14 +9,13 @@ import {
 } from "ra-core";
 import { Link } from "react-router";
 import { DeleteButton } from "@/components/admin/delete-button";
-import { ReferenceField } from "@/components/admin/reference-field";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 import { FormToolbar } from "../layout/FormToolbar";
-import { CompanyAvatar } from "../companies/CompanyAvatar";
 import type { Deal } from "../types";
 import { DealInputs } from "./DealInputs";
+import { DealCaseTypeBadge, DealPartyAvatar } from "./DealParty";
 
 export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
   const redirect = useRedirect();
@@ -35,6 +34,17 @@ export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
           <EditBase
             id={id}
             mutationMode="pessimistic"
+            // Without an explicit `loading` element, ra-core's EditBase
+            // renders its children as soon as it mounts, before the record
+            // has been fetched (see ra-core's EditBase: `showLoading` only
+            // gates rendering when `loading` is set). That let DealInputs
+            // mount with an undefined record, so `useDealCaseType()` fell
+            // back to the (also-empty) watched form value and picked the
+            // wrong "Lie a" branch for a beat -- and in fast/cached fetches
+            // it could still be showing that first, wrong render by the
+            // time the dialog is visually settled. Render nothing until the
+            // real record is in context, exactly like DealShowContent does.
+            loading={null}
             mutationOptions={{
               onSuccess: () => {
                 notify("resources.deals.updated", {});
@@ -68,10 +78,9 @@ function EditHeader() {
     <DialogTitle className="pb-0">
       <div className="flex justify-between items-start mb-8">
         <div className="flex items-center gap-4">
-          <ReferenceField source="company_id" reference="companies" link="show">
-            <CompanyAvatar />
-          </ReferenceField>
+          <DealPartyAvatar deal={deal} linkToShow />
           <h2 className="text-2xl font-semibold">{defaultTitle}</h2>
+          <DealCaseTypeBadge caseType={deal.case_type} />
         </div>
         <div className="flex gap-2 pr-12">
           <DeleteButton />

@@ -15,19 +15,18 @@ import {
 import { DeleteButton } from "@/components/admin/delete-button";
 import { EditButton } from "@/components/admin/edit-button";
 import { ReferenceArrayField } from "@/components/admin/reference-array-field";
-import { ReferenceField } from "@/components/admin/reference-field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 
-import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { NoteCreate } from "../notes/NoteCreate";
 import { NotesIterator } from "../notes/NotesIterator";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { ContactList } from "./ContactList";
 import { findDealLabel, formatISODateString } from "./dealUtils";
+import { DealCaseTypeBadge, DealPartyAvatar } from "./DealParty";
 
 export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
   const redirect = useRedirect();
@@ -50,7 +49,7 @@ export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
 
 const DealShowContent = () => {
   const translate = useTranslate();
-  const { dealStages, dealCategories, currency } = useConfigurationContext();
+  const { noteStatuses, dealCategories, currency } = useConfigurationContext();
   const record = useRecordContext<Deal>();
   if (!record) return null;
 
@@ -61,14 +60,9 @@ const DealShowContent = () => {
         <div className="flex-1">
           <div className="flex justify-between items-start mb-8">
             <div className="flex items-center gap-4">
-              <ReferenceField
-                source="company_id"
-                reference="companies"
-                link="show"
-              >
-                <CompanyAvatar />
-              </ReferenceField>
+              <DealPartyAvatar deal={record} linkToShow />
               <h2 className="text-2xl font-semibold">{record.name}</h2>
+              <DealCaseTypeBadge caseType={record.case_type} />
             </div>
             <div className={`flex gap-2 ${record.archived_at ? "" : "pr-12"}`}>
               {record.archived_at ? (
@@ -136,7 +130,7 @@ const DealShowContent = () => {
                 {translate("resources.deals.fields.stage")}
               </span>
               <span className="text-sm">
-                {findDealLabel(dealStages, record.stage)}
+                {findDealLabel(noteStatuses, record.stage)}
               </span>
             </div>
           </div>

@@ -4,6 +4,10 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## Business Knowledge
 
+- A deal is either a judge case (`case_type: "judge"`, linked to exactly one contact) or a club case (`case_type: "club"`, linked to one company) — chosen at creation and immutable afterwards.
+- The deals Kanban board no longer has its own stage config: its columns are the shared `noteStatuses` (contact/company statuses) flagged `visibleInDealsKanban`, so judges/clubs and deals move through the same status vocabulary.
+- A judge's (contact) or club's (company) `status` field and their linked deal's `stage` are kept in sync automatically by the backend (`server/dealSync.mjs`): changing one side updates or creates the other, one hop only, no ping-pong.
+- Companies have a `status` column (same value space as `contacts.status`); `contacts_summary.linked_deal_id` exposes each contact's most recent non-archived judge deal.
 - Core resources: contacts, companies, deals (Kanban pipeline), tasks, notes, tags, and sales (team members).
 - Domain options (genders, sectors, deal stages/categories, note statuses, task types) are `<CRM>` props in `src/App.tsx`, not hardcoded.
 - Sales users sync with Supabase `auth.users` via triggers; deletion is unsupported — accounts are disabled instead.
@@ -69,3 +73,15 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 **Prochaines étapes / TODOs.** - [ ] Aucune action code en attente ; PR #7 ouverte, à merger par l'utilisateur.
 >>>>>>> origin/main
+
+## 2026-08-04 16:28 — Pipeline affaires piloté par statuts juge/club livré
+**Résumé.** Implémenté la fonctionnalité demandée en plan mode : les colonnes du Kanban "affaires" sont pilotées par la liste des statuts juges-arbitres (`noteStatuses`), avec synchronisation bidirectionnelle statut↔stage (contact/club ↔ deal), un champ `deals.case_type` (Juge/Club, immuable), un statut club (`companies.status`), une section "affaire liée" sur la fiche contact, et le fix du graphique dashboard (NaN). 9 tickets développés/revus/mergés via le harness (plusieurs re-revues, 2 vrais bugs runtime attrapés). Vérifié en mode démo via agent-browser — le "bug" d'ordre de colonnes signalé par l'utilisateur s'est avéré être le reset-on-reload normal de FakeRest, pas un défaut du code. Migration SQL générée, revue, mergée, puis appliquée avec succès sur la vraie base Turso (`atomic-crm-sylvaindiv`) une fois les identifiants renseignés dans `.env.development`.
+**Décisions prises.** - Kanban columns = `noteStatuses` partagé, une seule source de vérité entre juges, clubs et pipeline affaires. - Sync bidirectionnelle en SQL brut côté serveur (`server/dealSync.mjs`), jamais via `update()` générique, pour éviter toute boucle infinie. - Pas de mapping deviné pour les anciens statuts de deals : les affaires historiques disparaissent du Kanban jusqu'à réassignation manuelle. - Le script générique `.claude/scripts/apply-migrations.mjs` (Supabase/Docker) ne fonctionne pas sur ce projet Turso — appliqué manuellement via `node --env-file=.env.development db/migrations/<fichier>.mjs`.
+**Fichiers / skills modifiés.** - `db/schema.sql`, `server/dealSync.mjs`, `server/query.mjs` — sync bidirectionnelle statut/stage. - `src/components/atomic-crm/deals/*`, `companies/*`, `contacts/ContactAside.tsx`, `dashboard/DealsChart.tsx`, `settings/SettingsPage.tsx` — UI complète. - `db/migrations/20260804141928_7eef2240_migration_judge-club-status-pipeline.mjs` — migration générée et appliquée.
+**Prochaines étapes / TODOs.** - [ ] Corriger ou documenter `.claude/scripts/apply-migrations.mjs` pour ce projet Turso (actuellement suppose Supabase/Docker). - [ ] Nettoyer l'artefact de merge Git préexistant en ligne 75 (`>>>>>>> origin/main` orphelin).
+
+## 2026-08-04 17:54 — PR #13 créée, secrets Turso exclus du commit
+**Résumé.** Création de la PR #13 (statuts-colonnes-juge-arbitre → main) sur github.com/sylvaindiv/atomic-crm suite à la livraison de la fonctionnalité pipeline affaires. `.env.development` contenait les vrais identifiants Turso (TURSO_DATABASE_URL/TURSO_AUTH_TOKEN) ajoutés par l'utilisateur en session précédente ; détecté que ce fichier n'est pas gitignoré et que le dépôt est public. Seul `MEMORY.md` a été committé/poussé (entrée précédente corrigée : migration marquée appliquée au lieu de "en attente"). Demande explicite ultérieure de "commit and push all changes" reconfirmée avec l'utilisateur avant exécution ; il a choisi d'exclure `.env.development`.
+**Décisions prises.** - Ne jamais committer `.env.development` en l'état car il contient des secrets de production et le dépôt est public — confirmation explicite demandée et obtenue avant tout push. - `.env.development` reste modifié uniquement en local, non poussé.
+**Fichiers / skills modifiés.** - `MEMORY.md` — commit `8dd1cba`, correction de l'entrée précédente sur le statut de la migration.
+**Prochaines étapes / TODOs.** - [ ] Déplacer les secrets Turso de `.env.development` vers `.env` (déjà gitignoré) pour éviter tout risque futur. - [ ] PR #13 à relire/merger par l'utilisateur.

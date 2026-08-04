@@ -23,6 +23,7 @@ export const englishCrmMessages = {
         description: "Description",
         context_links: "Context links",
         sales_id: "Account manager",
+        status: "Status",
       },
       empty: {
         description: "It seems your club list is empty.",
@@ -74,6 +75,7 @@ export const englishCrmMessages = {
         misc: "Misc",
         personal_info: "Personal info",
         position: "Position",
+        linked_deal: "Linked deal",
       },
       fields: {
         first_name: "First name",
@@ -213,6 +215,11 @@ export const englishCrmMessages = {
         amount: "Budget",
         expected_closing_date: "Expected closing date",
         stage: "Stage",
+        case_type: "Case type",
+      },
+      case_types: {
+        judge: "Judge",
+        club: "Club",
       },
       action: {
         back_to_deal: "Back to deal",
@@ -504,6 +511,7 @@ export const englishCrmMessages = {
       light_mode_logo: "Light Mode Logo",
       notes: {
         statuses: "Statuses",
+        visible_in_kanban: "Visible in Deals Kanban",
       },
       reset_defaults: "Reset to Defaults",
       save_error: "Failed to save configuration",

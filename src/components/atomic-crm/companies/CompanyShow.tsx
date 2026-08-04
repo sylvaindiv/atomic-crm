@@ -41,6 +41,7 @@ import {
   ContextInfo,
 } from "./CompanyAside";
 import { CompanyAvatar } from "./CompanyAvatar";
+import { CompanyStatusSelector } from "./CompanyInputs";
 
 export const CompanyShow = () => {
   const isMobile = useIsMobile();
@@ -77,6 +78,7 @@ const CompanyShowContentMobile = () => {
             <div className="mx-3 flex-1">
               <h2 className="text-2xl font-bold">{record.name}</h2>
             </div>
+            <CompanyStatusSelector />
           </div>
         </div>
         <CompanyInfo record={record} />
@@ -113,9 +115,10 @@ const CompanyShowContent = () => {
       <div className="flex-1">
         <Card>
           <CardContent>
-            <div className="flex mb-3">
+            <div className="flex mb-3 items-center">
               <CompanyAvatar />
               <h5 className="text-xl ml-2 flex-1">{record.name}</h5>
+              <CompanyStatusSelector />
             </div>
             <Tabs defaultValue={currentTab} onValueChange={handleTabChange}>
               <TabsList className="grid w-full grid-cols-3">
@@ -262,7 +265,8 @@ const DealsIterator = () => {
   const translate = useTranslate();
   const [locale = "en"] = useLocaleState();
   const { data: deals, error, isPending } = useListContext<Deal>();
-  const { dealStages, dealCategories, currency } = useConfigurationContext();
+  // Deal stages resolve against the noteStatuses configuration.
+  const { noteStatuses, dealCategories, currency } = useConfigurationContext();
   if (isPending || error) return null;
   return (
     <div>
@@ -276,7 +280,7 @@ const DealsIterator = () => {
               <div className="flex-1 min-w-0">
                 <div className="font-medium">{deal.name}</div>
                 <div className="text-sm text-muted-foreground">
-                  {findDealLabel(dealStages, deal.stage)},{" "}
+                  {findDealLabel(noteStatuses, deal.stage)},{" "}
                   {deal.amount.toLocaleString("en-US", {
                     notation: "compact",
                     style: "currency",

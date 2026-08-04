@@ -3,11 +3,14 @@ import { datatype, lorem, random } from "faker/locale/en_US";
 
 import {
   defaultDealCategories,
-  defaultDealStages,
+  defaultNoteStatuses,
 } from "../../../root/defaultConfiguration";
+import { getVisibleDealStatuses } from "../../../deals/stages";
 import type { Deal } from "../../../types";
 import type { Db } from "./types";
 import { randomDate } from "./utils";
+
+const visibleDealStatuses = getVisibleDealStatuses(defaultNoteStatuses);
 
 export const generateDeals = (db: Db): Deal[] => {
   const deals = Array.from(Array(50).keys()).map((id) => {
@@ -33,7 +36,8 @@ export const generateDeals = (db: Db): Deal[] => {
       company_id: company.id,
       contact_ids: contacts.map((contact) => contact.id),
       category: random.arrayElement(defaultDealCategories).value,
-      stage: random.arrayElement(defaultDealStages).value,
+      case_type: random.arrayElement(["judge", "club"] as const),
+      stage: random.arrayElement(visibleDealStatuses).value,
       description: lorem.paragraphs(datatype.number({ min: 1, max: 4 })),
       amount: datatype.number(1000) * 100,
       created_at,
@@ -44,9 +48,9 @@ export const generateDeals = (db: Db): Deal[] => {
     };
   });
   // compute index based on stage
-  defaultDealStages.forEach((stage) => {
+  visibleDealStatuses.forEach((status) => {
     deals
-      .filter((deal) => deal.stage === stage.value)
+      .filter((deal) => deal.stage === status.value)
       .forEach((deal, index) => {
         deals[deal.id].index = index;
       });
