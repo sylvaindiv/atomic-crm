@@ -8,7 +8,11 @@ describe("DealCard", () => {
     await expect
       .element(screen.getByText(/Padel Club Paris/))
       .toBeInTheDocument();
-    await expect.element(screen.getByText("Club")).toBeInTheDocument();
+    // exact: true -- "Padel Club Paris" also contains the substring "Club",
+    // which would otherwise make this locator ambiguous against the badge.
+    await expect
+      .element(screen.getByText("Club", { exact: true }))
+      .toBeInTheDocument();
   });
 
   it("shows the judge name and a Judge badge for a judge deal, with no broken company slot", async () => {
