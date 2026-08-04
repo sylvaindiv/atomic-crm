@@ -556,6 +556,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/deals/DealParty.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/deals/DealListContent.tsx",
           "type": "registry:component"
         },
