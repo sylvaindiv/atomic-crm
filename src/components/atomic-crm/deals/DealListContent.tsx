@@ -7,20 +7,21 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { DealColumn } from "./DealColumn";
 import type { DealsByStage } from "./stages";
-import { getDealsByStage } from "./stages";
+import { getDealsByStage, getVisibleDealStatuses } from "./stages";
 
 export const DealListContent = () => {
-  const { dealStages } = useConfigurationContext();
+  const { noteStatuses } = useConfigurationContext();
+  const visibleStatuses = getVisibleDealStatuses(noteStatuses);
   const { data: unorderedDeals, isPending, refetch } = useListContext<Deal>();
   const dataProvider = useDataProvider();
 
   const [dealsByStage, setDealsByStage] = useState<DealsByStage>(
-    getDealsByStage([], dealStages),
+    getDealsByStage([], noteStatuses),
   );
 
   useEffect(() => {
     if (unorderedDeals) {
-      const newDealsByStage = getDealsByStage(unorderedDeals, dealStages);
+      const newDealsByStage = getDealsByStage(unorderedDeals, noteStatuses);
       if (!isEqual(newDealsByStage, dealsByStage)) {
         setDealsByStage(newDealsByStage);
       }
@@ -73,11 +74,11 @@ export const DealListContent = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex gap-4">
-        {dealStages.map((stage) => (
+        {visibleStatuses.map((status) => (
           <DealColumn
-            stage={stage.value}
-            deals={dealsByStage[stage.value]}
-            key={stage.value}
+            stage={status.value}
+            deals={dealsByStage[status.value]}
+            key={status.value}
           />
         ))}
       </div>
