@@ -10,9 +10,9 @@ describe("validateItemsInUse", () => {
   ];
 
   it("returns undefined when items is undefined", () => {
-    expect(
-      validateItemsInUse(undefined, deals, "category", "categories"),
-    ).toBe(undefined);
+    expect(validateItemsInUse(undefined, deals, "category", "categories")).toBe(
+      undefined,
+    );
   });
 
   it("returns undefined when all in-use values are present", () => {
@@ -20,16 +20,14 @@ describe("validateItemsInUse", () => {
       { value: "ui-design", label: "UI Design" },
       { value: "copywriting", label: "Copywriting" },
     ];
-    expect(
-      validateItemsInUse(items, deals, "category", "categories"),
-    ).toBe(undefined);
+    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
+      undefined,
+    );
   });
 
   it("returns an error when an in-use value is removed", () => {
     const items = [{ value: "ui-design", label: "UI Design" }];
-    expect(
-      validateItemsInUse(items, deals, "category", "categories"),
-    ).toBe(
+    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
       "Cannot remove categories that are still used by deals: copywriting",
     );
   });
@@ -47,9 +45,9 @@ describe("validateItemsInUse", () => {
       { value: "ui-design", label: "UI Design again" },
       { value: "copywriting", label: "Copywriting" },
     ];
-    expect(
-      validateItemsInUse(items, deals, "category", "categories"),
-    ).toBe("Duplicate categories: ui-design");
+    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
+      "Duplicate categories: ui-design",
+    );
   });
 
   it("detects duplicates via slug fallback when value is empty", () => {
@@ -58,16 +56,16 @@ describe("validateItemsInUse", () => {
       { value: "ui-design", label: "Already UI Design" },
       { value: "copywriting", label: "Copywriting" },
     ];
-    expect(
-      validateItemsInUse(items, deals, "category", "categories"),
-    ).toBe("Duplicate categories: ui-design");
+    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
+      "Duplicate categories: ui-design",
+    );
   });
 
   it("returns 'Validating…' when deals have not loaded yet", () => {
     const items = [{ value: "ui-design", label: "UI Design" }];
-    expect(
-      validateItemsInUse(items, undefined, "category", "categories"),
-    ).toBe("Validating…");
+    expect(validateItemsInUse(items, undefined, "category", "categories")).toBe(
+      "Validating…",
+    );
   });
 
   it("ignores deals with a falsy value for the checked field", () => {
@@ -117,9 +115,11 @@ describe("transformFormValues", () => {
 
     const result = transformFormValues(data);
 
-    expect(result.config.noteStatuses?.map((status) => status.label)).toEqual(
-      ["Third", "First", "Second"],
-    );
+    expect(result.config.noteStatuses?.map((status) => status.label)).toEqual([
+      "Third",
+      "First",
+      "Second",
+    ]);
   });
 
   it("slugs the value from the label when absent", () => {
