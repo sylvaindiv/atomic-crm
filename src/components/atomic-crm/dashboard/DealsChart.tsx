@@ -80,7 +80,10 @@ export const DealsChart = memo(() => {
 
     const amountByMonth = Object.keys(dealsByMonth).map((month) => {
       return dealsByMonth[month].reduce(
-        (acc: { date: string; won: number; pending: number; lost: number }, deal: Deal) => {
+        (
+          acc: { date: string; won: number; pending: number; lost: number },
+          deal: Deal,
+        ) => {
           const { bucket, weight } = getDealStageBucket(deal.stage);
           if (bucket === "won") {
             acc.won += deal.amount;
