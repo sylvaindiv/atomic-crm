@@ -42,7 +42,7 @@ export const ContactLinkedDeal = () => {
 
 const LinkedDealSummary = () => {
   const deal = useRecordContext<Deal>();
-  const { dealStages } = useConfigurationContext();
+  const { noteStatuses } = useConfigurationContext();
 
   if (!deal) return null;
 
@@ -50,7 +50,7 @@ const LinkedDealSummary = () => {
     <div>
       <div className="font-medium">{deal.name}</div>
       <div className="text-muted-foreground">
-        {findDealLabel(dealStages, deal.stage) ?? deal.stage}
+        {findDealLabel(noteStatuses, deal.stage) ?? deal.stage}
       </div>
     </div>
   );

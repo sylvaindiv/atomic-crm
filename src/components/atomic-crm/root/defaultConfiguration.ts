@@ -21,17 +21,6 @@ export const defaultCompanySectors = [
   { value: "utilities", label: "Utilities" },
 ];
 
-export const defaultDealStages = [
-  { value: "opportunity", label: "Opportunity" },
-  { value: "proposal-sent", label: "Proposal Sent" },
-  { value: "in-negociation", label: "In Negotiation" },
-  { value: "won", label: "Won" },
-  { value: "lost", label: "Lost" },
-  { value: "delayed", label: "Delayed" },
-];
-
-export const defaultDealPipelineStatuses = ["won"];
-
 export const defaultDealCategories = [
   { value: "other", label: "Other" },
   { value: "copywriting", label: "Copywriting" },
@@ -98,8 +87,6 @@ export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
   currency: defaultCurrency,
   dealCategories: defaultDealCategories,
-  dealPipelineStatuses: defaultDealPipelineStatuses,
-  dealStages: defaultDealStages,
   noteStatuses: defaultNoteStatuses,
   taskTypes: defaultTaskTypes,
   title: defaultTitle,
