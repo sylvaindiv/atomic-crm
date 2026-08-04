@@ -2,7 +2,9 @@ import type { NoteStatus } from "../types";
 import type { Deal } from "../types";
 import { getDealsByStage, getVisibleDealStatuses } from "./stages";
 
-const makeStatus = (overrides: Partial<NoteStatus> & Pick<NoteStatus, "value">): NoteStatus =>
+const makeStatus = (
+  overrides: Partial<NoteStatus> & Pick<NoteStatus, "value">,
+): NoteStatus =>
   ({
     label: overrides.value,
     color: "#000000",
@@ -10,7 +12,9 @@ const makeStatus = (overrides: Partial<NoteStatus> & Pick<NoteStatus, "value">):
     ...overrides,
   }) as NoteStatus;
 
-const makeDeal = (overrides: Partial<Deal> & Pick<Deal, "id" | "stage">): Deal =>
+const makeDeal = (
+  overrides: Partial<Deal> & Pick<Deal, "id" | "stage">,
+): Deal =>
   ({
     name: "Deal",
     index: 0,
