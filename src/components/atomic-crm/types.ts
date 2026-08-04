@@ -69,6 +69,8 @@ export type Company = {
   context_links?: string[];
   nb_contacts?: number;
   nb_deals?: number;
+  // Same value space as Contact['status'] (see providers/commons/*CrmMessages).
+  status?: string;
 } & Pick<RaRecord, "id">;
 
 export type EmailAndType = {
@@ -103,6 +105,9 @@ export type Contact = {
   company_name?: string;
   referred_by_name?: string;
   latest_note_text?: string;
+  // Most recent non-archived 'judge' deal this contact is a party to
+  // (contacts_summary view). Null when there is none.
+  linked_deal_id?: Identifier | null;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {
@@ -119,6 +124,9 @@ export type Deal = {
   company_id: Identifier;
   contact_ids: Identifier[];
   category: string;
+  // 'judge' | 'club'. Named case_type (not "type") to avoid a conceptual
+  // collision with DealNote['type'] / Task['type'].
+  case_type: "judge" | "club";
   stage: string;
   description: string;
   amount: number;
@@ -218,10 +226,10 @@ export interface LabeledValue {
   label: string;
 }
 
-export type DealStage = LabeledValue;
-
 export interface NoteStatus extends LabeledValue {
   color: string;
+  // Whether a note-status is one of the deals Kanban columns.
+  visibleInDealsKanban: boolean;
 }
 
 export interface ContactGender {

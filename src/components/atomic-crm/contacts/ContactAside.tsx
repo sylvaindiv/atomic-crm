@@ -1,9 +1,12 @@
 import { useRecordContext, useTranslate } from "ra-core";
 import { EditButton } from "@/components/admin/edit-button";
 import { DeleteButton } from "@/components/admin";
+import { ReferenceField } from "@/components/admin/reference-field";
 import { ReferenceManyField } from "@/components/admin/reference-many-field";
 import { ShowButton } from "@/components/admin/show-button";
 
+import { findDealLabel } from "../deals/dealUtils";
+import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AddTask } from "../tasks/AddTask";
 import { TasksIterator } from "../tasks/TasksIterator";
 import { TagsListEdit } from "./TagsListEdit";
@@ -11,8 +14,47 @@ import { ContactStatusSelector } from "./ContactInputs";
 import { ContactPersonalInfo } from "./ContactPersonalInfo";
 import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
 import { AsideSection } from "../misc/AsideSection";
-import type { Contact } from "../types";
+import type { Contact, Deal } from "../types";
 import { ContactMergeButton } from "./ContactMergeButton";
+
+/**
+ * Shows the "judge" deal this contact currently mirrors the status of
+ * (`linked_deal_id`, computed by the `contacts_summary` view). Renders
+ * nothing when the contact has no linked deal -- no broken reference, no
+ * loading spinner.
+ */
+export const ContactLinkedDeal = () => {
+  const record = useRecordContext<Contact>();
+  const translate = useTranslate();
+
+  if (!record?.linked_deal_id) return null;
+
+  return (
+    <AsideSection
+      title={translate("resources.contacts.field_categories.linked_deal")}
+    >
+      <ReferenceField source="linked_deal_id" reference="deals" link="show">
+        <LinkedDealSummary />
+      </ReferenceField>
+    </AsideSection>
+  );
+};
+
+const LinkedDealSummary = () => {
+  const deal = useRecordContext<Deal>();
+  const { noteStatuses } = useConfigurationContext();
+
+  if (!deal) return null;
+
+  return (
+    <div>
+      <div className="font-medium">{deal.name}</div>
+      <div className="text-muted-foreground">
+        {findDealLabel(noteStatuses, deal.stage) ?? deal.stage}
+      </div>
+    </div>
+  );
+};
 
 export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
   const record = useRecordContext<Contact>();
@@ -45,6 +87,8 @@ export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
       >
         <ContactBackgroundInfo />
       </AsideSection>
+
+      <ContactLinkedDeal />
 
       <AsideSection
         title={translate("resources.tags.name", { smart_count: 2 })}

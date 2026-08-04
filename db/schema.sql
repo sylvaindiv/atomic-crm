@@ -35,7 +35,10 @@ CREATE TABLE IF NOT EXISTS companies (
     description    TEXT,
     revenue        TEXT,
     tax_identifier TEXT,
-    logo           TEXT           -- JSON object (RAFile)
+    logo           TEXT,          -- JSON object (RAFile)
+    -- Same value space as contacts.status, no CHECK constraint (consistent
+    -- with the existing contacts.status).
+    status         TEXT
 );
 
 -- Contacts --------------------------------------------------------------------
@@ -79,6 +82,9 @@ CREATE TABLE IF NOT EXISTS deals (
     company_id            INTEGER REFERENCES companies(id) ON UPDATE CASCADE ON DELETE CASCADE,
     contact_ids           TEXT,   -- JSON array of contact ids
     category              TEXT,
+    -- 'judge' | 'club'. Named case_type (not "type") to avoid a conceptual
+    -- collision with deal_notes.type / tasks.type.
+    case_type             TEXT NOT NULL DEFAULT 'club',
     stage                 TEXT NOT NULL,
     description           TEXT,
     amount                INTEGER,
@@ -148,6 +154,7 @@ CREATE INDEX IF NOT EXISTS contact_notes_contact_id_idx ON contact_notes (contac
 CREATE INDEX IF NOT EXISTS contacts_company_id_idx      ON contacts (company_id);
 CREATE INDEX IF NOT EXISTS deal_notes_deal_id_idx        ON deal_notes (deal_id);
 CREATE INDEX IF NOT EXISTS deals_company_id_idx          ON deals (company_id);
+CREATE INDEX IF NOT EXISTS deals_case_type_idx           ON deals (case_type);
 CREATE UNIQUE INDEX IF NOT EXISTS uq__sales__email       ON sales (email);
 
 -- Views -----------------------------------------------------------------------
@@ -177,5 +184,16 @@ SELECT
        FROM contacts r WHERE r.id = co.referred_by_id
     ) AS referred_by_name,
     (SELECT count(*) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS nb_tasks,
-    (SELECT text FROM contact_notes cn WHERE cn.contact_id = co.id ORDER BY date DESC LIMIT 1) AS latest_note_text
+    (SELECT text FROM contact_notes cn WHERE cn.contact_id = co.id ORDER BY date DESC LIMIT 1) AS latest_note_text,
+    -- Most recent non-archived 'judge' deal this contact is a party to.
+    (SELECT d.id FROM deals d
+       WHERE d.case_type = 'judge'
+         AND d.archived_at IS NULL
+         AND EXISTS (
+           SELECT 1 FROM json_each(CASE WHEN json_valid(d.contact_ids) THEN d.contact_ids ELSE '[]' END) je
+           WHERE je.value = co.id
+         )
+       ORDER BY d.created_at DESC
+       LIMIT 1
+    ) AS linked_deal_id
 FROM contacts co;
