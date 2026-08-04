@@ -2,10 +2,7 @@ import { format } from "date-fns";
 
 import type { LabeledValue } from "../types";
 
-export const findDealLabel = (
-  statuses: LabeledValue[],
-  dealValue: string,
-) => {
+export const findDealLabel = (statuses: LabeledValue[], dealValue: string) => {
   const status = statuses.find((status) => status.value === dealValue);
   return status?.label;
 };
