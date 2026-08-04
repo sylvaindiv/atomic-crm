@@ -1,4 +1,10 @@
-import { required, useRecordContext, useTranslate } from "ra-core";
+import {
+  required,
+  useNotify,
+  useRecordContext,
+  useTranslate,
+  useUpdate,
+} from "ra-core";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { TextInput } from "@/components/admin/text-input";
 import { SelectInput } from "@/components/admin/select-input";
@@ -9,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 import ImageEditorField from "../misc/ImageEditorField";
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
+import { StatusSelector } from "../notes";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Company, Sale } from "../types";
 import { getTranslatedCompanySizeLabel } from "./getTranslatedCompanySizeLabel";
@@ -33,6 +40,7 @@ export const CompanyInputs = () => {
   return (
     <div className="flex flex-col gap-4 p-1">
       <CompanyDisplayInputs />
+      <CompanyStatusInputs />
       <div className={`flex gap-6 ${isMobile ? "flex-col" : "flex-row"}`}>
         <div className="flex flex-col gap-10 flex-1">
           <CompanyContactInputs />
@@ -70,6 +78,18 @@ const CompanyDisplayInputs = () => {
           _: "Club name",
         })}
       />
+    </div>
+  );
+};
+
+const CompanyStatusInputs = () => {
+  const translate = useTranslate();
+  return (
+    <div className="flex flex-col gap-4">
+      <h6 className="text-lg font-semibold">
+        {translate("resources.companies.fields.status")}
+      </h6>
+      <CompanyStatusSelector />
     </div>
   );
 };
@@ -175,3 +195,59 @@ const CompanyAdditionalInformationInputs = () => {
 
 const saleOptionRenderer = (choice: Sale) =>
   `${choice.first_name} ${choice.last_name}`;
+
+/**
+ * Status selector for the `companies` resource, modelled on
+ * `ContactStatusSelector` (see `contacts/ContactInputs.tsx`): it persists the
+ * selection immediately via a normal `update` on `companies` rather than
+ * going through the surrounding form's save button, so it also works when
+ * embedded outside a form (`CompanyShow.tsx`, `CompanyCard.tsx`).
+ *
+ * Renders nothing while creating a company (no record/id yet) -- the status
+ * only becomes settable once the company exists.
+ */
+export const CompanyStatusSelector = () => {
+  const record = useRecordContext<Company>();
+  const [update] = useUpdate<Company>();
+  const notify = useNotify();
+  if (!record) return null;
+
+  const handleStatusChange = (nextStatus: string) => {
+    if (nextStatus === record?.status) return;
+
+    update(
+      "companies",
+      {
+        id: record.id,
+        data: { status: nextStatus },
+        previousData: record,
+      },
+      {
+        mutationMode: "optimistic",
+        onError: (error) => {
+          notify(
+            typeof error === "string"
+              ? error
+              : error?.message || "ra.notification.http_error",
+            {
+              type: "error",
+              messageArgs: {
+                _: typeof error === "string" ? error : error?.message,
+              },
+            },
+          );
+        },
+      },
+    );
+  };
+
+  return (
+    <div className="[&_button]:w-auto">
+      <StatusSelector
+        status={record?.status}
+        setStatus={handleStatusChange}
+        triggerClassName="w-full"
+      />
+    </div>
+  );
+};
