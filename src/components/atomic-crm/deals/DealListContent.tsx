@@ -27,7 +27,7 @@ export const DealListContent = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [unorderedDeals]);
+  }, [unorderedDeals, noteStatuses]);
 
   if (isPending) return null;
 
@@ -77,7 +77,7 @@ export const DealListContent = () => {
         {visibleStatuses.map((status) => (
           <DealColumn
             stage={status.value}
-            deals={dealsByStage[status.value]}
+            deals={dealsByStage[status.value] ?? []}
             key={status.value}
           />
         ))}
