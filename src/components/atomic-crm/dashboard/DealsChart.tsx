@@ -50,12 +50,12 @@ const DEFAULT_LOCALE = "en-US";
 
 export const DealsChart = memo(() => {
   const translate = useTranslate();
-  const { dealStages, currency } = useConfigurationContext();
+  const { noteStatuses, currency } = useConfigurationContext();
   const acceptedLanguages = navigator
     ? navigator.languages || [navigator.language]
     : [DEFAULT_LOCALE];
-  const wonLabel = findDealLabel(dealStages, WON_STAGE_VALUE) ?? "Won";
-  const lostLabel = findDealLabel(dealStages, LOST_STAGE_VALUE) ?? "Lost";
+  const wonLabel = findDealLabel(noteStatuses, WON_STAGE_VALUE) ?? "Won";
+  const lostLabel = findDealLabel(noteStatuses, LOST_STAGE_VALUE) ?? "Lost";
 
   const { data, isPending } = useGetList<Deal>("deals", {
     pagination: { perPage: 100, page: 1 },
