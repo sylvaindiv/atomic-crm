@@ -96,6 +96,7 @@ describe("DealInputs", () => {
           contact_ids: [1],
         }}
         withSaveButton
+        saveButtonType="submit"
         onSubmit={onSubmit}
       />,
     );

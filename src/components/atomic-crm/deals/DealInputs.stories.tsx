@@ -11,6 +11,11 @@ type DealInputsStoryProps = {
   defaultValues?: Record<string, unknown>;
   record?: Partial<Deal>;
   withSaveButton?: boolean;
+  // "button" (the default) mirrors production, where the surrounding
+  // Edit/Create dialog owns the SaveContext and submits through it. "submit"
+  // triggers the native <form onSubmit>, which is how tests can observe the
+  // `onSubmit` prop below without a SaveContext in the tree.
+  saveButtonType?: "button" | "submit";
   onSubmit?: SubmitHandler<FieldValues>;
 };
 
@@ -18,6 +23,7 @@ export const DealInputsStory = ({
   defaultValues,
   record,
   withSaveButton = false,
+  saveButtonType = "button",
   onSubmit,
 }: DealInputsStoryProps) => (
   <StoryWrapper
@@ -41,7 +47,7 @@ export const DealInputsStory = ({
       onSubmit={onSubmit}
     >
       <DealInputs />
-      {withSaveButton ? <SaveButton type="button" /> : null}
+      {withSaveButton ? <SaveButton type={saveButtonType} /> : null}
     </Form>
   </StoryWrapper>
 );
