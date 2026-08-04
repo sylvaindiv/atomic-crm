@@ -15,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 import ImageEditorField from "../misc/ImageEditorField";
 import { isLinkedinUrl } from "../misc/isLinkedInUrl";
+import { Status } from "../misc/Status";
 import { StatusSelector } from "../notes";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Company, Sale } from "../types";
@@ -82,17 +83,47 @@ const CompanyDisplayInputs = () => {
   );
 };
 
+/**
+ * On the create form there is no record yet, so `CompanyStatusSelector`
+ * (which persists via an immediate `update`) has nothing to update -- it
+ * renders nothing. Fall back to a plain form-bound `SelectInput` so the
+ * status is still settable at creation time and saved by the form's normal
+ * submit, exactly like `NoteInputs` does for note status.
+ */
 const CompanyStatusInputs = () => {
   const translate = useTranslate();
+  const record = useRecordContext<Company>();
+  const { noteStatuses } = useConfigurationContext();
+
   return (
     <div className="flex flex-col gap-4">
       <h6 className="text-lg font-semibold">
         {translate("resources.companies.fields.status")}
       </h6>
-      <CompanyStatusSelector />
+      {record ? (
+        <CompanyStatusSelector />
+      ) : (
+        <SelectInput
+          source="status"
+          label={false}
+          choices={noteStatuses.map((status) => ({
+            id: status.value,
+            name: status.label,
+            value: status.value,
+          }))}
+          optionText={statusOptionRenderer}
+          helperText={false}
+        />
+      )}
     </div>
   );
 };
+
+const statusOptionRenderer = (choice: { value: string; name: string }) => (
+  <div>
+    <Status status={choice.value} /> {choice.name}
+  </div>
+);
 
 const CompanyContactInputs = () => {
   const translate = useTranslate();
