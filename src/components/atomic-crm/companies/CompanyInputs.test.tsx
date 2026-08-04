@@ -51,8 +51,6 @@ describe("CompanyStatusSelector", () => {
       </StoryWrapper>,
     );
 
-    await expect
-      .element(screen.getByRole("combobox"))
-      .not.toBeInTheDocument();
+    await expect.element(screen.getByRole("combobox")).not.toBeInTheDocument();
   });
 });
