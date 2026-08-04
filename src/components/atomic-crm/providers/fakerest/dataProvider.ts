@@ -542,7 +542,16 @@ export const createDataProvider = ({
           };
         },
         beforeUpdate: async (params) => {
-          return await processCompanyLogo(params);
+          // Partial updates (e.g. the status selector sending only
+          // `{ status }`) must not touch the logo: `processCompanyLogo`
+          // treats a missing `logo` key as "no logo", falls back to
+          // `getCompanyAvatar`, and -- without a website in the partial
+          // payload -- erases the existing logo. Only run it when the
+          // update actually carries a `logo` key, mirroring the early
+          // return `processContactAvatar` uses for the same reason.
+          return "logo" in params.data
+            ? await processCompanyLogo(params)
+            : params;
         },
         afterUpdate: async (result, dataProvider) => {
           // get all contacts of the company and for each contact, update the company_name

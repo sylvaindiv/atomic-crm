@@ -13,6 +13,7 @@ import { Avatar as ContactAvatar } from "../contacts/Avatar";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Company } from "../types";
 import { CompanyAvatar } from "./CompanyAvatar";
+import { CompanyStatusSelector } from "./CompanyInputs";
 
 export const CompanyCard = (props: { record?: Company }) => {
   const createPath = useCreatePath();
@@ -39,6 +40,10 @@ export const CompanyCard = (props: { record?: Company }) => {
           <div className="text-center mt-1">
             <h6 className="text-sm font-medium">{record.name}</h6>
             <p className="text-xs text-muted-foreground">{sectorLabel}</p>
+          </div>
+          {/* Stop propagation so picking a status doesn't trigger the card's navigation link. */}
+          <div onClick={(event) => event.stopPropagation()}>
+            <CompanyStatusSelector />
           </div>
         </div>
         <div className="flex flex-row w-full justify-between gap-2">
