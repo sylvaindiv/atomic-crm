@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { EditBase, Form, ResourceContextProvider } from "ra-core";
+import type { FieldValues, SubmitHandler } from "react-hook-form";
 
 import { DealInputs } from "./DealInputs";
 import { SaveButton } from "@/components/admin/form";
@@ -10,12 +11,14 @@ type DealInputsStoryProps = {
   defaultValues?: Record<string, unknown>;
   record?: Partial<Deal>;
   withSaveButton?: boolean;
+  onSubmit?: SubmitHandler<FieldValues>;
 };
 
 export const DealInputsStory = ({
   defaultValues,
   record,
   withSaveButton = false,
+  onSubmit,
 }: DealInputsStoryProps) => (
   <StoryWrapper
     data={{
@@ -32,7 +35,11 @@ export const DealInputsStory = ({
       ],
     }}
   >
-    <Form defaultValues={defaultValues} record={record as Deal}>
+    <Form
+      defaultValues={defaultValues}
+      record={record as Deal}
+      onSubmit={onSubmit}
+    >
       <DealInputs />
       {withSaveButton ? <SaveButton type="button" /> : null}
     </Form>
@@ -45,6 +52,7 @@ const meta = {
     "Create",
     "EditJudgeDeal",
     "EditClubDeal",
+    "EditClubDealWithIdZero",
     "EditJudgeDealFromRealRecord",
   ],
   render: (args) => <DealInputsStory {...args} />,
@@ -65,6 +73,16 @@ export const EditJudgeDeal: Story = {
 export const EditClubDeal: Story = {
   args: {
     record: { id: 43, case_type: "club", company_id: 1 },
+  },
+};
+
+// Regression coverage for the falsy-id bug: a record whose id is 0 (e.g. the
+// first deal seeded by FakeRest) must still be treated as an edit form, not
+// a create form -- `!record?.id` is truthy for id 0, `record?.id == null` is
+// not.
+export const EditClubDealWithIdZero: Story = {
+  args: {
+    record: { id: 0, case_type: "club", company_id: 1, contact_ids: [1] },
   },
 };
 

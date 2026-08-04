@@ -48,12 +48,20 @@ const useDealCaseType = () => {
   return record?.case_type ?? watchedCaseType;
 };
 
-const DealInfoInputs = () => {
+// Whether the current deal form is a create form (no persisted record yet).
+// Uses a nullish check rather than a truthy one so a record whose id is 0
+// (e.g. FakeRest's first seeded deal) is still recognized as an edit form.
+const useIsDealCreate = () => {
   const record = useRecordContext<Deal>();
+  return record?.id == null;
+};
+
+const DealInfoInputs = () => {
+  const isCreate = useIsDealCreate();
   return (
     <div className="flex flex-col gap-4 flex-1">
       <TextInput source="name" validate={required()} helperText={false} />
-      {!record?.id && (
+      {isCreate && (
         <SelectInput
           source="case_type"
           label="resources.deals.fields.case_type"
@@ -71,22 +79,22 @@ const DealInfoInputs = () => {
 
 const DealLinkedToInputs = () => {
   const translate = useTranslate();
-  const record = useRecordContext<Deal>();
   const { setValue } = useFormContext();
   const caseType = useDealCaseType();
+  const isCreate = useIsDealCreate();
 
   // Clear the irrelevant link when the user changes case_type while
   // creating a deal, so a stray company_id/contact_ids never rides along
   // with the wrong case type. Not needed on edit: case_type is immutable
   // there, so this branch never switches.
   useEffect(() => {
-    if (record?.id) return;
+    if (!isCreate) return;
     if (caseType === "club") {
       setValue("contact_ids", []);
     } else if (caseType === "judge") {
       setValue("company_id", null);
     }
-  }, [caseType, record?.id, setValue]);
+  }, [caseType, isCreate, setValue]);
 
   return (
     <div className="flex flex-col gap-4 flex-1">

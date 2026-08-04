@@ -6,7 +6,8 @@ import {
   EditJudgeDealFromRealRecord,
 } from "./DealInputs.stories";
 
-const { Create, EditJudgeDeal, EditClubDeal } = composeStories(stories);
+const { Create, EditJudgeDeal, EditClubDeal, EditClubDealWithIdZero } =
+  composeStories(stories);
 
 describe("DealInputs", () => {
   it("shows a required case type select on the create form", async () => {
@@ -74,6 +75,30 @@ describe("DealInputs", () => {
       .element(screen.getByText("Judges-Referees"))
       .toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
+  });
+
+  it("treats a record with id 0 as an edit form, hiding the case type select and keeping its linked contacts", async () => {
+    const screen = await render(<EditClubDealWithIdZero />);
+
+    await expect.element(screen.getByText("Case type")).not.toBeInTheDocument();
+    await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
+  });
+
+  it("does not clear contact_ids on save for a club deal whose id is 0", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{ id: 0, case_type: "club", company_id: 1, contact_ids: [1] }}
+        withSaveButton
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.contact_ids).toEqual([1]);
   });
 
   it("resolves case_type from the real fetched record on edit, showing the judge input and hiding the club input", async () => {
