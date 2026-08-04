@@ -265,8 +265,7 @@ const DealsIterator = () => {
   const translate = useTranslate();
   const [locale = "en"] = useLocaleState();
   const { data: deals, error, isPending } = useListContext<Deal>();
-  // Deal stages are the note-status configuration -- read `noteStatuses`
-  // (not the legacy `dealStages` config key) so this label keeps resolving.
+  // Deal stages resolve against the noteStatuses configuration.
   const { noteStatuses, dealCategories, currency } = useConfigurationContext();
   if (isPending || error) return null;
   return (

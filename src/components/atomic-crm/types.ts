@@ -226,8 +226,6 @@ export interface LabeledValue {
   label: string;
 }
 
-export type DealStage = LabeledValue;
-
 export interface NoteStatus extends LabeledValue {
   color: string;
   // Whether a note-status is one of the deals Kanban columns.

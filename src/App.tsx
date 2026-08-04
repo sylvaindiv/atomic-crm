@@ -7,8 +7,6 @@ import { CRM } from "@/components/atomic-crm/root/CRM";
  *  - companySectors
  *  - darkTheme
  *  - dealCategories
- *  - dealPipelineStatuses
- *  - dealStages
  *  - lightTheme
  *  - logo
  *  - noteStatuses
