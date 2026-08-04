@@ -4,6 +4,10 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## Business Knowledge
 
+- A deal is either a judge case (`case_type: "judge"`, linked to exactly one contact) or a club case (`case_type: "club"`, linked to one company) — chosen at creation and immutable afterwards.
+- The deals Kanban board no longer has its own stage config: its columns are the shared `noteStatuses` (contact/company statuses) flagged `visibleInDealsKanban`, so judges/clubs and deals move through the same status vocabulary.
+- A judge's (contact) or club's (company) `status` field and their linked deal's `stage` are kept in sync automatically by the backend (`server/dealSync.mjs`): changing one side updates or creates the other, one hop only, no ping-pong.
+- Companies have a `status` column (same value space as `contacts.status`); `contacts_summary.linked_deal_id` exposes each contact's most recent non-archived judge deal.
 - Core resources: contacts, companies, deals (Kanban pipeline), tasks, notes, tags, and sales (team members).
 - Domain options (genders, sectors, deal stages/categories, note statuses, task types) are `<CRM>` props in `src/App.tsx`, not hardcoded.
 - Sales users sync with Supabase `auth.users` via triggers; deletion is unsupported — accounts are disabled instead.
