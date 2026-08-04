@@ -8,12 +8,39 @@ import { findDealLabel } from "../deals/dealUtils";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 
-const multiplier = {
-  opportunity: 0.2,
-  "proposal-sent": 0.5,
-  "in-negociation": 0.8,
-  delayed: 0.3,
-};
+/** Stage value counted as won -- the judge/club "Client" status. */
+export const WON_STAGE_VALUE = "client";
+/** Stage value counted as lost -- the judge/club "Mort" status. */
+export const LOST_STAGE_VALUE = "mort";
+/** Flat weight applied to every pending deal's amount (no per-stage weighting). */
+export const PENDING_STAGE_WEIGHT = 0.5;
+
+export type DealStageBucket = "won" | "lost" | "pending";
+
+/**
+ * Buckets a deal's stage value into won / lost / pending for dashboard
+ * aggregation, and returns the weight to apply to the deal's amount.
+ *
+ * Only `client` counts as won and `mort` as lost. Every other stage --
+ * including legacy generic-pipeline values (`won`, `lost`, `opportunity`,
+ * ...) or any status added later in Settings -- falls into the pending
+ * bucket with the same flat weight, since per-stage weighting no longer has
+ * meaning once stages are judge/club statuses. Pure and total: it never
+ * throws and never returns NaN, whatever string (or empty/undefined value)
+ * is passed in.
+ */
+export function getDealStageBucket(stage: string | undefined | null): {
+  bucket: DealStageBucket;
+  weight: number;
+} {
+  if (stage === WON_STAGE_VALUE) {
+    return { bucket: "won", weight: 1 };
+  }
+  if (stage === LOST_STAGE_VALUE) {
+    return { bucket: "lost", weight: 1 };
+  }
+  return { bucket: "pending", weight: PENDING_STAGE_WEIGHT };
+}
 
 const threeMonthsAgo = new Date(
   new Date().setMonth(new Date().getMonth() - 6),
@@ -27,8 +54,8 @@ export const DealsChart = memo(() => {
   const acceptedLanguages = navigator
     ? navigator.languages || [navigator.language]
     : [DEFAULT_LOCALE];
-  const wonLabel = findDealLabel(dealStages, "won") ?? "Won";
-  const lostLabel = findDealLabel(dealStages, "lost") ?? "Lost";
+  const wonLabel = findDealLabel(dealStages, WON_STAGE_VALUE) ?? "Won";
+  const lostLabel = findDealLabel(dealStages, LOST_STAGE_VALUE) ?? "Lost";
 
   const { data, isPending } = useGetList<Deal>("deals", {
     pagination: { perPage: 100, page: 1 },
@@ -52,28 +79,20 @@ export const DealsChart = memo(() => {
     }, {} as any);
 
     const amountByMonth = Object.keys(dealsByMonth).map((month) => {
-      return {
-        date: format(month, "MMM"),
-        won: dealsByMonth[month]
-          .filter((deal: Deal) => deal.stage === "won")
-          .reduce((acc: number, deal: Deal) => {
-            acc += deal.amount;
-            return acc;
-          }, 0),
-        pending: dealsByMonth[month]
-          .filter((deal: Deal) => !["won", "lost"].includes(deal.stage))
-          .reduce((acc: number, deal: Deal) => {
-            // @ts-expect-error - multiplier type issue
-            acc += deal.amount * multiplier[deal.stage];
-            return acc;
-          }, 0),
-        lost: dealsByMonth[month]
-          .filter((deal: Deal) => deal.stage === "lost")
-          .reduce((acc: number, deal: Deal) => {
-            acc -= deal.amount;
-            return acc;
-          }, 0),
-      };
+      return dealsByMonth[month].reduce(
+        (acc: { date: string; won: number; pending: number; lost: number }, deal: Deal) => {
+          const { bucket, weight } = getDealStageBucket(deal.stage);
+          if (bucket === "won") {
+            acc.won += deal.amount;
+          } else if (bucket === "lost") {
+            acc.lost -= deal.amount;
+          } else {
+            acc.pending += deal.amount * weight;
+          }
+          return acc;
+        },
+        { date: format(month, "MMM"), won: 0, pending: 0, lost: 0 },
+      );
     });
 
     return amountByMonth;
