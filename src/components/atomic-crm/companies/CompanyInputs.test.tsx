@@ -1,5 +1,6 @@
 import { RecordContextProvider } from "ra-core";
 import { render } from "vitest-browser-react";
+import { page } from "vitest/browser";
 import { StoryWrapper } from "@/test/StoryWrapper";
 import type { Company } from "../types";
 import { CompanyStatusSelector } from "./CompanyInputs";
@@ -15,6 +16,12 @@ function buildCompany(overrides: Partial<Company> = {}): Company {
 }
 
 describe("CompanyStatusSelector", () => {
+  beforeAll(() => {
+    // StatusSelector renders a native <select> below the md breakpoint --
+    // force a desktop viewport to exercise the Radix Select branch.
+    page.viewport(1600, 900);
+  });
+
   it("commits the newly selected status via a normal companies update", async () => {
     const updateMock = vi.fn().mockResolvedValue({ data: {} });
     const company = buildCompany({ id: 1, status: "a_recontacter" });
