@@ -10,6 +10,7 @@ export const englishCrmMessages = {
         phone_number: "Phone number",
         created_at: "Created at",
         nb_contacts: "Number of judges-referees",
+        nb_deals: "Number of deals",
         revenue: "Revenue",
         sector: "Sector",
         size: "Size",

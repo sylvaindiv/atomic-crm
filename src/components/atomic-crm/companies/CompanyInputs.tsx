@@ -232,7 +232,7 @@ const saleOptionRenderer = (choice: Sale) =>
  * `ContactStatusSelector` (see `contacts/ContactInputs.tsx`): it persists the
  * selection immediately via a normal `update` on `companies` rather than
  * going through the surrounding form's save button, so it also works when
- * embedded outside a form (`CompanyShow.tsx`, `CompanyCard.tsx`).
+ * embedded outside a form (`CompanyShow.tsx`, `table/CompanyTable.tsx`).
  *
  * Renders nothing while creating a company (no record/id yet) -- the status
  * only becomes settable once the company exists.

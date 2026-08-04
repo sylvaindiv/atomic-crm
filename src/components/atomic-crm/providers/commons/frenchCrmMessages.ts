@@ -12,6 +12,7 @@ export const frenchCrmMessages = {
         phone_number: "Numéro de téléphone",
         created_at: "Date de création",
         nb_contacts: "Nombre de juges-arbitres",
+        nb_deals: "Nombre d'affaires",
         revenue: "Chiffre d'affaires",
         sector: "Secteur",
         size: "Taille",
