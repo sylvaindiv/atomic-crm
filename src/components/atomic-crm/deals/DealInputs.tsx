@@ -1,4 +1,6 @@
-import { required, useTranslate } from "ra-core";
+import { useEffect } from "react";
+import { maxLength, required, useRecordContext, useTranslate } from "ra-core";
+import { useFormContext, useWatch } from "react-hook-form";
 import { AutocompleteArrayInput } from "@/components/admin/autocomplete-array-input";
 import { ReferenceArrayInput } from "@/components/admin/reference-array-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
@@ -12,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
+import type { Deal } from "../types";
 
 export const DealInputs = () => {
   const isMobile = useIsMobile();
@@ -28,10 +31,39 @@ export const DealInputs = () => {
   );
 };
 
+// A deal is a judge case or a club case, chosen at creation and immutable
+// afterwards -- see DealInputs.tsx ticket notes.
+const caseTypeChoices = [
+  { value: "judge", label: "resources.deals.case_types.judge" },
+  { value: "club", label: "resources.deals.case_types.club" },
+];
+
+// Resolves the deal's case_type for both create and edit: the persisted
+// record wins once one exists (case_type is immutable after creation), the
+// live form value drives the create form before it's saved.
+const useDealCaseType = () => {
+  const record = useRecordContext<Deal>();
+  const { control } = useFormContext();
+  const watchedCaseType = useWatch({ control, name: "case_type" });
+  return record?.case_type ?? watchedCaseType;
+};
+
 const DealInfoInputs = () => {
+  const record = useRecordContext<Deal>();
   return (
     <div className="flex flex-col gap-4 flex-1">
       <TextInput source="name" validate={required()} helperText={false} />
+      {!record?.id && (
+        <SelectInput
+          source="case_type"
+          label="resources.deals.fields.case_type"
+          choices={caseTypeChoices}
+          optionText="label"
+          optionValue="value"
+          helperText={false}
+          validate={required()}
+        />
+      )}
       <TextInput source="description" multiline rows={3} helperText={false} />
     </div>
   );
@@ -39,32 +71,53 @@ const DealInfoInputs = () => {
 
 const DealLinkedToInputs = () => {
   const translate = useTranslate();
+  const record = useRecordContext<Deal>();
+  const { setValue } = useFormContext();
+  const caseType = useDealCaseType();
+
+  // Clear the irrelevant link when the user changes case_type while
+  // creating a deal, so a stray company_id/contact_ids never rides along
+  // with the wrong case type. Not needed on edit: case_type is immutable
+  // there, so this branch never switches.
+  useEffect(() => {
+    if (record?.id) return;
+    if (caseType === "club") {
+      setValue("contact_ids", []);
+    } else if (caseType === "judge") {
+      setValue("company_id", null);
+    }
+  }, [caseType, record?.id, setValue]);
+
   return (
     <div className="flex flex-col gap-4 flex-1">
       <h3 className="text-base font-medium">
         {translate("resources.deals.inputs.linked_to")}
       </h3>
-      <ReferenceInput source="company_id" reference="companies">
-        <AutocompleteCompanyInput
-          label="resources.deals.fields.company_id"
-          validate={required()}
-          modal
-        />
-      </ReferenceInput>
-
-      <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
-        <AutocompleteArrayInput
-          label="resources.deals.fields.contact_ids"
-          optionText={contactOptionText}
-          helperText={false}
-        />
-      </ReferenceArrayInput>
+      {caseType === "club" && (
+        <ReferenceInput source="company_id" reference="companies">
+          <AutocompleteCompanyInput
+            label="resources.deals.fields.company_id"
+            validate={required()}
+            modal
+          />
+        </ReferenceInput>
+      )}
+      {caseType === "judge" && (
+        <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
+          <AutocompleteArrayInput
+            label="resources.deals.fields.contact_ids"
+            optionText={contactOptionText}
+            helperText={false}
+            validate={[required(), maxLength(1)]}
+          />
+        </ReferenceArrayInput>
+      )}
     </div>
   );
 };
 
 const DealMiscInputs = () => {
-  const { dealStages, dealCategories } = useConfigurationContext();
+  const { noteStatuses, dealCategories } = useConfigurationContext();
   const translate = useTranslate();
   return (
     <div className="flex flex-col gap-4 flex-1">
@@ -93,10 +146,10 @@ const DealMiscInputs = () => {
       />
       <SelectInput
         source="stage"
-        choices={dealStages}
+        choices={noteStatuses}
         optionText="label"
         optionValue="value"
-        defaultValue="opportunity"
+        defaultValue={noteStatuses[0]?.value}
         helperText={false}
         validate={required()}
       />

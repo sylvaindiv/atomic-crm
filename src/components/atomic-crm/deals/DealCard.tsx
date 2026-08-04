@@ -1,13 +1,12 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { useRedirect, RecordContextProvider } from "ra-core";
-import { ReferenceField } from "@/components/admin/reference-field";
 import { NumberField } from "@/components/admin/number-field";
 import { SelectField } from "@/components/admin/select-field";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
+import { DealCaseTypeBadge, DealPartyAvatar, DealPartyName } from "./DealParty";
 
 export const DealCard = ({ deal, index }: { deal: Deal; index: number }) => {
   if (!deal) return null;
@@ -57,41 +56,34 @@ export const DealCardContent = ({
           <CardContent className="px-3 flex flex-col">
             <div className="flex-1 flex">
               <p className="flex-1 text-sm font-medium mb-2">
-                <ReferenceField
-                  source="company_id"
-                  reference="companies"
-                  link={false}
-                />
+                <DealPartyName deal={deal} />
                 {" - "}
                 {deal.name}
               </p>
-              <ReferenceField
-                source="company_id"
-                reference="companies"
-                link={false}
-              >
-                <CompanyAvatar width={20} height={20} />
-              </ReferenceField>
+              <DealPartyAvatar deal={deal} width={20} height={20} />
             </div>
-            <p className="text-xs text-muted-foreground">
-              <NumberField
-                source="amount"
-                options={{
-                  notation: "compact",
-                  style: "currency",
-                  currency,
-                  currencyDisplay: "narrowSymbol",
-                  minimumSignificantDigits: 3,
-                }}
-              />
-              {deal.category && ", "}
-              <SelectField
-                source="category"
-                choices={dealCategories}
-                optionText="label"
-                optionValue="value"
-              />
-            </p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs text-muted-foreground">
+                <NumberField
+                  source="amount"
+                  options={{
+                    notation: "compact",
+                    style: "currency",
+                    currency,
+                    currencyDisplay: "narrowSymbol",
+                    minimumSignificantDigits: 3,
+                  }}
+                />
+                {deal.category && ", "}
+                <SelectField
+                  source="category"
+                  choices={dealCategories}
+                  optionText="label"
+                  optionValue="value"
+                />
+              </p>
+              <DealCaseTypeBadge caseType={deal.case_type} />
+            </div>
           </CardContent>
         </Card>
       </RecordContextProvider>
