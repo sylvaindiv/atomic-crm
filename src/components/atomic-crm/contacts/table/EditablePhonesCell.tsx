@@ -1,6 +1,7 @@
 import { useRecordContext, useTranslate } from "ra-core";
 
 import type { Contact } from "../../types";
+import { formatPhoneNumber } from "@/lib/utils";
 import { EditableListCell, type EditableListEntry } from "./EditableListCell";
 import { useUpdateContactField } from "./useUpdateContactField";
 
@@ -35,6 +36,7 @@ export const EditablePhonesCell = () => {
       addLabel={translate("resources.contacts.action.add_phone_number", {
         _: "Add phone number",
       })}
+      formatValue={formatPhoneNumber}
     />
   );
 };
