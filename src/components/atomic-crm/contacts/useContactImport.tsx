@@ -28,6 +28,10 @@ export type ContactImportSchema = {
   known_via: string;
   comment: string;
   comment_2: string;
+  postal_code: string;
+  // The contact's own city, named contact_city (not city) to avoid clashing
+  // with the company address's city column above.
+  contact_city: string;
 };
 
 // The subset of a batch row needed to create a company, when its name doesn't
@@ -198,6 +202,8 @@ export function useContactImport() {
             known_via,
             comment,
             comment_2,
+            postal_code,
+            contact_city,
           }) => {
             const email_jsonb = [
               { email: email_work, type: "Work" },
@@ -243,6 +249,8 @@ export function useContactImport() {
                   tags: tagList.map((tag) => tag.id),
                   sales_id: user?.identity?.id,
                   linkedin_url,
+                  postal_code,
+                  city: contact_city,
                 },
               },
             );

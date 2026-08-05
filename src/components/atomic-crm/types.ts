@@ -108,6 +108,8 @@ export type Contact = {
   // Most recent non-archived 'judge' deal this contact is a party to
   // (contacts_summary view). Null when there is none.
   linked_deal_id?: Identifier | null;
+  postal_code?: string;
+  city?: string;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {

@@ -261,6 +261,11 @@ const exporter: Exporter<Contact> = async (
         ?.number,
       phone_jsonb: JSON.stringify(contact.phone_jsonb),
       phone_fts: undefined,
+      postal_code: contact.postal_code,
+      // Named contact_city (not city) to avoid clashing with the company
+      // address's own city field above (contact.city is the contact's own
+      // address, unrelated to companies[contact.company_id].city).
+      contact_city: contact.city,
       comment: recentNotes[0]?.text,
       comment_2: recentNotes[1]?.text,
     };

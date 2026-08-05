@@ -61,7 +61,9 @@ CREATE TABLE IF NOT EXISTS contacts (
     sales_id       INTEGER REFERENCES sales(id),
     linkedin_url   TEXT,
     email_jsonb    TEXT,          -- JSON array of {email,type}
-    phone_jsonb    TEXT           -- JSON array of {number,type}
+    phone_jsonb    TEXT,          -- JSON array of {number,type}
+    postal_code    TEXT,
+    city           TEXT
 );
 
 -- Contact notes ---------------------------------------------------------------

@@ -117,3 +117,18 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Matcher par nom normalisé + désambiguïsation par société plutôt que fuzzy match aveugle, pour éviter d'assigner le mauvais code postal aux noms dupliqués/placeholders. - Passer par l'orchestrator pour l'ajout de `city` et la migration, conformément au workflow du projet.
 **Fichiers / skills modifiés.** - `.context/scripts/fetch_contacts.mjs`, `match_postal_codes.mjs`, `apply_postal_codes.mjs` — scripts de matching/backfill (gitignorés, non committés).
 **Prochaines étapes / TODOs.** - [ ] Récupérer le résultat de l'orchestrator (colonne `city` + migration). - [ ] Relayer la question PD-ASK à l'utilisateur. - [ ] Exécuter `apply_postal_codes.mjs` sur Turso `atomic-crm` une fois les colonnes live.
+
+## 2026-08-05 17:34 — Pagination 500 lignes + code postal/ville juges-arbitres
+**Résumé.** Augmenté la limite de pagination des listes de 50 à 500 lignes (option sélecteur). Ajouté les colonnes `postal_code` et `city` sur `contacts` (schéma, types, table éditable, import/export CSV, i18n, générateur fakerest). Appliqué l'`ALTER TABLE` directement sur la base Turso live (`atomic-crm`) car l'outillage de migration du harness cible Supabase, pas Turso. Matché le fichier CSV "Listing JA" aux contacts existants par nom (avec déduction via club en cas d'ambiguïté/nom placeholder) et importé code postal + ville pour 359 des 361 lignes exploitables.
+**Décisions prises.**
+- Réconciliation manuelle du code de la colonne `city` (plutôt que merge harness) — le working tree avait des changements non liés (pagination) que le `git reset --hard` du merger aurait détruits.
+- ALTER TABLE appliqué directement via CLI turso plutôt que le pipeline de migration du harness, qui ne fonctionne pas sur ce projet (câblé Supabase).
+**Fichiers / skills modifiés.**
+- `db/schema.sql` — colonnes `postal_code`, `city` sur `contacts`
+- `src/components/admin/list-pagination.tsx` — options jusqu'à 500
+- `src/components/atomic-crm/companies/CompanyList.tsx` — override pagination retiré
+- `src/components/atomic-crm/contacts/*` (types, table, import/export) — plomberie `postal_code`/`city`
+- `providers/commons/*CrmMessages.ts`, `providers/fakerest/dataGenerator/contacts.ts` — libellés + fake data
+**Prochaines étapes / TODOs.**
+- [ ] Committer les changements en attente sur `increase-page-size-add-postal-code`
+- [ ] Adapter l'outillage de migration du harness pour Turso (pas seulement Supabase)

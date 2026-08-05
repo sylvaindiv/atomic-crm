@@ -99,6 +99,8 @@ export const englishCrmMessages = {
         first_seen: "First seen",
         latest_note_text: "Latest note",
         name: "Name",
+        postal_code: "Postal code",
+        city: "City",
       },
       action: {
         add: "Add judge-referee",

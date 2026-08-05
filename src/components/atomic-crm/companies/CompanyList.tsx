@@ -20,7 +20,7 @@ export const CompanyList = () => {
       perPage={25}
       sort={{ field: "name", order: "ASC" }}
       actions={<CompanyListActions />}
-      pagination={<ListPagination rowsPerPageOptions={[10, 25, 50, 100]} />}
+      pagination={<ListPagination />}
     >
       <CompanyListLayout />
     </List>
