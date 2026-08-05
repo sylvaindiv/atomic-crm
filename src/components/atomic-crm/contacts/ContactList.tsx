@@ -1,9 +1,11 @@
+import { useState } from "react";
 import jsonExport from "jsonexport/dist";
 import {
   downloadCSV,
   InfiniteListBase,
   useGetIdentity,
   useListContext,
+  useTranslate,
   type Exporter,
   type Identifier,
 } from "ra-core";
@@ -12,15 +14,16 @@ import { BulkActionsToolbar } from "@/components/admin/bulk-actions-toolbar";
 import { BulkDeleteButton } from "@/components/admin/bulk-delete-button";
 import { BulkExportButton } from "@/components/admin/bulk-export-button";
 import { ColumnsButton } from "@/components/admin/columns-button";
-import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
 import { SelectAllButton } from "@/components/admin/select-all-button";
 import { SortButton } from "@/components/admin/sort-button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 import type { Company, Contact, ContactNote, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";
+import { ContactCreateSheet } from "./ContactCreateSheet";
 import { ContactEmpty } from "./ContactEmpty";
 import { ContactImportButton } from "./ContactImportButton";
 import { ContactListContentMobile } from "./ContactListContent";
@@ -39,19 +42,24 @@ export const ContactList = () => {
   const { identity } = useGetIdentity();
   const [searchParams] = useSearchParams();
   const showId = searchParams.get("show");
+  const [createOpen, setCreateOpen] = useState(false);
 
   if (!identity) return null;
 
   return (
     <List
       title={false}
-      actions={<ContactListActions />}
+      actions={<ContactListActions onCreate={() => setCreateOpen(true)} />}
       perPage={25}
       sort={{ field: "last_seen", order: "DESC" }}
       exporter={exporter}
     >
       <ContactListLayoutDesktop />
       <ContactShowSheet open={!!showId} id={showId ?? undefined} />
+      <ContactCreateSheet
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      />
     </List>
   );
 };
@@ -89,15 +97,20 @@ const ContactBulkActionButtons = () => (
   </>
 );
 
-const ContactListActions = () => (
-  <TopToolbar>
-    <SortButton fields={["first_name", "last_name", "last_seen"]} />
-    <ColumnsButton />
-    <ContactImportButton />
-    <ExportButton exporter={exporter} />
-    <CreateButton />
-  </TopToolbar>
-);
+const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
+  const translate = useTranslate();
+  return (
+    <TopToolbar>
+      <SortButton fields={["first_name", "last_name", "last_seen"]} />
+      <ColumnsButton />
+      <ContactImportButton />
+      <ExportButton exporter={exporter} />
+      <Button onClick={onCreate}>
+        {translate("resources.contacts.action.new")}
+      </Button>
+    </TopToolbar>
+  );
+};
 
 export const ContactListMobile = () => {
   const { identity } = useGetIdentity();

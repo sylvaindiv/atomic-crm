@@ -1,7 +1,6 @@
 import { useGetList, useTranslate } from "ra-core";
 import { matchPath, useLocation, Link } from "react-router";
 import type { ReactNode } from "react";
-import { CreateButton } from "@/components/admin/create-button";
 import { Progress } from "@/components/ui/progress";
 
 import useAppBarHeight from "../misc/useAppBarHeight";
@@ -44,9 +43,6 @@ export const DealEmpty = ({ children }: { children?: ReactNode }) => {
             <p className="text-sm text-center text-muted-foreground mb-4">
               {translate("resources.deals.empty.description")}
             </p>
-          </div>
-          <div className="flex space-x-8">
-            <CreateButton label="resources.deals.action.create" />
           </div>
           <DealCreate open={!!matchCreate} />
           {children}

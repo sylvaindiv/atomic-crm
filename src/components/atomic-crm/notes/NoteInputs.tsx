@@ -32,24 +32,12 @@ export const NoteInputs = ({
   const { noteStatuses } = useConfigurationContext();
   const translate = useTranslate();
   const [displayMore, setDisplayMore] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { control, formState, setValue } = useFormContext<
     ContactNote | DealNote
   >();
   const selectedContactId = useWatch({ control, name: "contact_id" });
   const selectedStatus = useWatch({ control, name: "status" });
-  const textValue = useWatch({ control, name: "text" as any });
-  const isExpanded = isFocused || !!textValue;
-  useEffect(() => {
-    if (!textValue) {
-      setIsFocused(false);
-      const textarea = containerRef.current?.querySelector("textarea");
-      if (textarea) {
-        textarea.style.height = "";
-      }
-    }
-  }, [textValue]);
   const shouldHydrateStatus =
     showStatus &&
     (defaultStatus !== undefined ||
@@ -101,12 +89,15 @@ export const NoteInputs = ({
         helperText={false}
         placeholder={translate("resources.notes.inputs.add_note")}
         rows={2}
-        inputClassName={cn(
-          "transition-[min-height] duration-300 ease-in-out",
-          isExpanded && "min-h-[20rem]",
-        )}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
+            const form = containerRef.current?.closest("form");
+            form?.dispatchEvent(
+              new Event("submit", { cancelable: true, bubbles: true }),
+            );
+          }
+        }}
         validate={validateNoteOrAttachmentRequired}
       />
 
