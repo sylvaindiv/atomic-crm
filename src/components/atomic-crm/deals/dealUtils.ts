@@ -39,9 +39,7 @@ function ucFirst(str: string): string {
 
 const isoDateStringRegex = /^\d{4}-\d{2}-\d{2}$/;
 
-export function isValidISODateString(
-  value: unknown,
-): value is string {
+export function isValidISODateString(value: unknown): value is string {
   return typeof value === "string" && isoDateStringRegex.test(value);
 }
 

@@ -140,9 +140,7 @@ export const EditableListCell = ({
   };
 
   const summary = entries
-    .map((entry) =>
-      formatValue ? formatValue(entry.value) : entry.value,
-    )
+    .map((entry) => (formatValue ? formatValue(entry.value) : entry.value))
     .filter(Boolean)
     .join(", ");
 

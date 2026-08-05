@@ -58,10 +58,7 @@ export const ContactList = () => {
     >
       <ContactListLayoutDesktop />
       <ContactShowSheet open={!!showId} id={showId ?? undefined} />
-      <ContactCreateSheet
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-      />
+      <ContactCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
     </List>
   );
 };
