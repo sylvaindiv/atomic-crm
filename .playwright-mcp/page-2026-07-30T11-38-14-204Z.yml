@@ -1,0 +1,1153 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e6]:
+      - link "Atomic CRM Atomic CRM" [ref=e7] [cursor=pointer]:
+        - /url: "#/"
+        - img "Atomic CRM" [ref=e8]
+        - heading "Atomic CRM" [level=1] [ref=e9]
+      - navigation [ref=e11]:
+        - link "Tableau de bord" [ref=e12] [cursor=pointer]:
+          - /url: "#/"
+        - link "Arbitres" [ref=e13] [cursor=pointer]:
+          - /url: "#/contacts"
+        - link "Clubs" [ref=e14] [cursor=pointer]:
+          - /url: "#/companies"
+        - link "Affaires" [ref=e15] [cursor=pointer]:
+          - /url: "#/deals"
+      - generic [ref=e16]:
+        - button "Toggle theme" [ref=e17] [cursor=pointer]:
+          - img
+          - generic [ref=e18]: Toggle theme
+        - button [ref=e19] [cursor=pointer]:
+          - img
+        - button [ref=e50] [cursor=pointer]
+  - main [ref=e23]:
+    - generic [ref=e24]:
+      - heading [level=2]
+      - generic [ref=e25]:
+        - button "Trier par dernière activité décroissant" [ref=e26] [cursor=pointer]:
+          - img
+          - generic [ref=e27]: Trier par dernière activité décroissant
+          - img
+        - button "Colonnes" [ref=e29] [cursor=pointer]:
+          - img
+          - text: Colonnes
+        - button "Importer un fichier CSV" [ref=e30] [cursor=pointer]:
+          - img
+          - text: Importer un fichier CSV
+        - button "Exporter" [ref=e31] [cursor=pointer]:
+          - img
+          - text: Exporter
+        - link "Créer un juge-arbitre" [ref=e32] [cursor=pointer]:
+          - /url: "#/contacts/create"
+          - img
+          - text: Créer un juge-arbitre
+    - generic [ref=e52]:
+      - generic [ref=e53]:
+        - generic [ref=e55]:
+          - group [ref=e56]:
+            - textbox "Rechercher nom, club..." [ref=e57]
+          - img
+        - generic [ref=e58]:
+          - heading "Dernière activité" [level=3] [ref=e59]:
+            - img [ref=e60]
+            - text: Dernière activité
+          - generic [ref=e63]:
+            - button "Aujourd'hui" [ref=e64] [cursor=pointer]
+            - button "Cette semaine" [ref=e65] [cursor=pointer]
+            - button "Avant cette semaine" [ref=e66] [cursor=pointer]
+            - button "Avant ce mois-ci" [ref=e67] [cursor=pointer]
+            - button "Avant le mois dernier" [ref=e68] [cursor=pointer]
+        - generic [ref=e69]:
+          - heading "Statut" [level=3] [ref=e70]:
+            - img [ref=e71]
+            - text: Statut
+          - generic [ref=e74]:
+            - button "A recontacter A recontacter" [ref=e75] [cursor=pointer]:
+              - generic [ref=e76]:
+                - text: A recontacter
+                - generic [ref=e77]:
+                  - generic: A recontacter
+            - button "Visio Visio" [ref=e79] [cursor=pointer]:
+              - generic [ref=e80]:
+                - text: Visio
+                - generic [ref=e81]:
+                  - generic: Visio
+            - button "En discussion En discussion" [ref=e83] [cursor=pointer]:
+              - generic [ref=e84]:
+                - text: En discussion
+                - generic [ref=e85]:
+                  - generic: En discussion
+            - button "Client Client" [ref=e87] [cursor=pointer]:
+              - generic [ref=e88]:
+                - text: Client
+                - generic [ref=e89]:
+                  - generic: Client
+            - button "Mort Mort" [ref=e91] [cursor=pointer]:
+              - generic [ref=e92]:
+                - text: Mort
+                - generic [ref=e93]:
+                  - generic: Mort
+            - button "rdv sur place rdv sur place" [ref=e95] [cursor=pointer]:
+              - generic [ref=e96]:
+                - text: rdv sur place
+                - generic [ref=e97]:
+                  - generic: rdv sur place
+        - generic [ref=e99]:
+          - heading "Étiquettes" [level=3] [ref=e100]:
+            - img [ref=e101]
+            - text: Étiquettes
+          - generic [ref=e104]:
+            - button "football-fan" [ref=e105] [cursor=pointer]:
+              - generic [ref=e106]: football-fan
+            - button "holiday-card" [ref=e107] [cursor=pointer]:
+              - generic [ref=e108]: holiday-card
+            - button "influencer" [ref=e109] [cursor=pointer]:
+              - generic [ref=e110]: influencer
+            - button "manager" [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: manager
+            - button "musician" [ref=e113] [cursor=pointer]:
+              - generic [ref=e114]: musician
+            - button "vip" [ref=e115] [cursor=pointer]:
+              - generic [ref=e116]: vip
+        - generic [ref=e117]:
+          - heading "Tâches" [level=3] [ref=e118]:
+            - img [ref=e119]
+            - text: Tâches
+          - button "Avec des tâches en attente" [ref=e123] [cursor=pointer]
+        - generic [ref=e124]:
+          - heading "Responsable de compte" [level=3] [ref=e125]:
+            - img [ref=e126]
+            - text: Responsable de compte
+          - button "Moi" [ref=e132] [cursor=pointer]
+      - table [ref=e138]:
+        - rowgroup [ref=e139]:
+          - row "Nom Titre URL LinkedIn Club Connu par Responsable de compte Statut Adresses e-mail Numéros de téléphone Étiquettes Tâches Dernière activité Première activité" [ref=e140]:
+            - columnheader [ref=e141]:
+              - checkbox [ref=e142] [cursor=pointer]
+            - columnheader [ref=e143]
+            - columnheader "Nom" [ref=e144]:
+              - button "Nom" [ref=e145] [cursor=pointer]:
+                - generic [ref=e146]: Nom
+            - columnheader "Titre" [ref=e147]:
+              - button "Titre" [ref=e148] [cursor=pointer]:
+                - generic [ref=e149]: Titre
+            - columnheader "URL LinkedIn" [ref=e150]:
+              - button "URL LinkedIn" [ref=e151] [cursor=pointer]:
+                - generic [ref=e152]: URL LinkedIn
+            - columnheader "Club" [ref=e153]:
+              - button "Club" [ref=e154] [cursor=pointer]:
+                - generic [ref=e155]: Club
+            - columnheader "Connu par" [ref=e156]:
+              - button "Connu par" [ref=e157] [cursor=pointer]:
+                - generic [ref=e158]: Connu par
+            - columnheader "Responsable de compte" [ref=e159]:
+              - button "Responsable de compte" [ref=e160] [cursor=pointer]:
+                - generic [ref=e161]: Responsable de compte
+            - columnheader "Statut" [ref=e162]:
+              - button "Statut" [ref=e163] [cursor=pointer]:
+                - generic [ref=e164]: Statut
+            - columnheader "Adresses e-mail" [ref=e165]:
+              - button "Adresses e-mail" [ref=e166] [cursor=pointer]:
+                - generic [ref=e167]: Adresses e-mail
+            - columnheader "Numéros de téléphone" [ref=e168]:
+              - button "Numéros de téléphone" [ref=e169] [cursor=pointer]:
+                - generic [ref=e170]: Numéros de téléphone
+            - columnheader "Étiquettes" [ref=e171]:
+              - button "Étiquettes" [ref=e172] [cursor=pointer]:
+                - generic [ref=e173]: Étiquettes
+            - columnheader "Tâches" [ref=e174]:
+              - button "Tâches" [ref=e175] [cursor=pointer]:
+                - generic [ref=e176]: Tâches
+            - columnheader "Dernière activité" [ref=e177]:
+              - button "Dernière activité" [ref=e178] [cursor=pointer]:
+                - generic [ref=e179]: Dernière activité
+                - img
+            - columnheader "Première activité" [ref=e180]:
+              - button "Première activité" [ref=e181] [cursor=pointer]:
+                - generic [ref=e182]: Première activité
+        - rowgroup [ref=e183]:
+          - 'row "MJ Madelynn Jenkins Scalable — Club: Ebert, Frami and Towne Connu par Responsable de compte: Jane Doe Madelynn_Jenkins@hotmail.com (334) 900-5760 x35491, 1-276-512-8558 vip Ajouter une étiquette 0 aujourd’hui à 13:36 aujourd’hui à 12:50" [ref=e184]':
+            - cell [ref=e185]:
+              - checkbox [ref=e186] [cursor=pointer]
+            - cell "MJ" [ref=e187]:
+              - generic [ref=e189]: MJ
+            - cell "Madelynn Jenkins" [ref=e190]:
+              - link "Madelynn Jenkins" [ref=e191] [cursor=pointer]:
+                - /url: "#/contacts/436/show"
+            - cell "Scalable" [ref=e192]:
+              - button "Scalable" [ref=e194] [cursor=pointer]
+            - cell "—" [ref=e195]:
+              - button "—" [ref=e197] [cursor=pointer]
+            - 'cell "Club: Ebert, Frami and Towne" [ref=e198]':
+              - 'button "Club: Ebert, Frami and Towne" [ref=e200] [cursor=pointer]': Ebert, Frami and Towne
+            - cell "Connu par" [ref=e201]:
+              - button "Connu par" [ref=e203] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e204]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e206] [cursor=pointer]': Jane Doe
+            - cell [ref=e207]:
+              - combobox [ref=e210] [cursor=pointer]:
+                - generic:
+                  - generic: Client
+                - img
+            - cell "Madelynn_Jenkins@hotmail.com" [ref=e211]:
+              - button "Madelynn_Jenkins@hotmail.com" [ref=e213] [cursor=pointer]
+            - cell "(334) 900-5760 x35491, 1-276-512-8558" [ref=e214]:
+              - button "(334) 900-5760 x35491, 1-276-512-8558" [ref=e216] [cursor=pointer]
+            - cell "vip Ajouter une étiquette" [ref=e217]:
+              - generic [ref=e219]:
+                - generic [ref=e221] [cursor=pointer]:
+                  - text: vip
+                  - button [ref=e222]:
+                    - img [ref=e223]
+                - button "Ajouter une étiquette" [ref=e227] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e228]
+            - cell "aujourd’hui à 13:36" [ref=e229]
+            - cell "aujourd’hui à 12:50" [ref=e230]
+          - 'row "Monica Casper Collaborative — Club: Dare, Goodwin and Becker Connu par Responsable de compte: Candelario Hackett Monica.Casper0@gmail.com 1-209-560-5550, (735) 700-2578 Ajouter une étiquette 1 aujourd’hui à 13:17 12/07/2026" [ref=e231]':
+            - cell [ref=e232]:
+              - checkbox [ref=e233] [cursor=pointer]
+            - cell [ref=e234]:
+              - img [ref=e236]
+            - cell "Monica Casper" [ref=e237]:
+              - link "Monica Casper" [ref=e238] [cursor=pointer]:
+                - /url: "#/contacts/86/show"
+            - cell "Collaborative" [ref=e239]:
+              - button "Collaborative" [ref=e241] [cursor=pointer]
+            - cell "—" [ref=e242]:
+              - button "—" [ref=e244] [cursor=pointer]
+            - 'cell "Club: Dare, Goodwin and Becker" [ref=e245]':
+              - 'button "Club: Dare, Goodwin and Becker" [ref=e247] [cursor=pointer]': Dare, Goodwin and Becker
+            - cell "Connu par" [ref=e248]:
+              - button "Connu par" [ref=e250] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Candelario Hackett" [ref=e251]':
+              - 'button "Responsable de compte: Candelario Hackett" [ref=e253] [cursor=pointer]': Candelario Hackett
+            - cell [ref=e254]:
+              - combobox [ref=e257] [cursor=pointer]:
+                - generic:
+                  - generic: Client
+                - img
+            - cell "Monica.Casper0@gmail.com" [ref=e258]:
+              - button "Monica.Casper0@gmail.com" [ref=e260] [cursor=pointer]
+            - cell "1-209-560-5550, (735) 700-2578" [ref=e261]:
+              - button "1-209-560-5550, (735) 700-2578" [ref=e263] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e264]:
+              - button "Ajouter une étiquette" [ref=e268] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "1" [ref=e269]
+            - cell "aujourd’hui à 13:17" [ref=e270]
+            - cell "12/07/2026" [ref=e271]
+          - 'row "Tami Bechtelar Dynamic — Club: Dickinson - Pacocha Connu par: Trevor Cremin Responsable de compte: Jane Doe Tami71@hotmail.com (976) 458-7161, 648.433.2960 x150 Ajouter une étiquette 0 aujourd’hui à 13:00 21/07/2026" [ref=e272]':
+            - cell [ref=e273]:
+              - checkbox [ref=e274] [cursor=pointer]
+            - cell [ref=e275]:
+              - img [ref=e277]
+            - cell "Tami Bechtelar" [ref=e278]:
+              - link "Tami Bechtelar" [ref=e279] [cursor=pointer]:
+                - /url: "#/contacts/429/show"
+            - cell "Dynamic" [ref=e280]:
+              - button "Dynamic" [ref=e282] [cursor=pointer]
+            - cell "—" [ref=e283]:
+              - button "—" [ref=e285] [cursor=pointer]
+            - 'cell "Club: Dickinson - Pacocha" [ref=e286]':
+              - 'button "Club: Dickinson - Pacocha" [ref=e288] [cursor=pointer]': Dickinson - Pacocha
+            - 'cell "Connu par: Trevor Cremin" [ref=e289]':
+              - 'button "Connu par: Trevor Cremin" [ref=e291] [cursor=pointer]': Trevor Cremin
+            - 'cell "Responsable de compte: Jane Doe" [ref=e292]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e294] [cursor=pointer]': Jane Doe
+            - cell [ref=e295]:
+              - combobox [ref=e298] [cursor=pointer]:
+                - generic:
+                  - generic: A recontacter
+                - img
+            - cell "Tami71@hotmail.com" [ref=e299]:
+              - button "Tami71@hotmail.com" [ref=e301] [cursor=pointer]
+            - cell "(976) 458-7161, 648.433.2960 x150" [ref=e302]:
+              - button "(976) 458-7161, 648.433.2960 x150" [ref=e304] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e305]:
+              - button "Ajouter une étiquette" [ref=e309] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "0" [ref=e310]
+            - cell "aujourd’hui à 13:00" [ref=e311]
+            - cell "21/07/2026" [ref=e312]
+          - 'row "MH Misty Hodkiewicz Cutting-edge — Club: Blanda - O''Connell Connu par: Elizabeth Connelly Responsable de compte: Jarod Emard Misty.Hodkiewicz65@hotmail.com 1-530-644-4142 x9346, 439-383-0287 x758 holiday-card Ajouter une étiquette 3 aujourd’hui à 12:56 lundi dernier à 08:19" [ref=e313]':
+            - cell [ref=e314]:
+              - checkbox [ref=e315] [cursor=pointer]
+            - cell "MH" [ref=e316]:
+              - generic [ref=e318]: MH
+            - cell "Misty Hodkiewicz" [ref=e319]:
+              - link "Misty Hodkiewicz" [ref=e320] [cursor=pointer]:
+                - /url: "#/contacts/375/show"
+            - cell "Cutting-edge" [ref=e321]:
+              - button "Cutting-edge" [ref=e323] [cursor=pointer]
+            - cell "—" [ref=e324]:
+              - button "—" [ref=e326] [cursor=pointer]
+            - 'cell "Club: Blanda - O''Connell" [ref=e327]':
+              - 'button "Club: Blanda - O''Connell" [ref=e329] [cursor=pointer]': Blanda - O'Connell
+            - 'cell "Connu par: Elizabeth Connelly" [ref=e330]':
+              - 'button "Connu par: Elizabeth Connelly" [ref=e332] [cursor=pointer]': Elizabeth Connelly
+            - 'cell "Responsable de compte: Jarod Emard" [ref=e333]':
+              - 'button "Responsable de compte: Jarod Emard" [ref=e335] [cursor=pointer]': Jarod Emard
+            - cell [ref=e336]:
+              - combobox [ref=e339] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Misty.Hodkiewicz65@hotmail.com" [ref=e340]:
+              - button "Misty.Hodkiewicz65@hotmail.com" [ref=e342] [cursor=pointer]
+            - cell "1-530-644-4142 x9346, 439-383-0287 x758" [ref=e343]:
+              - button "1-530-644-4142 x9346, 439-383-0287 x758" [ref=e345] [cursor=pointer]
+            - cell "holiday-card Ajouter une étiquette" [ref=e346]:
+              - generic [ref=e348]:
+                - generic [ref=e350] [cursor=pointer]:
+                  - text: holiday-card
+                  - button [ref=e351]:
+                    - img [ref=e352]
+                - button "Ajouter une étiquette" [ref=e356] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "3" [ref=e357]
+            - cell "aujourd’hui à 12:56" [ref=e358]
+            - cell "lundi dernier à 08:19" [ref=e359]
+          - 'row "PK Phillip Kling Enterprise — Club: McKenzie Inc Connu par Responsable de compte: Jane Doe Phillip90@yahoo.com (643) 372-8523, 621-225-1821 x4129 holiday-card vip Ajouter une étiquette 1 aujourd’hui à 12:55 aujourd’hui à 00:03" [ref=e360]':
+            - cell [ref=e361]:
+              - checkbox [ref=e362] [cursor=pointer]
+            - cell "PK" [ref=e363]:
+              - generic [ref=e365]: PK
+            - cell "Phillip Kling" [ref=e366]:
+              - link "Phillip Kling" [ref=e367] [cursor=pointer]:
+                - /url: "#/contacts/265/show"
+            - cell "Enterprise" [ref=e368]:
+              - button "Enterprise" [ref=e370] [cursor=pointer]
+            - cell "—" [ref=e371]:
+              - button "—" [ref=e373] [cursor=pointer]
+            - 'cell "Club: McKenzie Inc" [ref=e374]':
+              - 'button "Club: McKenzie Inc" [ref=e376] [cursor=pointer]': McKenzie Inc
+            - cell "Connu par" [ref=e377]:
+              - button "Connu par" [ref=e379] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e380]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e382] [cursor=pointer]': Jane Doe
+            - cell [ref=e383]:
+              - combobox [ref=e386] [cursor=pointer]:
+                - generic:
+                  - generic: Mort
+                - img
+            - cell "Phillip90@yahoo.com" [ref=e387]:
+              - button "Phillip90@yahoo.com" [ref=e389] [cursor=pointer]
+            - cell "(643) 372-8523, 621-225-1821 x4129" [ref=e390]:
+              - button "(643) 372-8523, 621-225-1821 x4129" [ref=e392] [cursor=pointer]
+            - cell "holiday-card vip Ajouter une étiquette" [ref=e393]:
+              - generic [ref=e395]:
+                - generic [ref=e397] [cursor=pointer]:
+                  - text: holiday-card
+                  - button [ref=e398]:
+                    - img [ref=e399]
+                - generic [ref=e403] [cursor=pointer]:
+                  - text: vip
+                  - button [ref=e404]:
+                    - img [ref=e405]
+                - button "Ajouter une étiquette" [ref=e409] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "1" [ref=e410]
+            - cell "aujourd’hui à 12:55" [ref=e411]
+            - cell "aujourd’hui à 00:03" [ref=e412]
+          - 'row "WL Wendy Ledner Clicks-and-mortar — Club: Prohaska, Ratke and Turner Connu par Responsable de compte: Khalil D''Amore Wendy38@yahoo.com 1-366-201-3754 x85418, (741) 760-0072 influencer Ajouter une étiquette 1 aujourd’hui à 12:54 14/07/2026" [ref=e413]':
+            - cell [ref=e414]:
+              - checkbox [ref=e415] [cursor=pointer]
+            - cell "WL" [ref=e416]:
+              - generic [ref=e418]: WL
+            - cell "Wendy Ledner" [ref=e419]:
+              - link "Wendy Ledner" [ref=e420] [cursor=pointer]:
+                - /url: "#/contacts/27/show"
+            - cell "Clicks-and-mortar" [ref=e421]:
+              - button "Clicks-and-mortar" [ref=e423] [cursor=pointer]
+            - cell "—" [ref=e424]:
+              - button "—" [ref=e426] [cursor=pointer]
+            - 'cell "Club: Prohaska, Ratke and Turner" [ref=e427]':
+              - 'button "Club: Prohaska, Ratke and Turner" [ref=e429] [cursor=pointer]': Prohaska, Ratke and Turner
+            - cell "Connu par" [ref=e430]:
+              - button "Connu par" [ref=e432] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Khalil D''Amore" [ref=e433]':
+              - 'button "Responsable de compte: Khalil D''Amore" [ref=e435] [cursor=pointer]': Khalil D'Amore
+            - cell [ref=e436]:
+              - combobox [ref=e439] [cursor=pointer]:
+                - generic:
+                  - generic: Visio
+                - img
+            - cell "Wendy38@yahoo.com" [ref=e440]:
+              - button "Wendy38@yahoo.com" [ref=e442] [cursor=pointer]
+            - cell "1-366-201-3754 x85418, (741) 760-0072" [ref=e443]:
+              - button "1-366-201-3754 x85418, (741) 760-0072" [ref=e445] [cursor=pointer]
+            - cell "influencer Ajouter une étiquette" [ref=e446]:
+              - generic [ref=e448]:
+                - generic [ref=e450] [cursor=pointer]:
+                  - text: influencer
+                  - button [ref=e451]:
+                    - img [ref=e452]
+                - button "Ajouter une étiquette" [ref=e456] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "1" [ref=e457]
+            - cell "aujourd’hui à 12:54" [ref=e458]
+            - cell "14/07/2026" [ref=e459]
+          - 'row "MW Morris Willms Revolutionary — Club: McKenzie Inc Connu par Responsable de compte: Jane Doe Morris31@yahoo.com (272) 227-3971, 435.918.0335 x96220 Ajouter une étiquette 1 aujourd’hui à 12:40 lundi dernier à 23:17" [ref=e460]':
+            - cell [ref=e461]:
+              - checkbox [ref=e462] [cursor=pointer]
+            - cell "MW" [ref=e463]:
+              - generic [ref=e465]: MW
+            - cell "Morris Willms" [ref=e466]:
+              - link "Morris Willms" [ref=e467] [cursor=pointer]:
+                - /url: "#/contacts/207/show"
+            - cell "Revolutionary" [ref=e468]:
+              - button "Revolutionary" [ref=e470] [cursor=pointer]
+            - cell "—" [ref=e471]:
+              - button "—" [ref=e473] [cursor=pointer]
+            - 'cell "Club: McKenzie Inc" [ref=e474]':
+              - 'button "Club: McKenzie Inc" [ref=e476] [cursor=pointer]': McKenzie Inc
+            - cell "Connu par" [ref=e477]:
+              - button "Connu par" [ref=e479] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e480]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e482] [cursor=pointer]': Jane Doe
+            - cell [ref=e483]:
+              - combobox [ref=e486] [cursor=pointer]:
+                - generic:
+                  - generic: Visio
+                - img
+            - cell "Morris31@yahoo.com" [ref=e487]:
+              - button "Morris31@yahoo.com" [ref=e489] [cursor=pointer]
+            - cell "(272) 227-3971, 435.918.0335 x96220" [ref=e490]:
+              - button "(272) 227-3971, 435.918.0335 x96220" [ref=e492] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e493]:
+              - button "Ajouter une étiquette" [ref=e497] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "1" [ref=e498]
+            - cell "aujourd’hui à 12:40" [ref=e499]
+            - cell "lundi dernier à 23:17" [ref=e500]
+          - 'row "AH Antonio Hoppe Cross-media — Club: Dickinson - Pacocha Connu par Responsable de compte: Jane Doe Antonio_Hoppe@yahoo.com 600.412.9599, 1-604-869-6444 x0382 influencer manager Ajouter une étiquette 0 aujourd’hui à 11:31 19/10/2025" [ref=e501]':
+            - cell [ref=e502]:
+              - checkbox [ref=e503] [cursor=pointer]
+            - cell "AH" [ref=e504]:
+              - generic [ref=e506]: AH
+            - cell "Antonio Hoppe" [ref=e507]:
+              - link "Antonio Hoppe" [ref=e508] [cursor=pointer]:
+                - /url: "#/contacts/76/show"
+            - cell "Cross-media" [ref=e509]:
+              - button "Cross-media" [ref=e511] [cursor=pointer]
+            - cell "—" [ref=e512]:
+              - button "—" [ref=e514] [cursor=pointer]
+            - 'cell "Club: Dickinson - Pacocha" [ref=e515]':
+              - 'button "Club: Dickinson - Pacocha" [ref=e517] [cursor=pointer]': Dickinson - Pacocha
+            - cell "Connu par" [ref=e518]:
+              - button "Connu par" [ref=e520] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e521]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e523] [cursor=pointer]': Jane Doe
+            - cell [ref=e524]:
+              - combobox [ref=e527] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Antonio_Hoppe@yahoo.com" [ref=e528]:
+              - button "Antonio_Hoppe@yahoo.com" [ref=e530] [cursor=pointer]
+            - cell "600.412.9599, 1-604-869-6444 x0382" [ref=e531]:
+              - button "600.412.9599, 1-604-869-6444 x0382" [ref=e533] [cursor=pointer]
+            - cell "influencer manager Ajouter une étiquette" [ref=e534]:
+              - generic [ref=e536]:
+                - generic [ref=e538] [cursor=pointer]:
+                  - text: influencer
+                  - button [ref=e539]:
+                    - img [ref=e540]
+                - generic [ref=e544] [cursor=pointer]:
+                  - text: manager
+                  - button [ref=e545]:
+                    - img [ref=e546]
+                - button "Ajouter une étiquette" [ref=e550] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e551]
+            - cell "aujourd’hui à 11:31" [ref=e552]
+            - cell "19/10/2025" [ref=e553]
+          - 'row "Gene Mohr 24/7 — Club: Rosenbaum, Parker and Miller Connu par Responsable de compte: Jane Doe Gene_Mohr@gmail.com 521-597-1275 x5043, 376-419-5819 x2441 Ajouter une étiquette 0 aujourd’hui à 11:14 15/07/2026" [ref=e554]':
+            - cell [ref=e555]:
+              - checkbox [ref=e556] [cursor=pointer]
+            - cell [ref=e557]:
+              - img [ref=e559]
+            - cell "Gene Mohr" [ref=e560]:
+              - link "Gene Mohr" [ref=e561] [cursor=pointer]:
+                - /url: "#/contacts/1/show"
+            - cell "24/7" [ref=e562]:
+              - button "24/7" [ref=e564] [cursor=pointer]
+            - cell "—" [ref=e565]:
+              - button "—" [ref=e567] [cursor=pointer]
+            - 'cell "Club: Rosenbaum, Parker and Miller" [ref=e568]':
+              - 'button "Club: Rosenbaum, Parker and Miller" [ref=e570] [cursor=pointer]': Rosenbaum, Parker and Miller
+            - cell "Connu par" [ref=e571]:
+              - button "Connu par" [ref=e573] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e574]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e576] [cursor=pointer]': Jane Doe
+            - cell [ref=e577]:
+              - combobox [ref=e580] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Gene_Mohr@gmail.com" [ref=e581]:
+              - button "Gene_Mohr@gmail.com" [ref=e583] [cursor=pointer]
+            - cell "521-597-1275 x5043, 376-419-5819 x2441" [ref=e584]:
+              - button "521-597-1275 x5043, 376-419-5819 x2441" [ref=e586] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e587]:
+              - button "Ajouter une étiquette" [ref=e591] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "0" [ref=e592]
+            - cell "aujourd’hui à 11:14" [ref=e593]
+            - cell "15/07/2026" [ref=e594]
+          - 'row "GM Glenn Morar Seamless — Club: Dare, Goodwin and Becker Connu par Responsable de compte: Candelario Hackett Glenn27@gmail.com 1-408-576-1757, 399-387-3217 Ajouter une étiquette 0 aujourd’hui à 11:09 18/06/2026" [ref=e595]':
+            - cell [ref=e596]:
+              - checkbox [ref=e597] [cursor=pointer]
+            - cell "GM" [ref=e598]:
+              - generic [ref=e600]: GM
+            - cell "Glenn Morar" [ref=e601]:
+              - link "Glenn Morar" [ref=e602] [cursor=pointer]:
+                - /url: "#/contacts/144/show"
+            - cell "Seamless" [ref=e603]:
+              - button "Seamless" [ref=e605] [cursor=pointer]
+            - cell "—" [ref=e606]:
+              - button "—" [ref=e608] [cursor=pointer]
+            - 'cell "Club: Dare, Goodwin and Becker" [ref=e609]':
+              - 'button "Club: Dare, Goodwin and Becker" [ref=e611] [cursor=pointer]': Dare, Goodwin and Becker
+            - cell "Connu par" [ref=e612]:
+              - button "Connu par" [ref=e614] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Candelario Hackett" [ref=e615]':
+              - 'button "Responsable de compte: Candelario Hackett" [ref=e617] [cursor=pointer]': Candelario Hackett
+            - cell [ref=e618]:
+              - combobox [ref=e621] [cursor=pointer]:
+                - generic:
+                  - generic: En discussion
+                - img
+            - cell "Glenn27@gmail.com" [ref=e622]:
+              - button "Glenn27@gmail.com" [ref=e624] [cursor=pointer]
+            - cell "1-408-576-1757, 399-387-3217" [ref=e625]:
+              - button "1-408-576-1757, 399-387-3217" [ref=e627] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e628]:
+              - button "Ajouter une étiquette" [ref=e632] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "0" [ref=e633]
+            - cell "aujourd’hui à 11:09" [ref=e634]
+            - cell "18/06/2026" [ref=e635]
+          - 'row "JF Jess Feeney Plug-and-play — Club: Rice, Ankunding and McDermott Connu par Responsable de compte: Jane Doe Jess.Feeney88@hotmail.com (948) 852-9292 x56688, 1-626-392-3419 influencer Ajouter une étiquette 0 aujourd’hui à 11:00 lundi dernier à 17:50" [ref=e636]':
+            - cell [ref=e637]:
+              - checkbox [ref=e638] [cursor=pointer]
+            - cell "JF" [ref=e639]:
+              - generic [ref=e641]: JF
+            - cell "Jess Feeney" [ref=e642]:
+              - link "Jess Feeney" [ref=e643] [cursor=pointer]:
+                - /url: "#/contacts/118/show"
+            - cell "Plug-and-play" [ref=e644]:
+              - button "Plug-and-play" [ref=e646] [cursor=pointer]
+            - cell "—" [ref=e647]:
+              - button "—" [ref=e649] [cursor=pointer]
+            - 'cell "Club: Rice, Ankunding and McDermott" [ref=e650]':
+              - 'button "Club: Rice, Ankunding and McDermott" [ref=e652] [cursor=pointer]': Rice, Ankunding and McDermott
+            - cell "Connu par" [ref=e653]:
+              - button "Connu par" [ref=e655] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e656]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e658] [cursor=pointer]': Jane Doe
+            - cell [ref=e659]:
+              - combobox [ref=e662] [cursor=pointer]:
+                - generic:
+                  - generic: Visio
+                - img
+            - cell "Jess.Feeney88@hotmail.com" [ref=e663]:
+              - button "Jess.Feeney88@hotmail.com" [ref=e665] [cursor=pointer]
+            - cell "(948) 852-9292 x56688, 1-626-392-3419" [ref=e666]:
+              - button "(948) 852-9292 x56688, 1-626-392-3419" [ref=e668] [cursor=pointer]
+            - cell "influencer Ajouter une étiquette" [ref=e669]:
+              - generic [ref=e671]:
+                - generic [ref=e673] [cursor=pointer]:
+                  - text: influencer
+                  - button [ref=e674]:
+                    - img [ref=e675]
+                - button "Ajouter une étiquette" [ref=e679] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e680]
+            - cell "aujourd’hui à 11:00" [ref=e681]
+            - cell "lundi dernier à 17:50" [ref=e682]
+          - 'row "KH Kristen Hayes Transparent — Club: Wyman Inc Connu par Responsable de compte: Jane Doe Kristen.Hayes77@yahoo.com 1-927-778-8079 x24712, (730) 789-9636 x848 musician Ajouter une étiquette 1 aujourd’hui à 10:52 28/06/2026" [ref=e683]':
+            - cell [ref=e684]:
+              - checkbox [ref=e685] [cursor=pointer]
+            - cell "KH" [ref=e686]:
+              - generic [ref=e688]: KH
+            - cell "Kristen Hayes" [ref=e689]:
+              - link "Kristen Hayes" [ref=e690] [cursor=pointer]:
+                - /url: "#/contacts/245/show"
+            - cell "Transparent" [ref=e691]:
+              - button "Transparent" [ref=e693] [cursor=pointer]
+            - cell "—" [ref=e694]:
+              - button "—" [ref=e696] [cursor=pointer]
+            - 'cell "Club: Wyman Inc" [ref=e697]':
+              - 'button "Club: Wyman Inc" [ref=e699] [cursor=pointer]': Wyman Inc
+            - cell "Connu par" [ref=e700]:
+              - button "Connu par" [ref=e702] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e703]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e705] [cursor=pointer]': Jane Doe
+            - cell [ref=e706]:
+              - combobox [ref=e709] [cursor=pointer]:
+                - generic:
+                  - generic: En discussion
+                - img
+            - cell "Kristen.Hayes77@yahoo.com" [ref=e710]:
+              - button "Kristen.Hayes77@yahoo.com" [ref=e712] [cursor=pointer]
+            - cell "1-927-778-8079 x24712, (730) 789-9636 x848" [ref=e713]:
+              - button "1-927-778-8079 x24712, (730) 789-9636 x848" [ref=e715] [cursor=pointer]
+            - cell "musician Ajouter une étiquette" [ref=e716]:
+              - generic [ref=e718]:
+                - generic [ref=e720] [cursor=pointer]:
+                  - text: musician
+                  - button [ref=e721]:
+                    - img [ref=e722]
+                - button "Ajouter une étiquette" [ref=e726] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "1" [ref=e727]
+            - cell "aujourd’hui à 10:52" [ref=e728]
+            - cell "28/06/2026" [ref=e729]
+          - 'row "MB Miller Batz B2C — Club: Fahey and Sons Connu par Responsable de compte: Candelario Hackett Miller_Batz@hotmail.com 1-582-628-5521, 349.571.5058 x4524 football-fan Ajouter une étiquette 2 aujourd’hui à 10:46 14/07/2026" [ref=e730]':
+            - cell [ref=e731]:
+              - checkbox [ref=e732] [cursor=pointer]
+            - cell "MB" [ref=e733]:
+              - generic [ref=e735]: MB
+            - cell "Miller Batz" [ref=e736]:
+              - link "Miller Batz" [ref=e737] [cursor=pointer]:
+                - /url: "#/contacts/496/show"
+            - cell "B2C" [ref=e738]:
+              - button "B2C" [ref=e740] [cursor=pointer]
+            - cell "—" [ref=e741]:
+              - button "—" [ref=e743] [cursor=pointer]
+            - 'cell "Club: Fahey and Sons" [ref=e744]':
+              - 'button "Club: Fahey and Sons" [ref=e746] [cursor=pointer]': Fahey and Sons
+            - cell "Connu par" [ref=e747]:
+              - button "Connu par" [ref=e749] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Candelario Hackett" [ref=e750]':
+              - 'button "Responsable de compte: Candelario Hackett" [ref=e752] [cursor=pointer]': Candelario Hackett
+            - cell [ref=e753]:
+              - combobox [ref=e756] [cursor=pointer]:
+                - generic:
+                  - generic: En discussion
+                - img
+            - cell "Miller_Batz@hotmail.com" [ref=e757]:
+              - button "Miller_Batz@hotmail.com" [ref=e759] [cursor=pointer]
+            - cell "1-582-628-5521, 349.571.5058 x4524" [ref=e760]:
+              - button "1-582-628-5521, 349.571.5058 x4524" [ref=e762] [cursor=pointer]
+            - cell "football-fan Ajouter une étiquette" [ref=e763]:
+              - generic [ref=e765]:
+                - generic [ref=e767] [cursor=pointer]:
+                  - text: football-fan
+                  - button [ref=e768]:
+                    - img [ref=e769]
+                - button "Ajouter une étiquette" [ref=e773] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "2" [ref=e774]
+            - cell "aujourd’hui à 10:46" [ref=e775]
+            - cell "14/07/2026" [ref=e776]
+          - 'row "TW Tyrone West Integrated — Club: Jones and Sons Connu par: Guy Shanahan Responsable de compte: Jane Doe Tyrone.West@hotmail.com 956-493-1089, 1-397-552-0876 Ajouter une étiquette 1 aujourd’hui à 10:38 03/07/2026" [ref=e777]':
+            - cell [ref=e778]:
+              - checkbox [ref=e779] [cursor=pointer]
+            - cell "TW" [ref=e780]:
+              - generic [ref=e782]: TW
+            - cell "Tyrone West" [ref=e783]:
+              - link "Tyrone West" [ref=e784] [cursor=pointer]:
+                - /url: "#/contacts/60/show"
+            - cell "Integrated" [ref=e785]:
+              - button "Integrated" [ref=e787] [cursor=pointer]
+            - cell "—" [ref=e788]:
+              - button "—" [ref=e790] [cursor=pointer]
+            - 'cell "Club: Jones and Sons" [ref=e791]':
+              - 'button "Club: Jones and Sons" [ref=e793] [cursor=pointer]': Jones and Sons
+            - 'cell "Connu par: Guy Shanahan" [ref=e794]':
+              - 'button "Connu par: Guy Shanahan" [ref=e796] [cursor=pointer]': Guy Shanahan
+            - 'cell "Responsable de compte: Jane Doe" [ref=e797]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e799] [cursor=pointer]': Jane Doe
+            - cell [ref=e800]:
+              - combobox [ref=e803] [cursor=pointer]:
+                - generic:
+                  - generic: A recontacter
+                - img
+            - cell "Tyrone.West@hotmail.com" [ref=e804]:
+              - button "Tyrone.West@hotmail.com" [ref=e806] [cursor=pointer]
+            - cell "956-493-1089, 1-397-552-0876" [ref=e807]:
+              - button "956-493-1089, 1-397-552-0876" [ref=e809] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e810]:
+              - button "Ajouter une étiquette" [ref=e814] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "1" [ref=e815]
+            - cell "aujourd’hui à 10:38" [ref=e816]
+            - cell "03/07/2026" [ref=e817]
+          - 'row "Clark Schamberger Viral — Club: McKenzie Inc Connu par Responsable de compte: Jane Doe Clark76@yahoo.com 1-768-866-4423 x445, 1-933-524-3861 x479 musician holiday-card Ajouter une étiquette 1 aujourd’hui à 10:25 mardi dernier à 11:28" [ref=e818]':
+            - cell [ref=e819]:
+              - checkbox [ref=e820] [cursor=pointer]
+            - cell [ref=e821]:
+              - img [ref=e823]
+            - cell "Clark Schamberger" [ref=e824]:
+              - link "Clark Schamberger" [ref=e825] [cursor=pointer]:
+                - /url: "#/contacts/153/show"
+            - cell "Viral" [ref=e826]:
+              - button "Viral" [ref=e828] [cursor=pointer]
+            - cell "—" [ref=e829]:
+              - button "—" [ref=e831] [cursor=pointer]
+            - 'cell "Club: McKenzie Inc" [ref=e832]':
+              - 'button "Club: McKenzie Inc" [ref=e834] [cursor=pointer]': McKenzie Inc
+            - cell "Connu par" [ref=e835]:
+              - button "Connu par" [ref=e837] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e838]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e840] [cursor=pointer]': Jane Doe
+            - cell [ref=e841]:
+              - combobox [ref=e844] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Clark76@yahoo.com" [ref=e845]:
+              - button "Clark76@yahoo.com" [ref=e847] [cursor=pointer]
+            - cell "1-768-866-4423 x445, 1-933-524-3861 x479" [ref=e848]:
+              - button "1-768-866-4423 x445, 1-933-524-3861 x479" [ref=e850] [cursor=pointer]
+            - cell "musician holiday-card Ajouter une étiquette" [ref=e851]:
+              - generic [ref=e853]:
+                - generic [ref=e855] [cursor=pointer]:
+                  - text: musician
+                  - button [ref=e856]:
+                    - img [ref=e857]
+                - generic [ref=e861] [cursor=pointer]:
+                  - text: holiday-card
+                  - button [ref=e862]:
+                    - img [ref=e863]
+                - button "Ajouter une étiquette" [ref=e867] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "1" [ref=e868]
+            - cell "aujourd’hui à 10:25" [ref=e869]
+            - cell "mardi dernier à 11:28" [ref=e870]
+          - 'row "JW Joanne Weimann Compelling — Club: McKenzie Inc Connu par: Jaime Grant Responsable de compte: Jane Doe Joanne.Weimann@yahoo.com (389) 568-6800, 1-897-389-1725 manager Ajouter une étiquette 0 aujourd’hui à 10:19 lundi dernier à 15:01" [ref=e871]':
+            - cell [ref=e872]:
+              - checkbox [ref=e873] [cursor=pointer]
+            - cell "JW" [ref=e874]:
+              - generic [ref=e876]: JW
+            - cell "Joanne Weimann" [ref=e877]:
+              - link "Joanne Weimann" [ref=e878] [cursor=pointer]:
+                - /url: "#/contacts/426/show"
+            - cell "Compelling" [ref=e879]:
+              - button "Compelling" [ref=e881] [cursor=pointer]
+            - cell "—" [ref=e882]:
+              - button "—" [ref=e884] [cursor=pointer]
+            - 'cell "Club: McKenzie Inc" [ref=e885]':
+              - 'button "Club: McKenzie Inc" [ref=e887] [cursor=pointer]': McKenzie Inc
+            - 'cell "Connu par: Jaime Grant" [ref=e888]':
+              - 'button "Connu par: Jaime Grant" [ref=e890] [cursor=pointer]': Jaime Grant
+            - 'cell "Responsable de compte: Jane Doe" [ref=e891]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e893] [cursor=pointer]': Jane Doe
+            - cell [ref=e894]:
+              - combobox [ref=e897] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Joanne.Weimann@yahoo.com" [ref=e898]:
+              - button "Joanne.Weimann@yahoo.com" [ref=e900] [cursor=pointer]
+            - cell "(389) 568-6800, 1-897-389-1725" [ref=e901]:
+              - button "(389) 568-6800, 1-897-389-1725" [ref=e903] [cursor=pointer]
+            - cell "manager Ajouter une étiquette" [ref=e904]:
+              - generic [ref=e906]:
+                - generic [ref=e908] [cursor=pointer]:
+                  - text: manager
+                  - button [ref=e909]:
+                    - img [ref=e910]
+                - button "Ajouter une étiquette" [ref=e914] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e915]
+            - cell "aujourd’hui à 10:19" [ref=e916]
+            - cell "lundi dernier à 15:01" [ref=e917]
+          - 'row "JD Jacey Douglas Sexy — Club: Ebert, Frami and Towne Connu par: Phillip Goldner Responsable de compte: Jane Doe Jacey30@hotmail.com 485.372.5570 x244, 1-561-731-0961 x839 manager influencer Ajouter une étiquette 0 aujourd’hui à 10:16 hier à 22:17" [ref=e918]':
+            - cell [ref=e919]:
+              - checkbox [ref=e920] [cursor=pointer]
+            - cell "JD" [ref=e921]:
+              - generic [ref=e923]: JD
+            - cell "Jacey Douglas" [ref=e924]:
+              - link "Jacey Douglas" [ref=e925] [cursor=pointer]:
+                - /url: "#/contacts/369/show"
+            - cell "Sexy" [ref=e926]:
+              - button "Sexy" [ref=e928] [cursor=pointer]
+            - cell "—" [ref=e929]:
+              - button "—" [ref=e931] [cursor=pointer]
+            - 'cell "Club: Ebert, Frami and Towne" [ref=e932]':
+              - 'button "Club: Ebert, Frami and Towne" [ref=e934] [cursor=pointer]': Ebert, Frami and Towne
+            - 'cell "Connu par: Phillip Goldner" [ref=e935]':
+              - 'button "Connu par: Phillip Goldner" [ref=e937] [cursor=pointer]': Phillip Goldner
+            - 'cell "Responsable de compte: Jane Doe" [ref=e938]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e940] [cursor=pointer]': Jane Doe
+            - cell [ref=e941]:
+              - combobox [ref=e944] [cursor=pointer]:
+                - generic:
+                  - generic: En discussion
+                - img
+            - cell "Jacey30@hotmail.com" [ref=e945]:
+              - button "Jacey30@hotmail.com" [ref=e947] [cursor=pointer]
+            - cell "485.372.5570 x244, 1-561-731-0961 x839" [ref=e948]:
+              - button "485.372.5570 x244, 1-561-731-0961 x839" [ref=e950] [cursor=pointer]
+            - cell "manager influencer Ajouter une étiquette" [ref=e951]:
+              - generic [ref=e953]:
+                - generic [ref=e955] [cursor=pointer]:
+                  - text: manager
+                  - button [ref=e956]:
+                    - img [ref=e957]
+                - generic [ref=e961] [cursor=pointer]:
+                  - text: influencer
+                  - button [ref=e962]:
+                    - img [ref=e963]
+                - button "Ajouter une étiquette" [ref=e967] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e968]
+            - cell "aujourd’hui à 10:16" [ref=e969]
+            - cell "hier à 22:17" [ref=e970]
+          - 'row "FD Fernando D''Amore Holistic — Club: Ebert, Frami and Towne Connu par: Roman Fahey Responsable de compte: Jane Doe Fernando.DAmore61@gmail.com (896) 802-5797 x24271, 684.211.4164 x828 holiday-card Ajouter une étiquette 2 aujourd’hui à 10:10 23/07/2026" [ref=e971]':
+            - cell [ref=e972]:
+              - checkbox [ref=e973] [cursor=pointer]
+            - cell "FD" [ref=e974]:
+              - generic [ref=e976]: FD
+            - cell "Fernando D'Amore" [ref=e977]:
+              - link "Fernando D'Amore" [ref=e978] [cursor=pointer]:
+                - /url: "#/contacts/109/show"
+            - cell "Holistic" [ref=e979]:
+              - button "Holistic" [ref=e981] [cursor=pointer]
+            - cell "—" [ref=e982]:
+              - button "—" [ref=e984] [cursor=pointer]
+            - 'cell "Club: Ebert, Frami and Towne" [ref=e985]':
+              - 'button "Club: Ebert, Frami and Towne" [ref=e987] [cursor=pointer]': Ebert, Frami and Towne
+            - 'cell "Connu par: Roman Fahey" [ref=e988]':
+              - 'button "Connu par: Roman Fahey" [ref=e990] [cursor=pointer]': Roman Fahey
+            - 'cell "Responsable de compte: Jane Doe" [ref=e991]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e993] [cursor=pointer]': Jane Doe
+            - cell [ref=e994]:
+              - combobox [ref=e997] [cursor=pointer]:
+                - generic:
+                  - generic: En discussion
+                - img
+            - cell "Fernando.DAmore61@gmail.com" [ref=e998]:
+              - button "Fernando.DAmore61@gmail.com" [ref=e1000] [cursor=pointer]
+            - cell "(896) 802-5797 x24271, 684.211.4164 x828" [ref=e1001]:
+              - button "(896) 802-5797 x24271, 684.211.4164 x828" [ref=e1003] [cursor=pointer]
+            - cell "holiday-card Ajouter une étiquette" [ref=e1004]:
+              - generic [ref=e1006]:
+                - generic [ref=e1008] [cursor=pointer]:
+                  - text: holiday-card
+                  - button [ref=e1009]:
+                    - img [ref=e1010]
+                - button "Ajouter une étiquette" [ref=e1014] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "2" [ref=e1015]
+            - cell "aujourd’hui à 10:10" [ref=e1016]
+            - cell "23/07/2026" [ref=e1017]
+          - 'row "CV Christian Volkman Clicks-and-mortar — Club: Jones and Sons Connu par Responsable de compte: Jane Doe Christian_Volkman@gmail.com 947-230-5255 x5677, 1-769-940-2732 x25548 Ajouter une étiquette 1 aujourd’hui à 09:55 27/06/2026" [ref=e1018]':
+            - cell [ref=e1019]:
+              - checkbox [ref=e1020] [cursor=pointer]
+            - cell "CV" [ref=e1021]:
+              - generic [ref=e1023]: CV
+            - cell "Christian Volkman" [ref=e1024]:
+              - link "Christian Volkman" [ref=e1025] [cursor=pointer]:
+                - /url: "#/contacts/185/show"
+            - cell "Clicks-and-mortar" [ref=e1026]:
+              - button "Clicks-and-mortar" [ref=e1028] [cursor=pointer]
+            - cell "—" [ref=e1029]:
+              - button "—" [ref=e1031] [cursor=pointer]
+            - 'cell "Club: Jones and Sons" [ref=e1032]':
+              - 'button "Club: Jones and Sons" [ref=e1034] [cursor=pointer]': Jones and Sons
+            - cell "Connu par" [ref=e1035]:
+              - button "Connu par" [ref=e1037] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e1038]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e1040] [cursor=pointer]': Jane Doe
+            - cell [ref=e1041]:
+              - combobox [ref=e1044] [cursor=pointer]:
+                - generic:
+                  - generic: Client
+                - img
+            - cell "Christian_Volkman@gmail.com" [ref=e1045]:
+              - button "Christian_Volkman@gmail.com" [ref=e1047] [cursor=pointer]
+            - cell "947-230-5255 x5677, 1-769-940-2732 x25548" [ref=e1048]:
+              - button "947-230-5255 x5677, 1-769-940-2732 x25548" [ref=e1050] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e1051]:
+              - button "Ajouter une étiquette" [ref=e1055] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "1" [ref=e1056]
+            - cell "aujourd’hui à 09:55" [ref=e1057]
+            - cell "27/06/2026" [ref=e1058]
+          - 'row "MD Michael Durgan Next-generation — Club: Rice, Ankunding and McDermott Connu par Responsable de compte: Jane Doe Michael.Durgan@yahoo.com 436-647-2371 x0828, 1-388-323-1722 x748 vip Ajouter une étiquette 0 aujourd’hui à 09:48 aujourd’hui à 05:17" [ref=e1059]':
+            - cell [ref=e1060]:
+              - checkbox [ref=e1061] [cursor=pointer]
+            - cell "MD" [ref=e1062]:
+              - generic [ref=e1064]: MD
+            - cell "Michael Durgan" [ref=e1065]:
+              - link "Michael Durgan" [ref=e1066] [cursor=pointer]:
+                - /url: "#/contacts/160/show"
+            - cell "Next-generation" [ref=e1067]:
+              - button "Next-generation" [ref=e1069] [cursor=pointer]
+            - cell "—" [ref=e1070]:
+              - button "—" [ref=e1072] [cursor=pointer]
+            - 'cell "Club: Rice, Ankunding and McDermott" [ref=e1073]':
+              - 'button "Club: Rice, Ankunding and McDermott" [ref=e1075] [cursor=pointer]': Rice, Ankunding and McDermott
+            - cell "Connu par" [ref=e1076]:
+              - button "Connu par" [ref=e1078] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e1079]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e1081] [cursor=pointer]': Jane Doe
+            - cell [ref=e1082]:
+              - combobox [ref=e1085] [cursor=pointer]:
+                - generic:
+                  - generic: Mort
+                - img
+            - cell "Michael.Durgan@yahoo.com" [ref=e1086]:
+              - button "Michael.Durgan@yahoo.com" [ref=e1088] [cursor=pointer]
+            - cell "436-647-2371 x0828, 1-388-323-1722 x748" [ref=e1089]:
+              - button "436-647-2371 x0828, 1-388-323-1722 x748" [ref=e1091] [cursor=pointer]
+            - cell "vip Ajouter une étiquette" [ref=e1092]:
+              - generic [ref=e1094]:
+                - generic [ref=e1096] [cursor=pointer]:
+                  - text: vip
+                  - button [ref=e1097]:
+                    - img [ref=e1098]
+                - button "Ajouter une étiquette" [ref=e1102] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e1103]
+            - cell "aujourd’hui à 09:48" [ref=e1104]
+            - cell "aujourd’hui à 05:17" [ref=e1105]
+          - 'row "KH Kristine Hansen Rich — Club: Rice, Ankunding and McDermott Connu par Responsable de compte: Jane Doe Kristine.Hansen@gmail.com 981.519.4381 x7458, 1-450-836-6515 x01848 holiday-card Ajouter une étiquette 1 aujourd’hui à 09:29 mardi dernier à 10:58" [ref=e1106]':
+            - cell [ref=e1107]:
+              - checkbox [ref=e1108] [cursor=pointer]
+            - cell "KH" [ref=e1109]:
+              - generic [ref=e1111]: KH
+            - cell "Kristine Hansen" [ref=e1112]:
+              - link "Kristine Hansen" [ref=e1113] [cursor=pointer]:
+                - /url: "#/contacts/53/show"
+            - cell "Rich" [ref=e1114]:
+              - button "Rich" [ref=e1116] [cursor=pointer]
+            - cell "—" [ref=e1117]:
+              - button "—" [ref=e1119] [cursor=pointer]
+            - 'cell "Club: Rice, Ankunding and McDermott" [ref=e1120]':
+              - 'button "Club: Rice, Ankunding and McDermott" [ref=e1122] [cursor=pointer]': Rice, Ankunding and McDermott
+            - cell "Connu par" [ref=e1123]:
+              - button "Connu par" [ref=e1125] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e1126]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e1128] [cursor=pointer]': Jane Doe
+            - cell [ref=e1129]:
+              - combobox [ref=e1132] [cursor=pointer]:
+                - generic:
+                  - generic: Visio
+                - img
+            - cell "Kristine.Hansen@gmail.com" [ref=e1133]:
+              - button "Kristine.Hansen@gmail.com" [ref=e1135] [cursor=pointer]
+            - cell "981.519.4381 x7458, 1-450-836-6515 x01848" [ref=e1136]:
+              - button "981.519.4381 x7458, 1-450-836-6515 x01848" [ref=e1138] [cursor=pointer]
+            - cell "holiday-card Ajouter une étiquette" [ref=e1139]:
+              - generic [ref=e1141]:
+                - generic [ref=e1143] [cursor=pointer]:
+                  - text: holiday-card
+                  - button [ref=e1144]:
+                    - img [ref=e1145]
+                - button "Ajouter une étiquette" [ref=e1149] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "1" [ref=e1150]
+            - cell "aujourd’hui à 09:29" [ref=e1151]
+            - cell "mardi dernier à 10:58" [ref=e1152]
+          - 'row "Roland Bednar Value-added — Club: McKenzie Inc Connu par Responsable de compte: Jane Doe Roland84@gmail.com 505.695.4895, (619) 876-1237 Ajouter une étiquette 0 aujourd’hui à 09:27 hier à 09:11" [ref=e1153]':
+            - cell [ref=e1154]:
+              - checkbox [ref=e1155] [cursor=pointer]
+            - cell [ref=e1156]:
+              - img [ref=e1158]
+            - cell "Roland Bednar" [ref=e1159]:
+              - link "Roland Bednar" [ref=e1160] [cursor=pointer]:
+                - /url: "#/contacts/376/show"
+            - cell "Value-added" [ref=e1161]:
+              - button "Value-added" [ref=e1163] [cursor=pointer]
+            - cell "—" [ref=e1164]:
+              - button "—" [ref=e1166] [cursor=pointer]
+            - 'cell "Club: McKenzie Inc" [ref=e1167]':
+              - 'button "Club: McKenzie Inc" [ref=e1169] [cursor=pointer]': McKenzie Inc
+            - cell "Connu par" [ref=e1170]:
+              - button "Connu par" [ref=e1172] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e1173]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e1175] [cursor=pointer]': Jane Doe
+            - cell [ref=e1176]:
+              - combobox [ref=e1179] [cursor=pointer]:
+                - generic:
+                  - generic: Mort
+                - img
+            - cell "Roland84@gmail.com" [ref=e1180]:
+              - button "Roland84@gmail.com" [ref=e1182] [cursor=pointer]
+            - cell "505.695.4895, (619) 876-1237" [ref=e1183]:
+              - button "505.695.4895, (619) 876-1237" [ref=e1185] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e1186]:
+              - button "Ajouter une étiquette" [ref=e1190] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "0" [ref=e1191]
+            - cell "aujourd’hui à 09:27" [ref=e1192]
+            - cell "hier à 09:11" [ref=e1193]
+          - 'row "MM Marion McClure Robust — Club: Dickinson - Pacocha Connu par Responsable de compte: Jane Doe Marion_McClure@yahoo.com 1-670-434-7830 x9927, (706) 248-7230 x2159 musician Ajouter une étiquette 0 aujourd’hui à 09:07 lundi dernier à 09:56" [ref=e1194]':
+            - cell [ref=e1195]:
+              - checkbox [ref=e1196] [cursor=pointer]
+            - cell "MM" [ref=e1197]:
+              - generic [ref=e1199]: MM
+            - cell "Marion McClure" [ref=e1200]:
+              - link "Marion McClure" [ref=e1201] [cursor=pointer]:
+                - /url: "#/contacts/287/show"
+            - cell "Robust" [ref=e1202]:
+              - button "Robust" [ref=e1204] [cursor=pointer]
+            - cell "—" [ref=e1205]:
+              - button "—" [ref=e1207] [cursor=pointer]
+            - 'cell "Club: Dickinson - Pacocha" [ref=e1208]':
+              - 'button "Club: Dickinson - Pacocha" [ref=e1210] [cursor=pointer]': Dickinson - Pacocha
+            - cell "Connu par" [ref=e1211]:
+              - button "Connu par" [ref=e1213] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Jane Doe" [ref=e1214]':
+              - 'button "Responsable de compte: Jane Doe" [ref=e1216] [cursor=pointer]': Jane Doe
+            - cell [ref=e1217]:
+              - combobox [ref=e1220] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Marion_McClure@yahoo.com" [ref=e1221]:
+              - button "Marion_McClure@yahoo.com" [ref=e1223] [cursor=pointer]
+            - cell "1-670-434-7830 x9927, (706) 248-7230 x2159" [ref=e1224]:
+              - button "1-670-434-7830 x9927, (706) 248-7230 x2159" [ref=e1226] [cursor=pointer]
+            - cell "musician Ajouter une étiquette" [ref=e1227]:
+              - generic [ref=e1229]:
+                - generic [ref=e1231] [cursor=pointer]:
+                  - text: musician
+                  - button [ref=e1232]:
+                    - img [ref=e1233]
+                - button "Ajouter une étiquette" [ref=e1237] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e1238]
+            - cell "aujourd’hui à 09:07" [ref=e1239]
+            - cell "lundi dernier à 09:56" [ref=e1240]
+          - 'row "Pamela Beatty Bleeding-edge — Club: Crona - Corwin Connu par Responsable de compte: Vernon Waters Pamela_Beatty@gmail.com 396-406-0112 x89909, 458-834-6598 x611 holiday-card Ajouter une étiquette 0 aujourd’hui à 09:05 lundi dernier à 14:30" [ref=e1241]':
+            - cell [ref=e1242]:
+              - checkbox [ref=e1243] [cursor=pointer]
+            - cell [ref=e1244]:
+              - img [ref=e1246]
+            - cell "Pamela Beatty" [ref=e1247]:
+              - link "Pamela Beatty" [ref=e1248] [cursor=pointer]:
+                - /url: "#/contacts/90/show"
+            - cell "Bleeding-edge" [ref=e1249]:
+              - button "Bleeding-edge" [ref=e1251] [cursor=pointer]
+            - cell "—" [ref=e1252]:
+              - button "—" [ref=e1254] [cursor=pointer]
+            - 'cell "Club: Crona - Corwin" [ref=e1255]':
+              - 'button "Club: Crona - Corwin" [ref=e1257] [cursor=pointer]': Crona - Corwin
+            - cell "Connu par" [ref=e1258]:
+              - button "Connu par" [ref=e1260] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Vernon Waters" [ref=e1261]':
+              - 'button "Responsable de compte: Vernon Waters" [ref=e1263] [cursor=pointer]': Vernon Waters
+            - cell [ref=e1264]:
+              - combobox [ref=e1267] [cursor=pointer]:
+                - generic:
+                  - generic: Client
+                - img
+            - cell "Pamela_Beatty@gmail.com" [ref=e1268]:
+              - button "Pamela_Beatty@gmail.com" [ref=e1270] [cursor=pointer]
+            - cell "396-406-0112 x89909, 458-834-6598 x611" [ref=e1271]:
+              - button "396-406-0112 x89909, 458-834-6598 x611" [ref=e1273] [cursor=pointer]
+            - cell "holiday-card Ajouter une étiquette" [ref=e1274]:
+              - generic [ref=e1276]:
+                - generic [ref=e1278] [cursor=pointer]:
+                  - text: holiday-card
+                  - button [ref=e1279]:
+                    - img [ref=e1280]
+                - button "Ajouter une étiquette" [ref=e1284] [cursor=pointer]:
+                  - img
+                  - text: Ajouter une étiquette
+            - cell "0" [ref=e1285]
+            - cell "aujourd’hui à 09:05" [ref=e1286]
+            - cell "lundi dernier à 14:30" [ref=e1287]
+          - 'row "BS Benny Schmitt Interactive — Club: Johnson, Orn and Mayer Connu par Responsable de compte: Vernon Waters Benny.Schmitt@gmail.com (433) 634-6383 x340, 791.490.9556 x59250 Ajouter une étiquette 1 aujourd’hui à 09:00 aujourd’hui à 03:33" [ref=e1288]':
+            - cell [ref=e1289]:
+              - checkbox [ref=e1290] [cursor=pointer]
+            - cell "BS" [ref=e1291]:
+              - generic [ref=e1293]: BS
+            - cell "Benny Schmitt" [ref=e1294]:
+              - link "Benny Schmitt" [ref=e1295] [cursor=pointer]:
+                - /url: "#/contacts/105/show"
+            - cell "Interactive" [ref=e1296]:
+              - button "Interactive" [ref=e1298] [cursor=pointer]
+            - cell "—" [ref=e1299]:
+              - button "—" [ref=e1301] [cursor=pointer]
+            - 'cell "Club: Johnson, Orn and Mayer" [ref=e1302]':
+              - 'button "Club: Johnson, Orn and Mayer" [ref=e1304] [cursor=pointer]': Johnson, Orn and Mayer
+            - cell "Connu par" [ref=e1305]:
+              - button "Connu par" [ref=e1307] [cursor=pointer]: —
+            - 'cell "Responsable de compte: Vernon Waters" [ref=e1308]':
+              - 'button "Responsable de compte: Vernon Waters" [ref=e1310] [cursor=pointer]': Vernon Waters
+            - cell [ref=e1311]:
+              - combobox [ref=e1314] [cursor=pointer]:
+                - generic:
+                  - generic: rdv sur place
+                - img
+            - cell "Benny.Schmitt@gmail.com" [ref=e1315]:
+              - button "Benny.Schmitt@gmail.com" [ref=e1317] [cursor=pointer]
+            - cell "(433) 634-6383 x340, 791.490.9556 x59250" [ref=e1318]:
+              - button "(433) 634-6383 x340, 791.490.9556 x59250" [ref=e1320] [cursor=pointer]
+            - cell "Ajouter une étiquette" [ref=e1321]:
+              - button "Ajouter une étiquette" [ref=e1325] [cursor=pointer]:
+                - img
+                - text: Ajouter une étiquette
+            - cell "1" [ref=e1326]
+            - cell "aujourd’hui à 09:00" [ref=e1327]
+            - cell "aujourd’hui à 03:33" [ref=e1328]
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - paragraph [ref=e35]: "Lignes par page :"
+        - combobox [ref=e36] [cursor=pointer]:
+          - generic: "25"
+          - img
+      - generic [ref=e37]: 1-25 sur 500
+      - navigation "pagination" [ref=e38]:
+        - list [ref=e39]:
+          - listitem [ref=e40]:
+            - img "Aller à la page précédente" [ref=e42]
+          - listitem [ref=e44]:
+            - link "1" [ref=e45] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1329]:
+            - link "2" [ref=e1330] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1331]:
+            - link "3" [ref=e1332] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1333]:
+            - link "4" [ref=e1334] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1335]:
+            - link "5" [ref=e1336] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e1337]:
+            - generic [ref=e1338]:
+              - img [ref=e1339]
+              - generic [ref=e1343]: More pages
+          - listitem [ref=e1344]:
+            - link "20" [ref=e1345] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e46]:
+            - link "Aller à la prochaine page" [ref=e1346] [cursor=pointer]:
+              - /url: "#"
+              - img
+  - region "Notifications alt+T"

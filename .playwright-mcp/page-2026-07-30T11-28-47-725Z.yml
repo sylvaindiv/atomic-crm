@@ -1,0 +1,61 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e6]:
+      - link "Atomic CRM Atomic CRM" [ref=e7] [cursor=pointer]:
+        - /url: "#/"
+        - img "Atomic CRM" [ref=e8]
+        - heading "Atomic CRM" [level=1] [ref=e9]
+      - navigation [ref=e11]:
+        - link "Tableau de bord" [ref=e12] [cursor=pointer]:
+          - /url: "#/"
+        - link "Arbitres" [ref=e13] [cursor=pointer]:
+          - /url: "#/contacts"
+        - link "Clubs" [ref=e14] [cursor=pointer]:
+          - /url: "#/companies"
+        - link "Affaires" [ref=e15] [cursor=pointer]:
+          - /url: "#/deals"
+      - generic [ref=e16]:
+        - button "Toggle theme" [ref=e17] [cursor=pointer]:
+          - img
+          - generic [ref=e18]: Toggle theme
+        - button [ref=e19] [cursor=pointer]:
+          - img
+        - button [ref=e20] [cursor=pointer]
+  - main [ref=e22]:
+    - generic [ref=e23]:
+      - heading [level=2]
+      - generic [ref=e24]:
+        - button "Trier par dernière activité décroissant" [ref=e25] [cursor=pointer]:
+          - img
+          - generic [ref=e26]: Trier par dernière activité décroissant
+          - img
+        - button "Colonnes" [ref=e28] [cursor=pointer]:
+          - img
+          - text: Colonnes
+        - button "Importer un fichier CSV" [ref=e29] [cursor=pointer]:
+          - img
+          - text: Importer un fichier CSV
+        - button "Exporter" [ref=e30] [cursor=pointer]:
+          - img
+          - text: Exporter
+        - link "Créer un juge-arbitre" [ref=e31] [cursor=pointer]:
+          - /url: "#/contacts/create"
+          - img
+          - text: Créer un juge-arbitre
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - paragraph [ref=e34]: "Lignes par page :"
+        - combobox [ref=e35] [cursor=pointer]:
+          - generic: "25"
+          - img
+      - generic [ref=e36]: "1-%{offsetEnd} sur %{total}"
+      - navigation "pagination" [ref=e37]:
+        - list [ref=e38]:
+          - listitem [ref=e39]:
+            - img "Aller à la page précédente" [ref=e41]
+          - listitem [ref=e43]:
+            - link "1" [ref=e44] [cursor=pointer]:
+              - /url: "#"
+          - listitem [ref=e45]:
+            - img "Aller à la prochaine page" [ref=e47]
+  - region "Notifications alt+T"

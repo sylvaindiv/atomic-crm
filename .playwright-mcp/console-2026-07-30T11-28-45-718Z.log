@@ -1,0 +1,13 @@
+[    1657ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5303/node_modules/.vite/deps/react-dom_client.js?v=2583453e:17994
+[    2176ms] [LOG] {data: Object, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2286ms] [LOG] {data: Array(25), total: 500, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2915ms] [LOG] {data: Array(6), total: 6, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2949ms] [LOG] {data: Array(6), total: 6, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2949ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029
+[    2950ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=2583453e:2029

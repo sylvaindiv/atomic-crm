@@ -1,0 +1,15 @@
+[    1202ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5303/node_modules/.vite/deps/react-dom_client.js?v=d0ef2e5d:17994
+[    1692ms] [LOG] {data: Object, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    1792ms] [LOG] {data: Array(25), total: 500, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2328ms] [LOG] {data: Array(6), total: 6, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2328ms] [LOG] {data: Array(6), total: 6, meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029
+[    2329ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5303/node_modules/.vite/deps/ra-data-fakerest.js?v=d0ef2e5d:2029

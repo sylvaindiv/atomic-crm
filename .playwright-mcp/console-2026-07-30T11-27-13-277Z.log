@@ -1,0 +1,10 @@
+[     334ms] [LOG] {data: Object, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     750ms] [LOG] {data: Array(10), total: 55, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     752ms] [LOG] {data: Array(25), total: 499, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     752ms] [LOG] {data: Array(6), total: 6, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     752ms] [LOG] {data: Array(6), total: 6, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     752ms] [LOG] {data: Array(2), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     753ms] [LOG] {data: Array(0), total: 0, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     753ms] [LOG] {data: Object, meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     761ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029
+[     761ms] [LOG] {data: Array(1), meta: undefined} @ http://localhost:5301/node_modules/.vite/deps/ra-data-fakerest.js?v=02537d4c:2029

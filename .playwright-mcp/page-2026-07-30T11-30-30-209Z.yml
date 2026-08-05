@@ -1,0 +1,25 @@
+- generic [ref=e2]:
+  - navigation [ref=e3]:
+    - generic [ref=e6]:
+      - link "Atomic CRM Atomic CRM" [ref=e7] [cursor=pointer]:
+        - /url: "#/"
+        - img "Atomic CRM" [ref=e8]
+        - heading "Atomic CRM" [level=1] [ref=e9]
+      - navigation [ref=e11]:
+        - link "Tableau de bord" [ref=e12] [cursor=pointer]:
+          - /url: "#/"
+        - link "Arbitres" [ref=e13] [cursor=pointer]:
+          - /url: "#/contacts"
+        - link "Clubs" [ref=e14] [cursor=pointer]:
+          - /url: "#/companies"
+        - link "Affaires" [ref=e15] [cursor=pointer]:
+          - /url: "#/deals"
+      - generic [ref=e16]:
+        - button "Toggle theme" [ref=e17] [cursor=pointer]:
+          - img
+          - generic [ref=e18]: Toggle theme
+        - button [ref=e19] [cursor=pointer]:
+          - img
+        - button [ref=e20] [cursor=pointer]
+  - main [ref=e22]
+  - region "Notifications alt+T"
