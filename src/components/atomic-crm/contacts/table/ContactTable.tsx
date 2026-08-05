@@ -5,7 +5,7 @@ import { DataTable } from "@/components/admin/data-table";
 import { RelativeDate } from "../../misc/RelativeDate";
 import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
-import { Avatar } from "../Avatar";
+
 import { EditableCompanyCell } from "./EditableCompanyCell";
 import { EditableEmailsCell } from "./EditableEmailsCell";
 import { EditableGenderCell } from "./EditableGenderCell";
@@ -45,7 +45,7 @@ import { LatestNoteCell } from "./LatestNoteCell";
  * The wrapping `<div>` tightens font size and cell padding for a denser
  * view, scoped to this table via descendant selectors (the shared
  * `admin/data-table.tsx` / `ui/table.tsx` primitives are left untouched).
- * Each row is also tinted 5% by its `status` color: `rowStyle` sets a
+ * Each row is also tinted 10% by its `status` color: `rowStyle` sets a
  * `--row-status-tint` CSS custom property via `color-mix()`, and
  * `rowClassName` applies it through the static Tailwind arbitrary class
  * `bg-(--row-status-tint)` rather than a raw inline `backgroundColor`, so
@@ -74,13 +74,10 @@ export const ContactTable = () => {
           const statusTint = getStatusTint(record);
           if (!statusTint) return undefined;
           return {
-            "--row-status-tint": `color-mix(in srgb, ${statusTint.color} 5%, transparent)`,
+            "--row-status-tint": `color-mix(in srgb, ${statusTint.color} 10%, transparent)`,
           } as React.CSSProperties;
         }}
       >
-        <DataTable.Col label={false}>
-          <Avatar width={20} height={20} />
-        </DataTable.Col>
         <DataTable.Col
           source="last_name"
           label="resources.contacts.fields.name"
