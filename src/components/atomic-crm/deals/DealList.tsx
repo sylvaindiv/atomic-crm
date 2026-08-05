@@ -19,7 +19,6 @@ import { DealEmpty } from "./DealEmpty";
 import { DealListContent } from "./DealListContent";
 import { DealShow } from "./DealShow";
 
-
 const DealList = () => {
   const { identity } = useGetIdentity();
   const { dealCategories } = useConfigurationContext();
