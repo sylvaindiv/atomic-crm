@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, getContrastingTextColor } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -45,14 +45,14 @@ export const StatusSelector = ({
             "flex w-full items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs h-9",
             selectedOption ? "border" : "border-input",
             disabled && "cursor-not-allowed opacity-50",
-            selectedOption && "rounded-full font-medium px-2 py-0.5 text-xs",
+            selectedOption && "rounded-full font-medium px-2 py-0 text-xs",
           )}
           style={
             selectedOption
               ? {
-                  backgroundColor: `color-mix(in srgb, ${selectedOption.color} 16%, transparent)`,
+                  backgroundColor: selectedOption.color,
                   borderColor: selectedOption.color,
-                  color: selectedOption.color,
+                  color: getContrastingTextColor(selectedOption.color),
                 }
               : undefined
           }
@@ -101,16 +101,16 @@ export const StatusSelector = ({
         className={cn(
           "w-32",
           selectedOption
-            ? "border rounded-full font-medium px-2 py-0.5 text-xs focus-visible:ring-0"
+            ? "border rounded-full font-medium px-2 py-0 text-xs focus-visible:ring-0 !h-6"
             : "border-input",
           triggerClassName,
         )}
         style={
           selectedOption
             ? {
-                backgroundColor: `color-mix(in srgb, ${selectedOption.color} 16%, transparent)`,
+                backgroundColor: selectedOption.color,
                 borderColor: selectedOption.color,
-                color: selectedOption.color,
+                color: getContrastingTextColor(selectedOption.color),
               }
             : undefined
         }
@@ -129,9 +129,9 @@ export const StatusSelector = ({
             value={statusOption.value}
             className="rounded-full border font-medium focus:!bg-transparent focus:!text-current"
             style={{
-              backgroundColor: `color-mix(in srgb, ${statusOption.color} 16%, transparent)`,
+              backgroundColor: statusOption.color,
               borderColor: statusOption.color,
-              color: statusOption.color,
+              color: getContrastingTextColor(statusOption.color),
             }}
           >
             {statusOption.label}
