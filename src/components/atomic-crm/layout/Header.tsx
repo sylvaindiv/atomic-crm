@@ -31,12 +31,12 @@ const Header = () => {
   return (
     <>
       <nav className="grow">
-        <header className="bg-secondary">
+        <header className="bg-header-background text-header-foreground">
           <div className="px-4">
             <div className="flex justify-between items-center flex-1">
               <Link
                 to="/"
-                className="flex items-center gap-2 text-secondary-foreground no-underline"
+                className="flex items-center gap-2 text-header-foreground no-underline"
               >
                 <img
                   className="[.light_&]:hidden h-6"
@@ -116,8 +116,8 @@ const NavigationTab = ({
     to={to}
     className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
       isActive
-        ? "text-secondary-foreground border-secondary-foreground"
-        : "text-secondary-foreground/70 border-transparent hover:text-secondary-foreground/80"
+        ? "text-header-foreground border-header-foreground"
+        : "text-header-foreground/70 border-transparent hover:text-header-foreground/80"
     }`}
   >
     {label}

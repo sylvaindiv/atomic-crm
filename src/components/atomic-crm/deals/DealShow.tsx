@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { isValid } from "date-fns";
 import { Archive, ArchiveRestore } from "lucide-react";
 import {
   InfiniteListBase,
@@ -25,7 +24,7 @@ import { NotesIterator } from "../notes/NotesIterator";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { ContactList } from "./ContactList";
-import { findDealLabel, formatISODateString } from "./dealUtils";
+import { findDealLabel, formatISODateString, isValidISODateString } from "./dealUtils";
 import { DealCaseTypeBadge, DealPartyAvatar } from "./DealParty";
 
 export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
@@ -86,11 +85,12 @@ const DealShowContent = () => {
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-sm">
-                  {isValid(new Date(record.expected_closing_date))
+                  {isValidISODateString(record.expected_closing_date)
                     ? formatISODateString(record.expected_closing_date)
                     : translate("resources.deals.invalid_date")}
                 </span>
-                {new Date(record.expected_closing_date) < new Date() ? (
+                {isValidISODateString(record.expected_closing_date) &&
+                new Date(record.expected_closing_date) < new Date() ? (
                   <Badge variant="destructive">
                     {translate("crm.common.past")}
                   </Badge>

@@ -20,3 +20,18 @@ export function getContrastingTextColor(hexColor: string): string {
   return luminance > 0.5 ? "#000000" : "#ffffff";
 }
 
+export function formatPhoneNumber(raw: string): string {
+  if (!raw) return raw;
+  const isInternational = /^(\+33|0033)/.test(raw.trim());
+  const digits = raw.replace(/\D/g, "");
+  const national = isInternational ? digits.slice(-9) : digits;
+  const local10 = national.length === 9 ? `0${national}` : national;
+
+  if (local10.length !== 10 || !/^0\d{9}$/.test(local10)) {
+    return raw;
+  }
+
+  const grouped = local10.match(/\d{2}/g)!.join(" ");
+  return isInternational ? `+33 ${grouped}` : grouped;
+}
+

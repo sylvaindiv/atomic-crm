@@ -3,7 +3,6 @@ import type { InputProps } from "ra-core";
 import { useGetIdentity, useListContext, useTranslate } from "ra-core";
 import { matchPath, useLocation } from "react-router";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
-import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
 import { ReferenceInput } from "@/components/admin/reference-input";
@@ -19,7 +18,7 @@ import { DealEdit } from "./DealEdit";
 import { DealEmpty } from "./DealEmpty";
 import { DealListContent } from "./DealListContent";
 import { DealShow } from "./DealShow";
-import { OnlyMineInput } from "./OnlyMineInput";
+
 
 const DealList = () => {
   const { identity } = useGetIdentity();
@@ -46,7 +45,6 @@ const DealList = () => {
         optionValue="value"
       />
     </WrapperField>,
-    <OnlyMineInput source="sales_id" alwaysOn />,
   ];
 
   return (
@@ -99,7 +97,6 @@ const DealActions = () => (
   <TopToolbar>
     <FilterButton />
     <ExportButton />
-    <CreateButton label="resources.deals.action.new" />
   </TopToolbar>
 );
 

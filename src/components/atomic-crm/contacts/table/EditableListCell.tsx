@@ -45,6 +45,8 @@ interface EditableListCellProps {
   placeholder: string;
   /** Label of the "add a row" button, e.g. "Add email". */
   addLabel: string;
+  /** Optional formatter applied to each entry value in read mode. */
+  formatValue?: (value: string) => string;
 }
 
 const PERSONAL_INFO_TYPES: PersonalInfoType[] = ["Work", "Home", "Other"];
@@ -84,6 +86,7 @@ export const EditableListCell = ({
   onCommit,
   placeholder,
   addLabel,
+  formatValue,
 }: EditableListCellProps) => {
   const translate = useTranslate();
   const [open, setOpen] = useState(false);
@@ -137,7 +140,9 @@ export const EditableListCell = ({
   };
 
   const summary = entries
-    .map((entry) => entry.value)
+    .map((entry) =>
+      formatValue ? formatValue(entry.value) : entry.value,
+    )
     .filter(Boolean)
     .join(", ");
 

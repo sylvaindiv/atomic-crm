@@ -147,15 +147,17 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
           <h2 className="text-2xl font-bold tracking-tight mb-2">
             {finalTitle}
           </h2>
-          {actions ?? (
-            <div className="flex items-center gap-2">
-              {filters && filters.length > 0 ? <FilterButton /> : null}
-              {hasCreate ? <CreateButton /> : null}
-              {<ExportButton />}
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            <FilterForm />
+            {actions ?? (
+              <div className="flex items-center gap-2">
+                {filters && filters.length > 0 ? <FilterButton /> : null}
+                {hasCreate ? <CreateButton /> : null}
+                {<ExportButton />}
+              </div>
+            )}
+          </div>
         </div>
-        <FilterForm />
 
         <div className={cn("my-2", props.className)}>{children}</div>
         {pagination}

@@ -85,3 +85,15 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Ne jamais committer `.env.development` en l'état car il contient des secrets de production et le dépôt est public — confirmation explicite demandée et obtenue avant tout push. - `.env.development` reste modifié uniquement en local, non poussé.
 **Fichiers / skills modifiés.** - `MEMORY.md` — commit `8dd1cba`, correction de l'entrée précédente sur le statut de la migration.
 **Prochaines étapes / TODOs.** - [ ] Déplacer les secrets Turso de `.env.development` vers `.env` (déjà gitignoré) pour éviter tout risque futur. - [ ] PR #13 à relire/merger par l'utilisateur.
+
+## 2026-08-05 13:52 — Merge origin/main, résolution conflit ContactList
+
+**Résumé.** Fusion de `origin/main` dans `crm-multi-changes-batch` (1 commit de retard). Un seul conflit dans `ContactList.tsx` entre le flux de création via `ContactCreateSheet` (branche courante) et le nouveau panneau de filtres repliable (`main`, PR #15). Conflit résolu en combinant les deux fonctionnalités, plus suppression d'un import dupliqué de `Button`. Vérifié avec `tsc --noEmit` (aucune erreur), commit de merge créé et poussé sur `origin/crm-multi-changes-batch`.
+
+**Décisions prises.**
+- Conserver le flux `ContactCreateSheet` + `useTranslate` de la branche courante plutôt que le `CreateButton` de `main` — car c'est la fonctionnalité la plus récente/spécifique à cette branche, et ajouter le toggle de filtre (`useStore`, `PanelLeftClose/Open`) de `main` par-dessus.
+
+**Fichiers / skills modifiés.**
+- `src/components/atomic-crm/contacts/ContactList.tsx` — résolution de conflit de merge (imports fusionnés, `ContactListActions` combine bouton toggle filtre + bouton création via sheet)
+
+**Prochaines étapes / TODOs.** _aucune_

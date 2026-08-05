@@ -12,6 +12,7 @@ import { TextField } from "@/components/admin/text-field";
 import { UrlField } from "@/components/admin/url-field";
 import { SelectField } from "@/components/admin/select-field";
 
+import { formatPhoneNumber } from "@/lib/utils";
 import { formatLocalizedDate } from "../misc/RelativeDate";
 import { AsideSection } from "../misc/AsideSection";
 import { useConfigurationContext } from "../root/ConfigurationContext";
@@ -99,7 +100,7 @@ export const CompanyInfo = ({ record }: { record: Company }) => {
       {record.phone_number && (
         <div className="flex flex-row items-center gap-1 min-h-[24px]">
           <Phone className="w-4 h-4" />
-          <TextField source="phone_number" />
+          <span className="text-sm">{formatPhoneNumber(record.phone_number)}</span>
         </div>
       )}
     </AsideSection>

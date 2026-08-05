@@ -3,10 +3,10 @@ import { useRecordContext, useTranslate, WithRecord } from "ra-core";
 import { Link } from "react-router";
 import { ArrayField } from "@/components/admin/array-field";
 import { SingleFieldList } from "@/components/admin/single-field-list";
-import { TextField } from "@/components/admin/text-field";
 import { EmailField } from "@/components/admin/email-field";
 import { Mail, Phone, Check, UserPlus } from "lucide-react";
 import type { ReactNode } from "react";
+import { formatPhoneNumber } from "@/lib/utils";
 import { translatePersonalInfoTypeLabel } from "./contactModel";
 import type { Contact } from "../types";
 
@@ -27,7 +27,7 @@ export const ContactPersonalInfo = () => {
         <SingleFieldList className="flex-col gap-y-0">
           <PersonalInfoRow
             icon={<Phone className="w-4 h-4 text-muted-foreground" />}
-            primary={<TextField source="number" />}
+            primary={<PhoneNumberField />}
             showType
           />
         </SingleFieldList>
@@ -82,6 +82,12 @@ const EmailRow = () => {
       primary={<EmailField source="email" />}
     />
   );
+};
+
+const PhoneNumberField = () => {
+  const record = useRecordContext<{ number: string }>();
+  if (!record) return null;
+  return <span className="text-sm">{formatPhoneNumber(record.number)}</span>;
 };
 
 const PersonalInfoRow = ({

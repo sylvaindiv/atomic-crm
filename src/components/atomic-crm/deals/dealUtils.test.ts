@@ -1,6 +1,6 @@
 import { commands } from "vitest/browser";
 
-import { formatISODateString } from "./dealUtils";
+import { formatISODateString, isValidISODateString } from "./dealUtils";
 
 describe("formatISODateString", () => {
   let originalTimezone: string;
@@ -50,5 +50,29 @@ describe("formatISODateString", () => {
     expect(() => formatISODateString(invalidDate)).toThrow(
       "Invalid date format. Expected YYYY-MM-DD.",
     );
+  });
+});
+
+describe("isValidISODateString", () => {
+  it("returns true for a valid YYYY-MM-DD string", () => {
+    expect(isValidISODateString("2024-06-15")).toBe(true);
+  });
+
+  it("returns false for null", () => {
+    expect(isValidISODateString(null)).toBe(false);
+  });
+
+  it("returns false for undefined", () => {
+    expect(isValidISODateString(undefined)).toBe(false);
+  });
+
+  it("returns false for a malformed string", () => {
+    expect(isValidISODateString("invalid-date")).toBe(false);
+    expect(isValidISODateString("15-06-2024")).toBe(false);
+  });
+
+  it("returns false for non-string values", () => {
+    expect(isValidISODateString(123)).toBe(false);
+    expect(isValidISODateString({})).toBe(false);
   });
 });

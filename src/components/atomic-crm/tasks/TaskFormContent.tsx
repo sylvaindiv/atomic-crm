@@ -19,7 +19,6 @@ export const TaskFormContent = ({
       <TextInput
         autoFocus
         source="text"
-        validate={required()}
         multiline
         className="m-0"
         helperText={false}
