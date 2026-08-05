@@ -5,6 +5,7 @@ import {
   InfiniteListBase,
   useGetIdentity,
   useListContext,
+  useStore,
   useTranslate,
   type Exporter,
   type Identifier,
@@ -20,6 +21,7 @@ import { SelectAllButton } from "@/components/admin/select-all-button";
 import { SortButton } from "@/components/admin/sort-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import type { Company, Contact, ContactNote, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";
@@ -66,6 +68,7 @@ export const ContactList = () => {
 
 const ContactListLayoutDesktop = () => {
   const { data, isPending, filterValues } = useListContext();
+  const [filterPanelOpen] = useStore<boolean>("contacts.filterPanelOpen", true);
 
   const hasFilters = filterValues && Object.keys(filterValues).length > 0;
 
@@ -75,7 +78,7 @@ const ContactListLayoutDesktop = () => {
 
   return (
     <div className="flex flex-row gap-8">
-      <ContactListFilter />
+      {filterPanelOpen && <ContactListFilter />}
       <div className="w-full flex flex-col gap-4">
         <Card className="py-0">
           <ContactTable />
@@ -99,10 +102,28 @@ const ContactBulkActionButtons = () => (
 
 const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
   const translate = useTranslate();
+  const [filterPanelOpen, setFilterPanelOpen] = useStore<boolean>(
+    "contacts.filterPanelOpen",
+    true,
+  );
+
   return (
     <TopToolbar>
       <SortButton fields={["first_name", "last_name", "last_seen"]} />
       <ColumnsButton />
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={filterPanelOpen ? "Hide filters" : "Show filters"}
+        onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+        className="cursor-pointer"
+      >
+        {filterPanelOpen ? (
+          <PanelLeftClose className="size-4" />
+        ) : (
+          <PanelLeftOpen className="size-4" />
+        )}
+      </Button>
       <ContactImportButton />
       <ExportButton exporter={exporter} />
       <Button onClick={onCreate}>
