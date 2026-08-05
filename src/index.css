@@ -20,6 +20,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-header-background: var(--header-background);
+  --color-header-foreground: var(--header-foreground);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -46,7 +47,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: #f9f9f9;
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -87,7 +88,8 @@
   --avatar-7: oklch(0.88 0.09 10);
   --avatar-8: oklch(0.92 0.08 80);
   --avatar-9: oklch(0.86 0.09 270);
-  --header-background: oklch(0.8394 0.0631 154.2);
+  --header-background: oklch(0.269 0 0);
+  --header-foreground: oklch(0.985 0 0);
 }
 
 .dark {
@@ -133,6 +135,7 @@
   --avatar-8: oklch(0.4 0.11 80);
   --avatar-9: oklch(0.36 0.13 270);
   --header-background: var(--secondary);
+  --header-foreground: var(--secondary-foreground);
 }
 
 a,
