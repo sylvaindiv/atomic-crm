@@ -1,0 +1,15 @@
+# Requires the EASYPANEL_DEPLOY_WEBHOOK_URL repository secret (gh secret set EASYPANEL_DEPLOY_WEBHOOK_URL --body "<url>") — see repo Settings > Secrets and variables > Actions.
+name: EasyPanel Deploy
+on:
+  push:
+    branches: [main]
+
+jobs:
+  trigger-deploy:
+    name: Trigger EasyPanel deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call EasyPanel deploy webhook
+        env:
+          DEPLOY_WEBHOOK_URL: ${{ secrets.EASYPANEL_DEPLOY_WEBHOOK_URL }}
+        run: curl -fsS -X POST "$DEPLOY_WEBHOOK_URL"

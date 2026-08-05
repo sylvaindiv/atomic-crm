@@ -24,7 +24,11 @@ import { NotesIterator } from "../notes/NotesIterator";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { ContactList } from "./ContactList";
-import { findDealLabel, formatISODateString, isValidISODateString } from "./dealUtils";
+import {
+  findDealLabel,
+  formatISODateString,
+  isValidISODateString,
+} from "./dealUtils";
 import { DealCaseTypeBadge, DealPartyAvatar } from "./DealParty";
 
 export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
