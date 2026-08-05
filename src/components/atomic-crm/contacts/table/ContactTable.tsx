@@ -90,6 +90,12 @@ export const ContactTable = () => {
         <DataTable.Col source="linkedin_url">
           <EditableTextCell source="linkedin_url" />
         </DataTable.Col>
+        <DataTable.Col source="postal_code">
+          <EditableTextCell source="postal_code" />
+        </DataTable.Col>
+        <DataTable.Col source="city">
+          <EditableTextCell source="city" />
+        </DataTable.Col>
         <DataTable.Col
           source="latest_note_text"
           label="resources.contacts.fields.latest_note_text"

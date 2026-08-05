@@ -99,6 +99,8 @@ export const frenchCrmMessages = {
         first_seen: "Première activité",
         latest_note_text: "Dernière note",
         name: "Nom",
+        postal_code: "Code postal",
+        city: "Ville",
       },
       action: {
         add: "Ajouter un juge-arbitre",

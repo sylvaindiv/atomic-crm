@@ -32,6 +32,8 @@ const buildRow = (
   known_via: "",
   comment: "",
   comment_2: "",
+  postal_code: "",
+  contact_city: "",
   ...overrides,
 });
 

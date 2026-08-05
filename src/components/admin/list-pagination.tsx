@@ -38,7 +38,7 @@ import { useListPaginationContext, Translate, useTranslate } from "ra-core";
  * );
  */
 export const ListPagination = ({
-  rowsPerPageOptions = [5, 10, 25, 50],
+  rowsPerPageOptions = [5, 10, 25, 50, 100, 250, 500],
   className,
 }: {
   rowsPerPageOptions?: number[];
