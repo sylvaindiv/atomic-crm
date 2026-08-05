@@ -7,6 +7,7 @@ import {
   type Identifier,
 } from "ra-core";
 import { useCallback, useState } from "react";
+import { getContrastingTextColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -125,9 +126,10 @@ export const TagsListEdit = () => {
               >
                 <Badge
                   variant="secondary"
-                  className="text-sm md:text-xs font-normal text-black"
+                  className="text-sm md:text-xs font-normal"
                   style={{
                     backgroundColor: tag.color,
+                    color: getContrastingTextColor(tag.color),
                   }}
                 >
                   {tag.name}

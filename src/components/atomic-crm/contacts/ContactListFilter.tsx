@@ -7,6 +7,7 @@ import {
   useTranslate,
 } from "ra-core";
 import { ToggleFilterButton } from "@/components/admin/toggle-filter-button";
+import { getContrastingTextColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 import { FilterCategory } from "../filters/FilterCategory";
@@ -114,9 +115,10 @@ export const ContactListFilter = () => {
               label={
                 <Badge
                   variant="secondary"
-                  className="text-black text-sm md:text-xs font-normal cursor-pointer"
+                  className="text-sm md:text-xs font-normal cursor-pointer"
                   style={{
                     backgroundColor: record?.color,
+                    color: getContrastingTextColor(record?.color ?? "#ffffff"),
                   }}
                 >
                   {record?.name}
@@ -235,9 +237,10 @@ export const ContactListFilterSummary = () => {
             label={
               <Badge
                 variant="secondary"
-                className="text-black text-sm md:text-xs font-normal cursor-pointer"
+                className="text-sm md:text-xs font-normal cursor-pointer"
                 style={{
                   backgroundColor: record?.color,
+                  color: getContrastingTextColor(record?.color ?? "#ffffff"),
                 }}
               >
                 {record?.name}
