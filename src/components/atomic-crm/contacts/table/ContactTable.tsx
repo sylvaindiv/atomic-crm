@@ -66,6 +66,7 @@ export const ContactTable = () => {
         rowClick={false}
         bulkActionsToolbar={false}
         hiddenColumns={["gender"]}
+        resizableColumns
         rowClassName={(record: Contact) =>
           getStatusTint(record) ? "bg-(--row-status-tint)" : undefined
         }

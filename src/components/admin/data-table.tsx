@@ -1,5 +1,14 @@
 import type { ReactNode } from "react";
-import { Children, createElement, isValidElement, useCallback } from "react";
+import {
+  Children,
+  createContext,
+  createElement,
+  isValidElement,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import type {
   DataTableBaseProps,
   ExtractRecordPaths,
@@ -60,6 +69,12 @@ import {
 
 const defaultBulkActionButtons = <BulkActionsToolbarChildren />;
 
+const DataTableResizeContext = createContext<{
+  resizable: boolean;
+  widths: Record<string, number>;
+  setWidth: (source: string, width: number) => void;
+} | null>(null);
+
 /**
  * A powerful data table with sorting, selection, and column customization.
  *
@@ -96,6 +111,7 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
     rowStyle,
     bulkActionButtons = defaultBulkActionButtons,
     bulkActionsToolbar,
+    resizableColumns = false,
     ...rest
   } = props;
   const hasBulkActions = !!bulkActionsToolbar || bulkActionButtons !== false;
@@ -106,6 +122,17 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
     ? reorderChildren(children, columnRanks)
     : children;
 
+  const [columnWidths, setColumnWidths] = useStore<Record<string, number>>(
+    `${storeKey}_columnWidths`,
+    {},
+  );
+  const setWidth = useCallback(
+    (source: string, width: number) => {
+      setColumnWidths((prev) => ({ ...prev, [source]: width }));
+    },
+    [setColumnWidths],
+  );
+
   return (
     <DataTableBase<RecordType>
       hasBulkActions={hasBulkActions}
@@ -113,30 +140,34 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
       empty={<DataTableEmpty />}
       {...rest}
     >
-      <div className={cn("rounded-md border", className)}>
-        <Table>
-          <DataTableRenderContext.Provider value="header">
-            <DataTableHead>{columns}</DataTableHead>
-          </DataTableRenderContext.Provider>
-          <DataTableBody<RecordType>
-            rowClassName={rowClassName}
-            rowStyle={rowStyle}
-          >
-            {columns}
-          </DataTableBody>
-        </Table>
-      </div>
-      {bulkActionsToolbar ??
-        (bulkActionButtons !== false && (
-          <BulkActionsToolbar>
-            {isValidElement(bulkActionButtons)
-              ? bulkActionButtons
-              : defaultBulkActionButtons}
-          </BulkActionsToolbar>
-        ))}
-      <DataTableRenderContext.Provider value="columnsSelector">
-        <ColumnsSelector>{children}</ColumnsSelector>
-      </DataTableRenderContext.Provider>
+      <DataTableResizeContext.Provider
+        value={{ resizable: resizableColumns, widths: columnWidths, setWidth }}
+      >
+        <div className={cn("rounded-md border", className)}>
+          <Table className={resizableColumns ? "table-fixed" : undefined}>
+            <DataTableRenderContext.Provider value="header">
+              <DataTableHead>{columns}</DataTableHead>
+            </DataTableRenderContext.Provider>
+            <DataTableBody<RecordType>
+              rowClassName={rowClassName}
+              rowStyle={rowStyle}
+            >
+              {columns}
+            </DataTableBody>
+          </Table>
+        </div>
+        {bulkActionsToolbar ??
+          (bulkActionButtons !== false && (
+            <BulkActionsToolbar>
+              {isValidElement(bulkActionButtons)
+                ? bulkActionButtons
+                : defaultBulkActionButtons}
+            </BulkActionsToolbar>
+          ))}
+        <DataTableRenderContext.Provider value="columnsSelector">
+          <ColumnsSelector>{children}</ColumnsSelector>
+        </DataTableRenderContext.Provider>
+      </DataTableResizeContext.Provider>
     </DataTableBase>
   );
 }
@@ -313,6 +344,7 @@ export interface DataTableProps<RecordType extends RaRecord = RaRecord>
   rowStyle?: (record: RecordType) => React.CSSProperties | undefined;
   bulkActionButtons?: ReactNode;
   bulkActionsToolbar?: ReactNode;
+  resizableColumns?: boolean;
 }
 
 export function DataTableColumn<
@@ -366,8 +398,50 @@ function DataTableHeadCell<
   const translateLabel = useTranslateLabel();
   const { storeKey, defaultHiddenColumns } = useDataTableStoreContext();
   const [hiddenColumns] = useStore<string[]>(storeKey, defaultHiddenColumns);
+
+  const resize = useContext(DataTableResizeContext);
+  const [dragWidth, setDragWidth] = useState<number | null>(null);
+  const startXRef = useRef(0);
+  const startWidthRef = useRef(0);
+
   const isColumnHidden = hiddenColumns.includes(source!);
   if (isColumnHidden) return null;
+
+  const isResizing = dragWidth !== null;
+  const storedWidth =
+    source && resize?.resizable ? resize.widths[source] : undefined;
+  const effectiveWidth = isResizing ? dragWidth : storedWidth;
+
+  const handleResizePointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const th = (e.currentTarget as HTMLElement).closest("th");
+    if (!th) return;
+    startXRef.current = e.clientX;
+    startWidthRef.current = th.getBoundingClientRect().width;
+    document.body.style.userSelect = "none";
+    document.body.style.cursor = "col-resize";
+
+    const handlePointerMove = (ev: PointerEvent) => {
+      const delta = ev.clientX - startXRef.current;
+      const newWidth = Math.max(60, startWidthRef.current + delta);
+      setDragWidth(newWidth);
+    };
+
+    const handlePointerUp = (ev: PointerEvent) => {
+      const delta = ev.clientX - startXRef.current;
+      const newWidth = Math.max(60, startWidthRef.current + delta);
+      if (source) resize?.setWidth(source, newWidth);
+      setDragWidth(null);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+      document.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
+  };
 
   const nextSortOrder =
     sort && sort.field === source
@@ -388,8 +462,20 @@ function DataTableHeadCell<
     _: translate("ra.action.sort"),
   });
 
+  const columnStyle: React.CSSProperties = {};
+  if (effectiveWidth && resize?.resizable && source) {
+    columnStyle.width = `${effectiveWidth}px`;
+  }
+
   return (
-    <TableHead className={cn(className, headerClassName)}>
+    <TableHead
+      className={cn(
+        className,
+        headerClassName,
+        resize?.resizable && source && "relative",
+      )}
+      style={columnStyle}
+    >
       {handleSort && sort && !disableSort && source ? (
         <TooltipProvider>
           <Tooltip>
@@ -431,6 +517,12 @@ function DataTableHeadCell<
         </TooltipProvider>
       ) : (
         <FieldTitle label={label} source={source} resource={resource} />
+      )}
+      {resize?.resizable && source && (
+        <div
+          className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-primary/50 select-none z-10"
+          onPointerDown={handleResizePointerDown}
+        />
       )}
     </TableHead>
   );
