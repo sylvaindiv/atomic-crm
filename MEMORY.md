@@ -132,3 +132,9 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Prochaines étapes / TODOs.**
 - [ ] Committer les changements en attente sur `increase-page-size-add-postal-code`
 - [ ] Adapter l'outillage de migration du harness pour Turso (pas seulement Supabase)
+
+## 2026-08-05 21:51 — PR créée : pagination 500 + code postal/ville
+**Résumé.** Créé la PR #18 (increase-page-size-add-postal-code → main) suivant les instructions du fichier attaché. Vérifié git status/diff, confirmé que le hook Stop avait déjà écrit l'entrée MEMORY.md précédente, staged et committé les 14 fichiers en attente (pagination + postal_code/city + MEMORY.md), pushé avec upstream, revu le diff complet via GetWorkspaceDiff, puis créé la PR avec gh pr create en suivant le template du projet.
+**Décisions prises.** - Checklist "Additional Checks" (documentation, fakerest, mobile) laissée décochée car non vérifiée manuellement en navigateur cette session — honnêteté sur ce qui a été réellement testé (uniquement typecheck).
+**Fichiers / skills modifiés.** - Commit `507aea6` sur `increase-page-size-add-postal-code` — 14 fichiers (schema.sql, list-pagination.tsx, CompanyList.tsx, contacts/*, providers/*, types.ts, MEMORY.md), poussé vers origin.
+**Prochaines étapes / TODOs.** - [ ] Tester la PR en fakerest et résolution mobile avant merge - [ ] Vérifier/mettre à jour la documentation si nécessaire
