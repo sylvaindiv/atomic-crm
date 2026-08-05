@@ -4,6 +4,8 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## Business Knowledge
 
+- Contacts have a dedicated `postal_code` field (editable inline in the contacts table, included in CSV import/export) distinct from the legacy `zipcode`/`city` address columns.
+- List pagination now offers up to 500 rows per page (`rowsPerPageOptions`), up from a 50-row cap.
 - A deal is either a judge case (`case_type: "judge"`, linked to exactly one contact) or a club case (`case_type: "club"`, linked to one company) — chosen at creation and immutable afterwards.
 - The deals Kanban board no longer has its own stage config: its columns are the shared `noteStatuses` (contact/company statuses) flagged `visibleInDealsKanban`, so judges/clubs and deals move through the same status vocabulary.
 - A judge's (contact) or club's (company) `status` field and their linked deal's `stage` are kept in sync automatically by the backend (`server/dealSync.mjs`): changing one side updates or creates the other, one hop only, no ping-pong.
@@ -97,3 +99,21 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 - `src/components/atomic-crm/contacts/ContactList.tsx` — résolution de conflit de merge (imports fusionnés, `ContactListActions` combine bouton toggle filtre + bouton création via sheet)
 
 **Prochaines étapes / TODOs.** _aucune_
+
+## 2026-08-05 17:11 — Postal code backfill blocked on DB access
+
+**Résumé.** Session portant sur deux demandes : pagination des listes jusqu'à 500 lignes et ajout d'une colonne code postal pour les juges-arbitres (contacts). Un plan initial a été rédigé et approuvé conceptuellement, mais l'utilisateur a indiqué l'avoir déjà exécuté ailleurs — la colonne `postal_code TEXT` est confirmée présente dans `db/schema.sql` sur la branche `increase-page-size-add-postal-code`. L'utilisateur a fourni un CSV réel (398 lignes : Nom, Club, CP, Ville, etc.) pour matcher et backfiller les codes postaux existants, en ignorant les autres colonnes jugées obsolètes. Le matching/update a été bloqué : ce workspace n'a ni `.env` (TURSO_DATABASE_URL/TURSO_AUTH_TOKEN), ni serveur backend local actif, ni session `turso` CLI authentifiée.
+
+**Décisions prises.** - Matcher uniquement sur la colonne Nom (normalisée, insensible à la casse) contre `first_name + last_name`, en ignorant club/email/téléphone/statut du CSV car signalés comme modifiés/obsolètes par l'utilisateur.
+
+**Fichiers / skills modifiés.** _aucune_
+
+**Prochaines étapes / TODOs.**
+- [ ] Obtenir l'accès DB (credentials Turso ou pointer vers le workspace où le plan a été exécuté) pour effectuer le matching et l'update
+- [ ] Produire une liste de correspondances proposées (matched/unmatched) pour validation avant écriture en base
+
+## 2026-08-05 17:21 — Pagination 500 + import code postal/ville juges-arbitres
+**Résumé.** Confirmé que le plafond de pagination (50) est purement front (`list-pagination.tsx`), sans limite backend. La colonne `postal_code` sur `contacts` était déjà codée (non committée, non migrée en base live). Import du CSV "Listing JA" (398 lignes) matché aux contacts existants par nom, avec désambiguïsation via société/club pour les noms dupliqués ou placeholders ("(non renseigné)") : 359/361 lignes avec code postal matchées avec confiance. Dispatch de l'orchestrator pour ajouter une colonne `city` (miroir de `postal_code`) et générer la migration de déploiement des deux colonnes ; en attente de la confirmation PD-ASK.
+**Décisions prises.** - Matcher par nom normalisé + désambiguïsation par société plutôt que fuzzy match aveugle, pour éviter d'assigner le mauvais code postal aux noms dupliqués/placeholders. - Passer par l'orchestrator pour l'ajout de `city` et la migration, conformément au workflow du projet.
+**Fichiers / skills modifiés.** - `.context/scripts/fetch_contacts.mjs`, `match_postal_codes.mjs`, `apply_postal_codes.mjs` — scripts de matching/backfill (gitignorés, non committés).
+**Prochaines étapes / TODOs.** - [ ] Récupérer le résultat de l'orchestrator (colonne `city` + migration). - [ ] Relayer la question PD-ASK à l'utilisateur. - [ ] Exécuter `apply_postal_codes.mjs` sur Turso `atomic-crm` une fois les colonnes live.
