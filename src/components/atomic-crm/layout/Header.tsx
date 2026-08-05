@@ -31,7 +31,7 @@ const Header = () => {
   return (
     <>
       <nav className="grow">
-        <header className="bg-secondary">
+        <header className="bg-header-background">
           <div className="px-4">
             <div className="flex justify-between items-center flex-1">
               <Link
