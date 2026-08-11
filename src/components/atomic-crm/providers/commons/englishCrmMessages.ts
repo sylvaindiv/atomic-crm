@@ -212,10 +212,11 @@ export const englishCrmMessages = {
         name: "Name",
         description: "Description",
         company_id: "Club",
-        contact_ids: "Judges-Referees",
+        // Singular: capped at one linked contact, for both case types. See
+        // the same convention on notes.fields.contact_id / tasks.fields.contact_id.
+        contact_ids: "Judge-Referee",
         category: "Category",
         amount: "Budget",
-        expected_closing_date: "Expected closing date",
         stage: "Stage",
         case_type: "Case type",
       },
@@ -241,7 +242,11 @@ export const englishCrmMessages = {
       },
       inputs: {
         linked_to: "Linked to",
+        next_action: "Next action",
+        next_action_text: "What's next",
       },
+      next_action_save_error:
+        "The next action could not be saved. The deal was not saved either.",
       unarchived: {
         action: "Send back to the board",
         error: "Error: deal not unarchived",
@@ -253,7 +258,6 @@ export const englishCrmMessages = {
         description: "It seems your deal list is empty.",
         title: "No deals found",
       },
-      invalid_date: "Invalid date",
     },
     notes: {
       name: "Note |||| Notes",

@@ -22,7 +22,6 @@ const buildLinkedDeal = (overrides: Partial<Deal> = {}): Deal => ({
   amount: 0,
   created_at: "2025-01-01T09:00:00.000Z",
   updated_at: "2025-01-01T09:00:00.000Z",
-  expected_closing_date: "2025-02-01",
   sales_id: 0,
   index: 0,
   ...overrides,
