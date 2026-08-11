@@ -4,6 +4,7 @@ import {
   useDataProvider,
   useGetIdentity,
   useListContext,
+  useNotify,
   useRedirect,
   type GetListResult,
 } from "ra-core";
@@ -14,10 +15,15 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import type { Deal } from "../types";
 import { DealInputs } from "./DealInputs";
+import {
+  transformDealWithNextAction,
+  type DealWithNextAction,
+} from "./dealNextAction";
 
 export const DealCreate = ({ open }: { open: boolean }) => {
   const redirect = useRedirect();
   const dataProvider = useDataProvider();
+  const notify = useNotify();
   const { data: allDeals } = useListContext<Deal>();
 
   const handleClose = () => {
@@ -72,10 +78,30 @@ export const DealCreate = ({ open }: { open: boolean }) => {
 
   const { identity } = useGetIdentity();
 
+  // Strips `next_action` off the submitted deal and upserts it onto the
+  // linked contact's earliest open task before the deal is written -- a
+  // deal can never be saved without one. See dealNextAction.ts.
+  const transform = async (values: DealWithNextAction) => {
+    try {
+      return await transformDealWithNextAction(
+        dataProvider,
+        values,
+        identity?.id,
+      );
+    } catch (error) {
+      notify("resources.deals.next_action_save_error", { type: "error" });
+      throw error;
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={() => handleClose()}>
       <DialogContent className="lg:max-w-4xl overflow-y-auto max-h-9/10 top-1/20 translate-y-0">
-        <Create resource="deals" mutationOptions={{ onSuccess }}>
+        <Create
+          resource="deals"
+          mutationOptions={{ onSuccess }}
+          transform={transform}
+        >
           <Form
             defaultValues={{
               sales_id: identity?.id,

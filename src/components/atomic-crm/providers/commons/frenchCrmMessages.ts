@@ -246,7 +246,11 @@ export const frenchCrmMessages = {
       },
       inputs: {
         linked_to: "Lié à",
+        next_action: "Prochaine action",
+        next_action_text: "Prochaine étape",
       },
+      next_action_save_error:
+        "La prochaine action n'a pas pu être enregistrée. L'affaire n'a pas été enregistrée non plus.",
       unarchived: {
         action: "Renvoyer au tableau",
         error: "Erreur : affaire non désarchivée",

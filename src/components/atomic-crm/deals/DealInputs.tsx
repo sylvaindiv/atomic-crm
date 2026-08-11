@@ -1,7 +1,14 @@
 import { useEffect } from "react";
-import { maxLength, required, useRecordContext, useTranslate } from "ra-core";
+import {
+  maxLength,
+  required,
+  useDataProvider,
+  useRecordContext,
+  useTranslate,
+} from "ra-core";
 import { useFormContext, useWatch } from "react-hook-form";
 import { AutocompleteArrayInput } from "@/components/admin/autocomplete-array-input";
+import { DateTimeInput } from "@/components/admin";
 import { ReferenceArrayInput } from "@/components/admin/reference-array-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { TextInput } from "@/components/admin/text-input";
@@ -13,6 +20,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
+import { getEarliestOpenTask } from "./dealNextAction";
 import type { Deal } from "../types";
 
 export const DealInputs = () => {
@@ -26,6 +34,9 @@ export const DealInputs = () => {
         <Separator orientation={isMobile ? "horizontal" : "vertical"} />
         <DealMiscInputs />
       </div>
+
+      <Separator />
+      <DealNextActionInputs />
     </div>
   );
 };
@@ -147,6 +158,71 @@ const DealMiscInputs = () => {
         helperText={false}
         validate={required()}
       />
+    </div>
+  );
+};
+
+// Every deal must always have a defined next action: the linked contact's
+// next open task. Tasks stay contact-scoped (no deal_id column), so this
+// mini-form lives on a non-persisted `next_action.*` namespace, stripped and
+// upserted onto the contact's task list by the deal form's async `transform`
+// (see dealNextAction.ts) -- never written to the deal record itself.
+const DealNextActionInputs = () => {
+  const { taskTypes } = useConfigurationContext();
+  const translate = useTranslate();
+  const dataProvider = useDataProvider();
+  const { control, setValue } = useFormContext();
+  const contactIds = useWatch({ control, name: "contact_ids" });
+  const contactId = contactIds?.[0];
+
+  // Resolve the linked contact's earliest open task whenever the linked
+  // contact changes (including on first mount, e.g. opening the edit
+  // dialog) and prefill the mini-form from it. Fields start empty -- and
+  // stay required -- when the contact has no open task, so a brand-new deal
+  // for a brand-new contact can still be saved in a single flow.
+  useEffect(() => {
+    if (contactId == null) return;
+    let cancelled = false;
+    getEarliestOpenTask(dataProvider, contactId).then((task) => {
+      if (cancelled) return;
+      setValue("next_action.text", task?.text ?? "");
+      setValue("next_action.type", task?.type ?? "");
+      setValue("next_action.due_date", task?.due_date ?? "");
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [contactId, dataProvider, setValue]);
+
+  return (
+    <div className="flex flex-col gap-4 flex-1">
+      <h3 className="text-base font-medium">
+        {translate("resources.deals.inputs.next_action")}
+      </h3>
+      <TextInput
+        source="next_action.text"
+        label="resources.deals.inputs.next_action_text"
+        multiline
+        helperText={false}
+        validate={required()}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <DateTimeInput
+          source="next_action.due_date"
+          label="resources.tasks.fields.due_date"
+          helperText={false}
+          validate={required()}
+        />
+        <SelectInput
+          source="next_action.type"
+          label="resources.tasks.fields.type"
+          validate={required()}
+          choices={taskTypes}
+          optionText="label"
+          optionValue="value"
+          helperText={false}
+        />
+      </div>
     </div>
   );
 };
