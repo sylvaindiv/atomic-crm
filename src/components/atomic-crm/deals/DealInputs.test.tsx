@@ -39,17 +39,13 @@ describe("DealInputs", () => {
     const screen = await render(<EditClubDeal />);
 
     await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Judge-Referee"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
   });
 
   it("shows the linked contact input and hides the club company input for a judge deal", async () => {
     const screen = await render(<EditJudgeDeal />);
 
-    await expect
-      .element(screen.getByText("Judge-Referee"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
   });
 
@@ -60,9 +56,7 @@ describe("DealInputs", () => {
     await screen.getByRole("listbox").getByText("Club").click();
 
     await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Judge-Referee"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
   });
 
   it("hides the club company input after choosing the judge case type, keeping the contact input", async () => {
@@ -71,9 +65,7 @@ describe("DealInputs", () => {
     await screen.getByRole("combobox", { name: /case type/i }).click();
     await screen.getByRole("listbox").getByText("Judge").click();
 
-    await expect
-      .element(screen.getByText("Judge-Referee"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
   });
 
@@ -192,9 +184,7 @@ describe("DealInputs", () => {
   it("resolves case_type from the real fetched record on edit, showing the judge input and hiding the club input", async () => {
     const screen = await render(<EditJudgeDealFromRealRecord />);
 
-    await expect
-      .element(screen.getByText("Judge-Referee"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
     await expect.element(screen.getByText("Case type")).not.toBeInTheDocument();
   });
