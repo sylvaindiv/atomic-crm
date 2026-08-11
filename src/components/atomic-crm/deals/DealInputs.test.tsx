@@ -380,7 +380,7 @@ describe("DealInputs", () => {
       )
       .toBe("Call the judge back");
 
-    await screen.getByLabelText("Budget").clear();
+    await screen.getByLabelText("Amount").clear();
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
