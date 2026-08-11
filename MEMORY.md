@@ -4,6 +4,9 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## Business Knowledge
 
+- A deal (judge or club) can never be saved without a "next action": the deal form upserts the linked contact's earliest open task from a non-persisted `next_action.*` mini-form (text/type/due_date all required), since tasks stay contact-scoped with no `deal_id` column.
+- Every deal, judge or club, now requires exactly one linked contact (`contact_ids`); previously only judge deals did.
+- A deal's `amount` is optional (nullable, no longer required), and `expected_closing_date` was dropped from the `deals` table entirely.
 - Contacts have a dedicated `postal_code` field (editable inline in the contacts table, included in CSV import/export) distinct from the legacy `zipcode`/`city` address columns.
 - List pagination now offers up to 500 rows per page (`rowsPerPageOptions`), up from a 50-row cap.
 - A deal is either a judge case (`case_type: "judge"`, linked to exactly one contact) or a club case (`case_type: "club"`, linked to one company) — chosen at creation and immutable afterwards.
