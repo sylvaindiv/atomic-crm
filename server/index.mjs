@@ -8,6 +8,7 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 
 import { initSchema, loadTableColumns } from "./db.mjs";
+import { startDailyDigestScheduler } from "./dailyDigest.mjs";
 import { HANDLERS } from "./query.mjs";
 import { RESOURCES } from "./resources.mjs";
 
@@ -42,6 +43,7 @@ if (process.env.NODE_ENV === "production" || process.env.SERVE_STATIC === "1") {
 
 await initSchema();
 await loadTableColumns();
+startDailyDigestScheduler();
 
 const port = Number(process.env.PORT ?? 3001);
 serve({ fetch: app.fetch, port }, (info) => {
