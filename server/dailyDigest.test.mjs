@@ -94,20 +94,18 @@ describe("dailyDigest.renderDigestEmail", () => {
     expect(html).toContain("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;");
   });
 
-  it("includes the CTA button linking to APP_URL", () => {
+  it("includes the CTA button linking to the dashboard", () => {
     // Arrange
-    const previousAppUrl = process.env.APP_URL;
-    process.env.APP_URL = "https://crm.example.test/#/";
+    // This test runs in the browser-based "app" Vitest project, where
+    // `process` does not exist, so dailyDigest.mjs's env guard always
+    // resolves to the hardcoded fallback URL -- exercised here.
 
     // Act
     const { html } = renderDigestEmail([]);
 
     // Assert
-    expect(html).toContain("https://crm.example.test/#/");
+    expect(html).toContain("https://crm.padel-arcade.fr/#/");
     expect(html).toContain("Ouvrir le dashboard");
-
-    // Cleanup
-    process.env.APP_URL = previousAppUrl;
   });
 });
 
