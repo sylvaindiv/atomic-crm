@@ -548,6 +548,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/deals/dealNextAction.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/deals/OnlyMineInput.tsx",
           "type": "registry:component"
         },
