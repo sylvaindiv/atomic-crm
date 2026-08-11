@@ -35,46 +35,119 @@ describe("DealInputs", () => {
       .toBeGreaterThan(0);
   });
 
-  it("shows the club company input and hides the judge input for a club deal", async () => {
+  it("shows the club company input and the linked contact input for a club deal", async () => {
     const screen = await render(<EditClubDeal />);
 
     await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .not.toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
   });
 
-  it("shows the judge input and hides the club company input for a judge deal", async () => {
+  it("shows the linked contact input and hides the club company input for a judge deal", async () => {
     const screen = await render(<EditJudgeDeal />);
 
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
   });
 
-  it("reveals the club company input after choosing the club case type", async () => {
+  it("reveals the club company input after choosing the club case type, alongside the always-present contact input", async () => {
     const screen = await render(<Create />);
 
     await screen.getByRole("combobox", { name: /case type/i }).click();
     await screen.getByRole("listbox").getByText("Club").click();
 
     await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .not.toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
   });
 
-  it("reveals the judge input after choosing the judge case type", async () => {
+  it("hides the club company input after choosing the judge case type, keeping the contact input", async () => {
     const screen = await render(<Create />);
 
     await screen.getByRole("combobox", { name: /case type/i }).click();
     await screen.getByRole("listbox").getByText("Judge").click();
 
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
+  });
+
+  it("blocks submission of a club deal without a linked contact, in create", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        defaultValues={{
+          case_type: "club",
+          name: "Padel dispute",
+          company_id: 1,
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect
+      .poll(
+        () =>
+          screen
+            .getByText("Judge-Referee")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
+      )
+      .toContain("Required");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("blocks submission of a club deal without a linked contact, in edit", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <EditClubDeal
+        record={{ id: 43, case_type: "club", company_id: 1 }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect
+      .poll(
+        () =>
+          screen
+            .getByText("Judge-Referee")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
+      )
+      .toContain("Required");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("clears company_id but keeps contact_ids when switching from club to judge", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        defaultValues={{
+          case_type: "club",
+          name: "Padel dispute",
+          company_id: 1,
+          contact_ids: [1],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("combobox", { name: /case type/i }).click();
+    await screen.getByRole("listbox").getByText("Judge").click();
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.company_id).toBeNull();
+    expect(submitted.contact_ids).toEqual([1]);
   });
 
   it("treats a record with id 0 as an edit form, hiding the case type select and keeping its linked contacts", async () => {
@@ -111,9 +184,7 @@ describe("DealInputs", () => {
   it("resolves case_type from the real fetched record on edit, showing the judge input and hiding the club input", async () => {
     const screen = await render(<EditJudgeDealFromRealRecord />);
 
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
     await expect.element(screen.getByText("Case type")).not.toBeInTheDocument();
   });

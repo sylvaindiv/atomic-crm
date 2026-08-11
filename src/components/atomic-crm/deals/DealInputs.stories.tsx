@@ -78,7 +78,7 @@ export const EditJudgeDeal: Story = {
 
 export const EditClubDeal: Story = {
   args: {
-    record: { id: 43, case_type: "club", company_id: 1 },
+    record: { id: 43, case_type: "club", company_id: 1, contact_ids: [1] },
   },
 };
 
