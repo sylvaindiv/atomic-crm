@@ -18,7 +18,6 @@ const baseDeal: Deal = {
   contact_ids: [],
   created_at: "2025-01-01T00:00:00.000Z",
   description: "",
-  expected_closing_date: "2025-02-01",
   id: 1,
   index: 0,
   name: "Match #12",

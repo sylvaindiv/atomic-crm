@@ -9,11 +9,7 @@ import { useUpdateContactField } from "./useUpdateContactField";
 
 /** Contact columns holding a plain string value, safe for a text/textarea cell. */
 type EditableTextField =
-  | "title"
-  | "linkedin_url"
-  | "background"
-  | "postal_code"
-  | "city";
+  "title" | "linkedin_url" | "background" | "postal_code" | "city";
 
 interface EditableTextCellProps {
   /** Contact column this cell reads and commits to. */

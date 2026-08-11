@@ -112,7 +112,6 @@ export const EditJudgeDealFromRealRecord = () => (
           stage: "a_recontacter",
           amount: 500,
           description: "",
-          expected_closing_date: "2025-02-01",
           index: 0,
           sales_id: 0,
           created_at: "2025-01-01T00:00:00.000Z",

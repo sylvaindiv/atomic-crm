@@ -27,9 +27,9 @@ describe("DealInputs", () => {
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
-    // Several required fields (name, case type, amount, closing date) are
-    // empty at once, so assert at least one "Required" error surfaced
-    // rather than pin down a single occurrence.
+    // Several required fields (name, case type) are empty at once, so
+    // assert at least one "Required" error surfaced rather than pin down a
+    // single occurrence.
     await expect
       .poll(() => screen.getByText("Required").all().length)
       .toBeGreaterThan(0);

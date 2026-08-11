@@ -215,7 +215,6 @@ export const englishCrmMessages = {
         contact_ids: "Judges-Referees",
         category: "Category",
         amount: "Budget",
-        expected_closing_date: "Expected closing date",
         stage: "Stage",
         case_type: "Case type",
       },
@@ -253,7 +252,6 @@ export const englishCrmMessages = {
         description: "It seems your deal list is empty.",
         title: "No deals found",
       },
-      invalid_date: "Invalid date",
     },
     notes: {
       name: "Note |||| Notes",
