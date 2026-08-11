@@ -140,6 +140,43 @@ async function createCompany({
   return data;
 }
 
+async function createDeal({
+  name,
+  stage = "a_recontacter",
+  caseType = "club",
+  companyId = null,
+  amount = null,
+  salesId,
+}: {
+  name: string;
+  stage?: string;
+  caseType?: "judge" | "club";
+  companyId?: string | number | null;
+  amount?: number | null;
+  salesId: string | number;
+}) {
+  const { data, error } = await adminSupabase
+    .from("deals")
+    .insert({
+      name,
+      stage,
+      case_type: caseType,
+      company_id: companyId,
+      contact_ids: [],
+      amount,
+      sales_id: salesId,
+      index: 0,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to create deal: ${error.message}`);
+  }
+
+  return data;
+}
+
 async function createContact({
   first_name,
   last_name,
@@ -217,6 +254,7 @@ export const test = base.extend<{
   createSales: typeof createSales;
   createCompany: typeof createCompany;
   createContact: typeof createContact;
+  createDeal: typeof createDeal;
   createNotes: typeof createNotes;
   menu: ReturnType<typeof getMenuMethod>;
   dismissToast: (content: string) => Promise<void>;
@@ -246,6 +284,10 @@ export const test = base.extend<{
   // eslint-disable-next-line no-empty-pattern
   createContact: async ({}, cb) => {
     await cb(createContact);
+  },
+  // eslint-disable-next-line no-empty-pattern
+  createDeal: async ({}, cb) => {
+    await cb(createDeal);
   },
   // eslint-disable-next-line no-empty-pattern
   createNotes: async ({}, cb) => {

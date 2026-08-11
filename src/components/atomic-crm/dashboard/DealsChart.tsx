@@ -85,12 +85,13 @@ export const DealsChart = memo(() => {
           deal: Deal,
         ) => {
           const { bucket, weight } = getDealStageBucket(deal.stage);
+          const amount = deal.amount ?? 0;
           if (bucket === "won") {
-            acc.won += deal.amount;
+            acc.won += amount;
           } else if (bucket === "lost") {
-            acc.lost -= deal.amount;
+            acc.lost -= amount;
           } else {
-            acc.pending += deal.amount * weight;
+            acc.pending += amount * weight;
           }
           return acc;
         },

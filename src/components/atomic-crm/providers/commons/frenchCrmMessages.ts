@@ -219,7 +219,6 @@ export const frenchCrmMessages = {
         contact_ids: "Juges-arbitres",
         category: "Catégorie",
         amount: "Budget",
-        expected_closing_date: "Date de clôture prévue",
         stage: "Étape",
         case_type: "Type d'affaire",
       },
@@ -257,7 +256,6 @@ export const frenchCrmMessages = {
         description: "Il semble que votre liste d'affaires soit vide.",
         title: "Aucune affaire trouvée",
       },
-      invalid_date: "Date invalide",
     },
     notes: {
       name: "Note |||| Notes",

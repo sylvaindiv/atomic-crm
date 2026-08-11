@@ -1,5 +1,3 @@
-import { format } from "date-fns";
-
 import type { LabeledValue } from "../types";
 
 export const findDealLabel = (statuses: LabeledValue[], dealValue: string) => {
@@ -37,20 +35,25 @@ function ucFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-const isoDateStringRegex = /^\d{4}-\d{2}-\d{2}$/;
+/** Placeholder shown in place of a formatted amount when a deal has no budget set. */
+const DEAL_AMOUNT_PLACEHOLDER = "–"; // en dash
 
-export function isValidISODateString(value: unknown): value is string {
-  return typeof value === "string" && isoDateStringRegex.test(value);
-}
-
-export function formatISODateString(dateString: string) {
-  if (!isoDateStringRegex.test(dateString)) {
-    throw new Error("Invalid date format. Expected YYYY-MM-DD.");
-  }
-  // Some browsers will consider a date in the format YYYY-MM-DD as UTC, which can cause off-by-one-day issues depending on the user's timezone.
-  // To avoid this, we can parse the date components manually and create a date object in the local timezone.
-  const [year, month, day] = dateString.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
-  return format(date, "PP");
+/**
+ * Formats a deal's amount as compact currency, or a placeholder when the
+ * deal has no budget (amount is optional -- see Deal['amount']). Factors out
+ * the currency-formatting options duplicated across every deal amount
+ * display site (DealShow, DealColumn, CompanyShow).
+ */
+export function formatDealAmount(
+  amount: number | null | undefined,
+  currency: string,
+): string {
+  if (amount == null) return DEAL_AMOUNT_PLACEHOLDER;
+  return amount.toLocaleString("en-US", {
+    notation: "compact",
+    style: "currency",
+    currency,
+    currencyDisplay: "narrowSymbol",
+    minimumSignificantDigits: 3,
+  });
 }

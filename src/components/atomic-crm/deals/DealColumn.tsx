@@ -4,6 +4,7 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { Status } from "../misc/Status";
 import { DealCard } from "./DealCard";
+import { formatDealAmount } from "./dealUtils";
 
 export const DealColumn = ({
   stage,
@@ -12,7 +13,7 @@ export const DealColumn = ({
   stage: string;
   deals: Deal[];
 }) => {
-  const totalAmount = deals.reduce((sum, deal) => sum + deal.amount, 0);
+  const totalAmount = deals.reduce((sum, deal) => sum + (deal.amount ?? 0), 0);
   const { noteStatuses, currency } = useConfigurationContext();
   const statusOption = noteStatuses.find((status) => status.value === stage);
   return (
@@ -23,13 +24,7 @@ export const DealColumn = ({
           {statusOption?.label}
         </h3>
         <p className="text-sm text-muted-foreground">
-          {totalAmount.toLocaleString("en-US", {
-            notation: "compact",
-            style: "currency",
-            currency,
-            currencyDisplay: "narrowSymbol",
-            minimumSignificantDigits: 3,
-          })}
+          {formatDealAmount(totalAmount, currency)}
         </p>
       </div>
       <Droppable droppableId={stage}>

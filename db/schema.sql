@@ -93,7 +93,6 @@ CREATE TABLE IF NOT EXISTS deals (
     created_at            TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     updated_at            TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     archived_at           TEXT,
-    expected_closing_date TEXT,
     sales_id              INTEGER REFERENCES sales(id),
     "index"               INTEGER
 );
