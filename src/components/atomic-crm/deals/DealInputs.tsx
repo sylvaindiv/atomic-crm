@@ -82,15 +82,15 @@ const DealLinkedToInputs = () => {
   const caseType = useDealCaseType();
   const isCreate = useIsDealCreate();
 
-  // Clear the irrelevant link when the user changes case_type while
-  // creating a deal, so a stray company_id/contact_ids never rides along
-  // with the wrong case type. Not needed on edit: case_type is immutable
-  // there, so this branch never switches.
+  // Clear the club company link when the user switches to the judge case
+  // type while creating a deal, so a stray company_id never rides along
+  // with the wrong case type. contact_ids is never cleared here: every
+  // deal, judge or club, requires a linked contact, so it must survive
+  // every switch. Not needed on edit: case_type is immutable there, so
+  // this branch never runs.
   useEffect(() => {
     if (!isCreate) return;
-    if (caseType === "club") {
-      setValue("contact_ids", []);
-    } else if (caseType === "judge") {
+    if (caseType === "judge") {
       setValue("company_id", null);
     }
   }, [caseType, isCreate, setValue]);
@@ -109,16 +109,14 @@ const DealLinkedToInputs = () => {
           />
         </ReferenceInput>
       )}
-      {caseType === "judge" && (
-        <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
-          <AutocompleteArrayInput
-            label="resources.deals.fields.contact_ids"
-            optionText={contactOptionText}
-            helperText={false}
-            validate={[required(), maxLength(1)]}
-          />
-        </ReferenceArrayInput>
-      )}
+      <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
+        <AutocompleteArrayInput
+          label="resources.deals.fields.contact_ids"
+          optionText={contactOptionText}
+          helperText={false}
+          validate={[required(), maxLength(1)]}
+        />
+      </ReferenceArrayInput>
     </div>
   );
 };

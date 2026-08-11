@@ -212,7 +212,9 @@ export const englishCrmMessages = {
         name: "Name",
         description: "Description",
         company_id: "Club",
-        contact_ids: "Judges-Referees",
+        // Singular: capped at one linked contact, for both case types. See
+        // the same convention on notes.fields.contact_id / tasks.fields.contact_id.
+        contact_ids: "Judge-Referee",
         category: "Category",
         amount: "Budget",
         stage: "Stage",
