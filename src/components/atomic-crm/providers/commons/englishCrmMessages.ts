@@ -242,7 +242,11 @@ export const englishCrmMessages = {
       },
       inputs: {
         linked_to: "Linked to",
+        next_action: "Next action",
+        next_action_text: "What's next",
       },
+      next_action_save_error:
+        "The next action could not be saved. The deal was not saved either.",
       unarchived: {
         action: "Send back to the board",
         error: "Error: deal not unarchived",

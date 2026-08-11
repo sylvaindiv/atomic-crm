@@ -1,11 +1,10 @@
 import { test, expect } from "./fixtures";
 
-test.describe("club deal requires a linked contact", () => {
-  test("blocks saving a club deal until a contact is selected", async ({
+test.describe("deal requires a next action", () => {
+  test("blocks saving a deal until the next action is filled in", async ({
     page,
     isMobile,
     createSales,
-    createCompany,
     createContact,
   }) => {
     test.skip(
@@ -20,7 +19,8 @@ test.describe("club deal requires a linked contact", () => {
       password: "password",
     });
 
-    await createCompany({ name: "Padel Club Paris", salesId: sales.id });
+    // No task created for this contact -- the next-action fields must start
+    // empty and block the save until filled in.
     await createContact({
       first_name: "Ada",
       last_name: "Lovelace",
@@ -37,33 +37,24 @@ test.describe("club deal requires a linked contact", () => {
 
     await page.getByLabel("Name *").fill("Padel dispute");
     await page.getByRole("combobox", { name: /case type/i }).click();
-    await page.getByRole("listbox").getByText("Club").click();
-
-    await page.getByLabel("Club *").click();
-    // The company combobox portals its options popover, which momentarily
-    // coexists with the always-mounted contact search input below -- scope
-    // to the popover so the two "Search" placeholders aren't ambiguous.
-    const companyPopover = page.locator('[data-slot="popover-content"]');
-    await companyPopover.getByPlaceholder("Search").fill("Padel Club Paris");
-    await page.getByRole("option", { name: "Padel Club Paris" }).click();
-
-    // No contact selected yet -- save is blocked, no navigation happens.
-    // The next-action fields are also empty and required, so "Required" now
-    // matches 3 elements -- scope to the first one (the contact field) to
-    // avoid a strict-mode violation.
-    await page.getByRole("button", { name: /^save$/i }).click();
-    await expect(page.getByText("Required").first()).toBeVisible();
+    await page.getByRole("listbox").getByText("Judge").click();
 
     await page.getByPlaceholder("Search").fill("Ada Lovelace");
     await page.getByRole("option", { name: "Ada Lovelace" }).click();
 
-    // A deal also requires a next action -- fill in the mini-form before
-    // saving (the contact has no open task, so it starts empty). Scoped to
-    // the "Next action" section -- its "Type" field would otherwise collide
-    // with the unrelated "Case type" combobox above.
+    // Next action left empty -- save is blocked, no navigation happens.
+    // Scoped to the "Next action" section -- its "Type" field would
+    // otherwise collide with the unrelated "Case type" combobox above.
     const nextAction = page
       .getByRole("heading", { name: "Next action" })
       .locator("..");
+    await page.getByRole("button", { name: /^save$/i }).click();
+    // Both the "what's next" text and the due-date field are required --
+    // scoping to the section avoids a strict-mode match on unrelated fields.
+    await expect(nextAction.getByText("Required")).toHaveCount(2);
+    // The form is still open (not navigated away) -- the field we filled
+    // earlier still holds its value.
+    await expect(page.getByLabel("Name *")).toHaveValue("Padel dispute");
     await nextAction.getByLabel("What's next *").fill("Call the referee");
     await nextAction.getByLabel("Due date").fill("2026-04-11T21:00");
     await nextAction.getByLabel("Type").click();

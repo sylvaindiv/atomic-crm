@@ -136,11 +136,37 @@ describe("DealInputs", () => {
         withSaveButton
         saveButtonType="submit"
         onSubmit={onSubmit}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Existing next action",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
       />,
     );
 
     await screen.getByRole("combobox", { name: /case type/i }).click();
     await screen.getByRole("listbox").getByText("Judge").click();
+
+    // Wait for the linked contact's earliest open task to prefill the
+    // (required) next-action fields before saving.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Existing next action");
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
@@ -171,8 +197,34 @@ describe("DealInputs", () => {
         withSaveButton
         saveButtonType="submit"
         onSubmit={onSubmit}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Existing next action",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
       />,
     );
+
+    // Wait for the linked contact's earliest open task to prefill the
+    // (required) next-action fields before saving.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Existing next action");
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
@@ -199,5 +251,145 @@ describe("DealInputs", () => {
     // configuration but must still be reachable from the deal form.
     await expect.element(listbox.getByText("Mort")).toBeInTheDocument();
     await expect.element(listbox.getByText("Client")).toBeInTheDocument();
+  });
+
+  it("requires the next-action fields when the linked contact has no open task", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{
+          id: 42,
+          case_type: "judge",
+          name: "Padel dispute",
+          contact_ids: [1],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect
+      .poll(
+        () =>
+          screen
+            .getByLabelText("Due date")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
+      )
+      .toContain("Required");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("prefills the next-action fields from the linked contact's earliest open task", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{
+          id: 42,
+          case_type: "judge",
+          name: "Padel dispute",
+          contact_ids: [1],
+        }}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Follow up on ruling",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    // Wait for the field driven directly by the DOM (not Radix's Select,
+    // which only renders its selected item's text once the dropdown has
+    // been opened) to reflect the prefill before asserting further.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Follow up on ruling");
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.next_action).toMatchObject({
+      text: "Follow up on ruling",
+      type: "call",
+      due_date: "2025-06-01T10:00:00.000Z",
+    });
+  });
+
+  it("submits successfully with no amount once the next action is filled in", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{
+          id: 42,
+          case_type: "judge",
+          name: "Padel dispute",
+          contact_ids: [1],
+        }}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Call the judge back",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    // Let the (required) next-action fields prefill from the contact's
+    // existing open task rather than driving the Select via the UI, which
+    // only renders its selected item's text once opened.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Call the judge back");
+
+    await screen.getByLabelText("Amount").clear();
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.amount).toBeFalsy();
+    expect(submitted.next_action).toMatchObject({
+      text: "Call the judge back",
+      type: "call",
+    });
   });
 });

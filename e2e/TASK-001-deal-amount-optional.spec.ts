@@ -37,7 +37,7 @@ test.describe("deal record shape: no closing date, optional budget", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveTitle(/Atomic CRM/);
 
-    await page.goto("http://localhost:5175/deals/create");
+    await page.goto("http://localhost:5175/#/deals/create");
 
     await expect(page.getByLabel("Name *")).toBeVisible();
     await expect(page.getByText("Expected closing date")).not.toBeVisible();
@@ -53,6 +53,21 @@ test.describe("deal record shape: no closing date, optional budget", () => {
     await page.getByLabel("Club *").click();
     await page.getByPlaceholder("Search").fill("Padel Club Paris");
     await page.getByRole("option", { name: "Padel Club Paris" }).click();
+
+    await page.getByPlaceholder("Search").fill("Ada Lovelace");
+    await page.getByRole("option", { name: "Ada Lovelace" }).click();
+
+    // A deal also requires a next action -- fill in the mini-form before
+    // saving (the contact has no open task, so it starts empty). Scoped to
+    // the "Next action" section -- its "Type" field would otherwise collide
+    // with the unrelated "Case type" combobox above.
+    const nextAction = page
+      .getByRole("heading", { name: "Next action" })
+      .locator("..");
+    await nextAction.getByLabel("What's next *").fill("Call the referee");
+    await nextAction.getByLabel("Due date").fill("2026-04-11T21:00");
+    await nextAction.getByLabel("Type").click();
+    await page.getByRole("option", { name: "Call" }).click();
 
     await page.getByRole("button", { name: /^save$/i }).click();
 
@@ -103,7 +118,7 @@ test.describe("deal record shape: no closing date, optional budget", () => {
     await expect(page.getByText("Padel dispute")).toBeVisible();
     await expect(page.getByText("NaN")).toHaveCount(0);
 
-    await page.goto(`http://localhost:5175/deals/${deal.id}/show`);
+    await page.goto(`http://localhost:5175/#/deals/${deal.id}/show`);
     await expect(
       page.getByRole("heading", { name: "Padel dispute" }),
     ).toBeVisible();

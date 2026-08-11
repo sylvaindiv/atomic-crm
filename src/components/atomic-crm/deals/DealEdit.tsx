@@ -1,7 +1,9 @@
 import {
   EditBase,
   Form,
+  useDataProvider,
   useEditContext,
+  useGetIdentity,
   useNotify,
   useRecordContext,
   useRedirect,
@@ -16,15 +18,37 @@ import { FormToolbar } from "../layout/FormToolbar";
 import type { Deal } from "../types";
 import { DealInputs } from "./DealInputs";
 import { DealCaseTypeBadge, DealPartyAvatar } from "./DealParty";
+import {
+  transformDealWithNextAction,
+  type DealWithNextAction,
+} from "./dealNextAction";
 
 export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
   const redirect = useRedirect();
   const notify = useNotify();
+  const dataProvider = useDataProvider();
+  const { identity } = useGetIdentity();
 
   const handleClose = () => {
     redirect("/deals", undefined, undefined, undefined, {
       _scrollToTop: false,
     });
+  };
+
+  // Strips `next_action` off the submitted deal and upserts it onto the
+  // linked contact's earliest open task before the deal is written -- a
+  // deal can never be saved without one. See dealNextAction.ts.
+  const transform = async (values: DealWithNextAction) => {
+    try {
+      return await transformDealWithNextAction(
+        dataProvider,
+        values,
+        identity?.id,
+      );
+    } catch (error) {
+      notify("resources.deals.next_action_save_error", { type: "error" });
+      throw error;
+    }
   };
 
   return (
@@ -34,6 +58,7 @@ export const DealEdit = ({ open, id }: { open: boolean; id?: string }) => {
           <EditBase
             id={id}
             mutationMode="pessimistic"
+            transform={transform}
             // Without an explicit `loading` element, ra-core's EditBase
             // renders its children as soon as it mounts, before the record
             // has been fetched (see ra-core's EditBase: `showLoading` only
