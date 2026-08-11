@@ -177,17 +177,24 @@ const DealNextActionInputs = () => {
 
   // Resolve the linked contact's earliest open task whenever the linked
   // contact changes (including on first mount, e.g. opening the edit
-  // dialog) and prefill the mini-form from it. Fields start empty -- and
-  // stay required -- when the contact has no open task, so a brand-new deal
-  // for a brand-new contact can still be saved in a single flow.
+  // dialog) and prefill the mini-form from it. Fields are cleared
+  // synchronously up front -- so switching contacts never leaves a stale
+  // next action lingering -- and only overwritten once the query resolves,
+  // and only when a task was actually found: this way a slow/empty lookup
+  // never races a user who's already started typing their own next action.
+  // Fields stay empty -- and required -- when the contact has none, so a
+  // brand-new deal for a brand-new contact can still be saved in one flow.
   useEffect(() => {
     if (contactId == null) return;
     let cancelled = false;
+    setValue("next_action.text", "");
+    setValue("next_action.type", "");
+    setValue("next_action.due_date", "");
     getEarliestOpenTask(dataProvider, contactId).then((task) => {
-      if (cancelled) return;
-      setValue("next_action.text", task?.text ?? "");
-      setValue("next_action.type", task?.type ?? "");
-      setValue("next_action.due_date", task?.due_date ?? "");
+      if (cancelled || !task) return;
+      setValue("next_action.text", task.text);
+      setValue("next_action.type", task.type);
+      setValue("next_action.due_date", task.due_date);
     });
     return () => {
       cancelled = true;

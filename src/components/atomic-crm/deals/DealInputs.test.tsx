@@ -284,6 +284,7 @@ describe("DealInputs", () => {
   });
 
   it("prefills the next-action fields from the linked contact's earliest open task", async () => {
+    const onSubmit = vi.fn();
     const screen = await render(
       <DealInputsStory
         record={{
@@ -305,9 +306,15 @@ describe("DealInputs", () => {
             } as any,
           ],
         }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
       />,
     );
 
+    // Wait for the field driven directly by the DOM (not Radix's Select,
+    // which only renders its selected item's text once the dropdown has
+    // been opened) to reflect the prefill before asserting further.
     await expect
       .poll(
         () =>
@@ -318,14 +325,16 @@ describe("DealInputs", () => {
           ).value,
       )
       .toBe("Follow up on ruling");
-    await expect.element(screen.getByText("Call")).toBeInTheDocument();
-    await expect
-      .poll(
-        () =>
-          (screen.getByLabelText("Due date").element() as HTMLInputElement)
-            .value,
-      )
-      .not.toBe("");
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.next_action).toMatchObject({
+      text: "Follow up on ruling",
+      type: "call",
+      due_date: "2025-06-01T10:00:00.000Z",
+    });
   });
 
   it("submits successfully with no amount once the next action is filled in", async () => {
