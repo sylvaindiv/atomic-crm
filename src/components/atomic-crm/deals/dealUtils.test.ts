@@ -1,78 +1,19 @@
-import { commands } from "vitest/browser";
+import { formatDealAmount } from "./dealUtils";
 
-import { formatISODateString, isValidISODateString } from "./dealUtils";
-
-describe("formatISODateString", () => {
-  let originalTimezone: string;
-
-  beforeEach(() => {
-    originalTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+describe("formatDealAmount", () => {
+  it("formats a positive amount as compact currency", () => {
+    expect(formatDealAmount(500, "USD")).toBe("$500");
   });
 
-  afterEach(async () => {
-    await commands.setTimezone(originalTimezone);
+  it("returns a placeholder when the amount is null", () => {
+    expect(formatDealAmount(null, "USD")).toBe("–");
   });
 
-  it("formats a valid ISO date string correctly", () => {
-    const isoDate = "2024-06-15";
-    const formattedDate = formatISODateString(isoDate);
-    expect(formattedDate).toBe("Jun 15, 2024");
+  it("returns a placeholder when the amount is undefined", () => {
+    expect(formatDealAmount(undefined, "USD")).toBe("–");
   });
 
-  it("should not shift the date regardless of timezone", async () => {
-    // Uses CDP (Emulation.setTimezoneOverride) to actually change the browser's
-    // timezone at runtime so we can catch regressions where someone replaces the
-    // manual date-component parse with new Date(isoString), which would shift
-    // dates in negative-offset timezones like America/New_York.
-    const isoDate = "2024-06-15";
-    await commands.setTimezone("America/New_York");
-    expect(formatISODateString(isoDate)).toBe("Jun 15, 2024");
-
-    await commands.setTimezone("Asia/Tokyo");
-    expect(formatISODateString(isoDate)).toBe("Jun 15, 2024");
-
-    await commands.setTimezone("UTC");
-    expect(formatISODateString(isoDate)).toBe("Jun 15, 2024");
-
-    await commands.setTimezone("Pacific/Auckland");
-    expect(formatISODateString(isoDate)).toBe("Jun 15, 2024");
-  });
-
-  it("throw for an invalid date string", () => {
-    const invalidDate = "invalid-date";
-    expect(() => formatISODateString(invalidDate)).toThrow(
-      "Invalid date format. Expected YYYY-MM-DD.",
-    );
-  });
-
-  it("throw for a date string with wrong format", () => {
-    const invalidDate = "15-06-2024";
-    expect(() => formatISODateString(invalidDate)).toThrow(
-      "Invalid date format. Expected YYYY-MM-DD.",
-    );
-  });
-});
-
-describe("isValidISODateString", () => {
-  it("returns true for a valid YYYY-MM-DD string", () => {
-    expect(isValidISODateString("2024-06-15")).toBe(true);
-  });
-
-  it("returns false for null", () => {
-    expect(isValidISODateString(null)).toBe(false);
-  });
-
-  it("returns false for undefined", () => {
-    expect(isValidISODateString(undefined)).toBe(false);
-  });
-
-  it("returns false for a malformed string", () => {
-    expect(isValidISODateString("invalid-date")).toBe(false);
-    expect(isValidISODateString("15-06-2024")).toBe(false);
-  });
-
-  it("returns false for non-string values", () => {
-    expect(isValidISODateString(123)).toBe(false);
-    expect(isValidISODateString({})).toBe(false);
+  it("formats a zero amount as currency rather than the placeholder", () => {
+    expect(formatDealAmount(0, "USD")).toBe("$0.00");
   });
 });

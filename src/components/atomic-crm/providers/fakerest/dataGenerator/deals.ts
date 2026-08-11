@@ -1,4 +1,3 @@
-import { add } from "date-fns";
 import { datatype, lorem, random } from "faker/locale/en_US";
 
 import {
@@ -23,13 +22,6 @@ export const generateDeals = (db: Db): Deal[] => {
     const lowercaseName = lorem.words();
     const created_at = randomDate(new Date(company.created_at)).toISOString();
 
-    const expected_closing_date = randomDate(
-      new Date(created_at),
-      add(new Date(created_at), { months: 6 }),
-    )
-      .toISOString()
-      .split("T")[0];
-
     return {
       id,
       name: lowercaseName[0].toUpperCase() + lowercaseName.slice(1),
@@ -42,7 +34,6 @@ export const generateDeals = (db: Db): Deal[] => {
       amount: datatype.number(1000) * 100,
       created_at,
       updated_at: randomDate(new Date(created_at)).toISOString(),
-      expected_closing_date,
       sales_id: company.sales_id!,
       index: 0,
     };

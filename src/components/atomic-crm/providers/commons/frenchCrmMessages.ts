@@ -216,10 +216,11 @@ export const frenchCrmMessages = {
         name: "Nom",
         description: "Description",
         company_id: "Club",
-        contact_ids: "Juges-arbitres",
+        // Singular: capped at one linked contact, for both case types. See
+        // the same convention on notes.fields.contact_id / tasks.fields.contact_id.
+        contact_ids: "Juge-arbitre",
         category: "Catégorie",
         amount: "Budget",
-        expected_closing_date: "Date de clôture prévue",
         stage: "Étape",
         case_type: "Type d'affaire",
       },
@@ -245,7 +246,11 @@ export const frenchCrmMessages = {
       },
       inputs: {
         linked_to: "Lié à",
+        next_action: "Prochaine action",
+        next_action_text: "Prochaine étape",
       },
+      next_action_save_error:
+        "La prochaine action n'a pas pu être enregistrée. L'affaire n'a pas été enregistrée non plus.",
       unarchived: {
         action: "Renvoyer au tableau",
         error: "Erreur : affaire non désarchivée",
@@ -257,7 +262,6 @@ export const frenchCrmMessages = {
         description: "Il semble que votre liste d'affaires soit vide.",
         title: "Aucune affaire trouvée",
       },
-      invalid_date: "Date invalide",
     },
     notes: {
       name: "Note |||| Notes",

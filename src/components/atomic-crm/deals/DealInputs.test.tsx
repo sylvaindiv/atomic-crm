@@ -27,54 +27,153 @@ describe("DealInputs", () => {
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
-    // Several required fields (name, case type, amount, closing date) are
-    // empty at once, so assert at least one "Required" error surfaced
-    // rather than pin down a single occurrence.
+    // Several required fields (name, case type) are empty at once, so
+    // assert at least one "Required" error surfaced rather than pin down a
+    // single occurrence.
     await expect
       .poll(() => screen.getByText("Required").all().length)
       .toBeGreaterThan(0);
   });
 
-  it("shows the club company input and hides the judge input for a club deal", async () => {
+  it("shows the club company input and the linked contact input for a club deal", async () => {
     const screen = await render(<EditClubDeal />);
 
     await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .not.toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
   });
 
-  it("shows the judge input and hides the club company input for a judge deal", async () => {
+  it("shows the linked contact input and hides the club company input for a judge deal", async () => {
     const screen = await render(<EditJudgeDeal />);
 
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
   });
 
-  it("reveals the club company input after choosing the club case type", async () => {
+  it("reveals the club company input after choosing the club case type, alongside the always-present contact input", async () => {
     const screen = await render(<Create />);
 
     await screen.getByRole("combobox", { name: /case type/i }).click();
     await screen.getByRole("listbox").getByText("Club").click();
 
     await expect.element(screen.getByLabelText("Club")).toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .not.toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
   });
 
-  it("reveals the judge input after choosing the judge case type", async () => {
+  it("hides the club company input after choosing the judge case type, keeping the contact input", async () => {
     const screen = await render(<Create />);
 
     await screen.getByRole("combobox", { name: /case type/i }).click();
     await screen.getByRole("listbox").getByText("Judge").click();
 
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
+  });
+
+  it("blocks submission of a club deal without a linked contact, in create", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        defaultValues={{
+          case_type: "club",
+          name: "Padel dispute",
+          company_id: 1,
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect
+      .poll(
+        () =>
+          screen
+            .getByText("Judge-Referee")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
+      )
+      .toContain("Required");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("blocks submission of a club deal without a linked contact, in edit", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <EditClubDeal
+        record={{ id: 43, case_type: "club", company_id: 1 }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect
+      .poll(
+        () =>
+          screen
+            .getByText("Judge-Referee")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
+      )
+      .toContain("Required");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("clears company_id but keeps contact_ids when switching from club to judge", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        defaultValues={{
+          case_type: "club",
+          name: "Padel dispute",
+          company_id: 1,
+          contact_ids: [1],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Existing next action",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
+      />,
+    );
+
+    await screen.getByRole("combobox", { name: /case type/i }).click();
+    await screen.getByRole("listbox").getByText("Judge").click();
+
+    // Wait for the linked contact's earliest open task to prefill the
+    // (required) next-action fields before saving.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Existing next action");
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.company_id).toBeNull();
+    expect(submitted.contact_ids).toEqual([1]);
   });
 
   it("treats a record with id 0 as an edit form, hiding the case type select and keeping its linked contacts", async () => {
@@ -98,8 +197,34 @@ describe("DealInputs", () => {
         withSaveButton
         saveButtonType="submit"
         onSubmit={onSubmit}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Existing next action",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
       />,
     );
+
+    // Wait for the linked contact's earliest open task to prefill the
+    // (required) next-action fields before saving.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Existing next action");
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
@@ -111,9 +236,7 @@ describe("DealInputs", () => {
   it("resolves case_type from the real fetched record on edit, showing the judge input and hiding the club input", async () => {
     const screen = await render(<EditJudgeDealFromRealRecord />);
 
-    await expect
-      .element(screen.getByText("Judges-Referees"))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText("Judge-Referee")).toBeInTheDocument();
     await expect.element(screen.getByLabelText("Club")).not.toBeInTheDocument();
     await expect.element(screen.getByText("Case type")).not.toBeInTheDocument();
   });
@@ -128,5 +251,145 @@ describe("DealInputs", () => {
     // configuration but must still be reachable from the deal form.
     await expect.element(listbox.getByText("Mort")).toBeInTheDocument();
     await expect.element(listbox.getByText("Client")).toBeInTheDocument();
+  });
+
+  it("requires the next-action fields when the linked contact has no open task", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{
+          id: 42,
+          case_type: "judge",
+          name: "Padel dispute",
+          contact_ids: [1],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect
+      .poll(
+        () =>
+          screen
+            .getByLabelText("Due date")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
+      )
+      .toContain("Required");
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("prefills the next-action fields from the linked contact's earliest open task", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{
+          id: 42,
+          case_type: "judge",
+          name: "Padel dispute",
+          contact_ids: [1],
+        }}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Follow up on ruling",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    // Wait for the field driven directly by the DOM (not Radix's Select,
+    // which only renders its selected item's text once the dropdown has
+    // been opened) to reflect the prefill before asserting further.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Follow up on ruling");
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.next_action).toMatchObject({
+      text: "Follow up on ruling",
+      type: "call",
+      due_date: "2025-06-01T10:00:00.000Z",
+    });
+  });
+
+  it("submits successfully with no amount once the next action is filled in", async () => {
+    const onSubmit = vi.fn();
+    const screen = await render(
+      <DealInputsStory
+        record={{
+          id: 42,
+          case_type: "judge",
+          name: "Padel dispute",
+          contact_ids: [1],
+        }}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Call the judge back",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
+        withSaveButton
+        saveButtonType="submit"
+        onSubmit={onSubmit}
+      />,
+    );
+
+    // Let the (required) next-action fields prefill from the contact's
+    // existing open task rather than driving the Select via the UI, which
+    // only renders its selected item's text once opened.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Call the judge back");
+
+    await screen.getByLabelText("Amount").clear();
+
+    await screen.getByRole("button", { name: /^save$/i }).click();
+
+    await expect.poll(() => onSubmit.mock.calls.length).toBeGreaterThan(0);
+    const submitted = onSubmit.mock.calls[0][0];
+    expect(submitted.amount).toBeFalsy();
+    expect(submitted.next_action).toMatchObject({
+      text: "Call the judge back",
+      type: "call",
+    });
   });
 });

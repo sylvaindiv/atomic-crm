@@ -1,12 +1,18 @@
 import { useEffect } from "react";
-import { maxLength, required, useRecordContext, useTranslate } from "ra-core";
+import {
+  maxLength,
+  required,
+  useDataProvider,
+  useRecordContext,
+  useTranslate,
+} from "ra-core";
 import { useFormContext, useWatch } from "react-hook-form";
 import { AutocompleteArrayInput } from "@/components/admin/autocomplete-array-input";
+import { DateTimeInput } from "@/components/admin";
 import { ReferenceArrayInput } from "@/components/admin/reference-array-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { TextInput } from "@/components/admin/text-input";
 import { NumberInput } from "@/components/admin/number-input";
-import { DateInput } from "@/components/admin/date-input";
 import { SelectInput } from "@/components/admin/select-input";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -14,6 +20,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
+import { getEarliestOpenTask } from "./dealNextAction";
 import type { Deal } from "../types";
 
 export const DealInputs = () => {
@@ -27,6 +34,9 @@ export const DealInputs = () => {
         <Separator orientation={isMobile ? "horizontal" : "vertical"} />
         <DealMiscInputs />
       </div>
+
+      <Separator />
+      <DealNextActionInputs />
     </div>
   );
 };
@@ -83,15 +93,15 @@ const DealLinkedToInputs = () => {
   const caseType = useDealCaseType();
   const isCreate = useIsDealCreate();
 
-  // Clear the irrelevant link when the user changes case_type while
-  // creating a deal, so a stray company_id/contact_ids never rides along
-  // with the wrong case type. Not needed on edit: case_type is immutable
-  // there, so this branch never switches.
+  // Clear the club company link when the user switches to the judge case
+  // type while creating a deal, so a stray company_id never rides along
+  // with the wrong case type. contact_ids is never cleared here: every
+  // deal, judge or club, requires a linked contact, so it must survive
+  // every switch. Not needed on edit: case_type is immutable there, so
+  // this branch never runs.
   useEffect(() => {
     if (!isCreate) return;
-    if (caseType === "club") {
-      setValue("contact_ids", []);
-    } else if (caseType === "judge") {
+    if (caseType === "judge") {
       setValue("company_id", null);
     }
   }, [caseType, isCreate, setValue]);
@@ -110,16 +120,14 @@ const DealLinkedToInputs = () => {
           />
         </ReferenceInput>
       )}
-      {caseType === "judge" && (
-        <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
-          <AutocompleteArrayInput
-            label="resources.deals.fields.contact_ids"
-            optionText={contactOptionText}
-            helperText={false}
-            validate={[required(), maxLength(1)]}
-          />
-        </ReferenceArrayInput>
-      )}
+      <ReferenceArrayInput source="contact_ids" reference="contacts_summary">
+        <AutocompleteArrayInput
+          label="resources.deals.fields.contact_ids"
+          optionText={contactOptionText}
+          helperText={false}
+          validate={[required(), maxLength(1)]}
+        />
+      </ReferenceArrayInput>
     </div>
   );
 };
@@ -140,18 +148,7 @@ const DealMiscInputs = () => {
         optionValue="value"
         helperText={false}
       />
-      <NumberInput
-        source="amount"
-        defaultValue={0}
-        helperText={false}
-        validate={required()}
-      />
-      <DateInput
-        validate={required()}
-        source="expected_closing_date"
-        helperText={false}
-        defaultValue={new Date().toISOString().split("T")[0]}
-      />
+      <NumberInput source="amount" defaultValue={0} helperText={false} />
       <SelectInput
         source="stage"
         choices={noteStatuses}
@@ -161,6 +158,78 @@ const DealMiscInputs = () => {
         helperText={false}
         validate={required()}
       />
+    </div>
+  );
+};
+
+// Every deal must always have a defined next action: the linked contact's
+// next open task. Tasks stay contact-scoped (no deal_id column), so this
+// mini-form lives on a non-persisted `next_action.*` namespace, stripped and
+// upserted onto the contact's task list by the deal form's async `transform`
+// (see dealNextAction.ts) -- never written to the deal record itself.
+const DealNextActionInputs = () => {
+  const { taskTypes } = useConfigurationContext();
+  const translate = useTranslate();
+  const dataProvider = useDataProvider();
+  const { control, setValue } = useFormContext();
+  const contactIds = useWatch({ control, name: "contact_ids" });
+  const contactId = contactIds?.[0];
+
+  // Resolve the linked contact's earliest open task whenever the linked
+  // contact changes (including on first mount, e.g. opening the edit
+  // dialog) and prefill the mini-form from it. Fields are cleared
+  // synchronously up front -- so switching contacts never leaves a stale
+  // next action lingering -- and only overwritten once the query resolves,
+  // and only when a task was actually found: this way a slow/empty lookup
+  // never races a user who's already started typing their own next action.
+  // Fields stay empty -- and required -- when the contact has none, so a
+  // brand-new deal for a brand-new contact can still be saved in one flow.
+  useEffect(() => {
+    if (contactId == null) return;
+    let cancelled = false;
+    setValue("next_action.text", "");
+    setValue("next_action.type", "");
+    setValue("next_action.due_date", "");
+    getEarliestOpenTask(dataProvider, contactId).then((task) => {
+      if (cancelled || !task) return;
+      setValue("next_action.text", task.text);
+      setValue("next_action.type", task.type);
+      setValue("next_action.due_date", task.due_date);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [contactId, dataProvider, setValue]);
+
+  return (
+    <div className="flex flex-col gap-4 flex-1">
+      <h3 className="text-base font-medium">
+        {translate("resources.deals.inputs.next_action")}
+      </h3>
+      <TextInput
+        source="next_action.text"
+        label="resources.deals.inputs.next_action_text"
+        multiline
+        helperText={false}
+        validate={required()}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <DateTimeInput
+          source="next_action.due_date"
+          label="resources.tasks.fields.due_date"
+          helperText={false}
+          validate={required()}
+        />
+        <SelectInput
+          source="next_action.type"
+          label="resources.tasks.fields.type"
+          validate={required()}
+          choices={taskTypes}
+          optionText="label"
+          optionValue="value"
+          helperText={false}
+        />
+      </div>
     </div>
   );
 };

@@ -5,6 +5,7 @@ import type { FieldValues, SubmitHandler } from "react-hook-form";
 import { DealInputs } from "./DealInputs";
 import { SaveButton } from "@/components/admin/form";
 import { StoryWrapper } from "@/test/StoryWrapper";
+import type { Db } from "../providers/fakerest/dataGenerator/types";
 import type { Deal } from "../types";
 
 type DealInputsStoryProps = {
@@ -17,6 +18,9 @@ type DealInputsStoryProps = {
   // `onSubmit` prop below without a SaveContext in the tree.
   saveButtonType?: "button" | "submit";
   onSubmit?: SubmitHandler<FieldValues>;
+  // Overrides the seeded FakeRest data (e.g. to seed a `tasks` fixture for
+  // the next-action mini-form's prefill).
+  data?: Partial<Db>;
 };
 
 export const DealInputsStory = ({
@@ -25,6 +29,7 @@ export const DealInputsStory = ({
   withSaveButton = false,
   saveButtonType = "button",
   onSubmit,
+  data,
 }: DealInputsStoryProps) => (
   <StoryWrapper
     data={{
@@ -39,6 +44,7 @@ export const DealInputsStory = ({
           tags: [],
         } as any,
       ],
+      ...data,
     }}
   >
     <Form
@@ -78,7 +84,7 @@ export const EditJudgeDeal: Story = {
 
 export const EditClubDeal: Story = {
   args: {
-    record: { id: 43, case_type: "club", company_id: 1 },
+    record: { id: 43, case_type: "club", company_id: 1, contact_ids: [1] },
   },
 };
 
@@ -112,7 +118,6 @@ export const EditJudgeDealFromRealRecord = () => (
           stage: "a_recontacter",
           amount: 500,
           description: "",
-          expected_closing_date: "2025-02-01",
           index: 0,
           sales_id: 0,
           created_at: "2025-01-01T00:00:00.000Z",
