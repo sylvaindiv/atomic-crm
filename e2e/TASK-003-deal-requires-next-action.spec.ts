@@ -1,11 +1,10 @@
 import { test, expect } from "./fixtures";
 
-test.describe("club deal requires a linked contact", () => {
-  test("blocks saving a club deal until a contact is selected", async ({
+test.describe("deal requires a next action", () => {
+  test("blocks saving a deal until the next action is filled in", async ({
     page,
     isMobile,
     createSales,
-    createCompany,
     createContact,
   }) => {
     test.skip(
@@ -20,7 +19,8 @@ test.describe("club deal requires a linked contact", () => {
       password: "password",
     });
 
-    await createCompany({ name: "Padel Club Paris", salesId: sales.id });
+    // No task created for this contact -- the next-action fields must start
+    // empty and block the save until filled in.
     await createContact({
       first_name: "Ada",
       last_name: "Lovelace",
@@ -37,27 +37,18 @@ test.describe("club deal requires a linked contact", () => {
 
     await page.getByLabel("Name *").fill("Padel dispute");
     await page.getByRole("combobox", { name: /case type/i }).click();
-    await page.getByRole("listbox").getByText("Club").click();
-
-    await page.getByLabel("Club *").click();
-    // The company combobox portals its options popover, which momentarily
-    // coexists with the always-mounted contact search input below -- scope
-    // to the popover so the two "Search" placeholders aren't ambiguous.
-    const companyPopover = page.locator('[data-slot="popover-content"]');
-    await companyPopover.getByPlaceholder("Search").fill("Padel Club Paris");
-    await page.getByRole("option", { name: "Padel Club Paris" }).click();
-
-    // No contact selected yet -- save is blocked, no navigation happens.
-    await page.getByRole("button", { name: /^save$/i }).click();
-    await expect(page.getByText("Required")).toBeVisible();
+    await page.getByRole("listbox").getByText("Judge").click();
 
     await page.getByPlaceholder("Search").fill("Ada Lovelace");
     await page.getByRole("option", { name: "Ada Lovelace" }).click();
 
-    // A deal also requires a next action -- fill in the mini-form before
-    // saving (the contact has no open task, so it starts empty). Scoped to
-    // the "Next action" section -- its "Type" field would otherwise collide
-    // with the unrelated "Case type" combobox above.
+    // Next action left empty -- save is blocked, no navigation happens.
+    await page.getByRole("button", { name: /^save$/i }).click();
+    await expect(page.getByText("Required")).toBeVisible();
+    await expect(page.getByText("Element created")).not.toBeVisible();
+
+    // Scoped to the "Next action" section -- its "Type" field would
+    // otherwise collide with the unrelated "Case type" combobox above.
     const nextAction = page
       .getByRole("heading", { name: "Next action" })
       .locator("..");
