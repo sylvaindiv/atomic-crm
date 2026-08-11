@@ -141,3 +141,22 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Checklist "Additional Checks" (documentation, fakerest, mobile) laissée décochée car non vérifiée manuellement en navigateur cette session — honnêteté sur ce qui a été réellement testé (uniquement typecheck).
 **Fichiers / skills modifiés.** - Commit `507aea6` sur `increase-page-size-add-postal-code` — 14 fichiers (schema.sql, list-pagination.tsx, CompanyList.tsx, contacts/*, providers/*, types.ts, MEMORY.md), poussé vers origin.
 **Prochaines étapes / TODOs.** - [ ] Tester la PR en fakerest et résolution mobile avant merge - [ ] Vérifier/mettre à jour la documentation si nécessaire
+
+## 2026-08-11 17:39 — Date clôture supprimée, budget facultatif, action obligatoire
+
+**Résumé.** Suppression complète de `expected_closing_date` sur les affaires (formulaire, affichage, type, colonne DB droppée en prod via migration appliquée sur Turso). Le budget (`amount`) devient facultatif, avec gestion null-safe partout où il était affiché/sommé (kanban, dashboard, fiche société). Ajout d'une "prochaine action" obligatoire par affaire : les affaires club exigent désormais un contact lié comme les affaires juge, et l'enregistrement est bloqué tant qu'une action ouverte n'est pas définie pour ce contact.
+
+**Décisions prises.**
+- Affaires club exigent aussi un contact lié, pour pouvoir porter une prochaine action (demande explicite)
+- Blocage strict à la sauvegarde sans prochaine action, pas un simple avertissement (demande explicite)
+- Colonne `expected_closing_date` supprimée en base, pas juste masquée en UI (demande explicite)
+
+**Fichiers / skills modifiés.**
+- `db/schema.sql`, `db/migrations/20260811144138_..._drop-deals-expected-closing-date.mjs` — suppression colonne
+- `src/components/atomic-crm/deals/DealInputs.tsx`, `DealCreate.tsx`, `DealEdit.tsx` — mini-form "prochaine action" + transform
+- `src/components/atomic-crm/deals/dealNextAction.ts` — nouveau helper
+- `DealShow.tsx`, `DealColumn.tsx`, `dashboard/DealsChart.tsx`, `companies/CompanyShow.tsx` — null-safety amount
+- `types.ts`, `englishCrmMessages.ts`, `frenchCrmMessages.ts`
+
+**Prochaines étapes / TODOs.**
+- [ ] Affaires club existantes sans contact lié : non éditables tant qu'un contact + une action ne sont pas ajoutés
