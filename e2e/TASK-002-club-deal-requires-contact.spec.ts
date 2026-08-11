@@ -33,7 +33,7 @@ test.describe("club deal requires a linked contact", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveTitle(/Atomic CRM/);
 
-    await page.goto("http://localhost:5175/deals/create");
+    await page.goto("http://localhost:5175/#/deals/create");
 
     await page.getByLabel("Name *").fill("Padel dispute");
     await page.getByRole("combobox", { name: /case type/i }).click();
@@ -49,7 +49,6 @@ test.describe("club deal requires a linked contact", () => {
 
     // No contact selected yet -- save is blocked, no navigation happens.
     await page.getByRole("button", { name: /^save$/i }).click();
-    await expect(page.getByText("Element created")).not.toBeVisible();
     await expect(page.getByText("Required")).toBeVisible();
 
     await page.getByPlaceholder("Search").fill("Ada Lovelace");

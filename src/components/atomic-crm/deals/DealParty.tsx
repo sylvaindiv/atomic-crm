@@ -1,6 +1,7 @@
 // Shared judge/club rendering for a deal, reused by DealCard, DealEdit and
-// DealShow: a deal is linked to either a company (club case) or a single
-// judge (judge case) -- never both, never neither.
+// DealShow: a deal is linked to either a company (club case, which also
+// requires a contact) or a single judge (judge case) -- never both parties,
+// never neither.
 import { ReferenceArrayFieldBase, useListContext, useTranslate } from "ra-core";
 import { Link as RouterLink } from "react-router";
 
