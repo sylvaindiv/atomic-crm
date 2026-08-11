@@ -48,8 +48,11 @@ test.describe("club deal requires a linked contact", () => {
     await page.getByRole("option", { name: "Padel Club Paris" }).click();
 
     // No contact selected yet -- save is blocked, no navigation happens.
+    // The next-action fields are also empty and required, so "Required" now
+    // matches 3 elements -- scope to the first one (the contact field) to
+    // avoid a strict-mode violation.
     await page.getByRole("button", { name: /^save$/i }).click();
-    await expect(page.getByText("Required")).toBeVisible();
+    await expect(page.getByText("Required").first()).toBeVisible();
 
     await page.getByPlaceholder("Search").fill("Ada Lovelace");
     await page.getByRole("option", { name: "Ada Lovelace" }).click();

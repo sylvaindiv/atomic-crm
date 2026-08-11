@@ -43,15 +43,18 @@ test.describe("deal requires a next action", () => {
     await page.getByRole("option", { name: "Ada Lovelace" }).click();
 
     // Next action left empty -- save is blocked, no navigation happens.
-    await page.getByRole("button", { name: /^save$/i }).click();
-    await expect(page.getByText("Required")).toBeVisible();
-    await expect(page.getByText("Element created")).not.toBeVisible();
-
     // Scoped to the "Next action" section -- its "Type" field would
     // otherwise collide with the unrelated "Case type" combobox above.
     const nextAction = page
       .getByRole("heading", { name: "Next action" })
       .locator("..");
+    await page.getByRole("button", { name: /^save$/i }).click();
+    // Both the "what's next" text and the due-date field are required --
+    // scoping to the section avoids a strict-mode match on unrelated fields.
+    await expect(nextAction.getByText("Required")).toHaveCount(2);
+    // The form is still open (not navigated away) -- the field we filled
+    // earlier still holds its value.
+    await expect(page.getByLabel("Name *")).toHaveValue("Padel dispute");
     await nextAction.getByLabel("What's next *").fill("Call the referee");
     await nextAction.getByLabel("Due date").fill("2026-04-11T21:00");
     await nextAction.getByLabel("Type").click();

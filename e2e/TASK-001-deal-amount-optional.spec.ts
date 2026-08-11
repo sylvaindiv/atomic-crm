@@ -37,7 +37,7 @@ test.describe("deal record shape: no closing date, optional budget", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveTitle(/Atomic CRM/);
 
-    await page.goto("http://localhost:5175/deals/create");
+    await page.goto("http://localhost:5175/#/deals/create");
 
     await expect(page.getByLabel("Name *")).toBeVisible();
     await expect(page.getByText("Expected closing date")).not.toBeVisible();
@@ -118,7 +118,7 @@ test.describe("deal record shape: no closing date, optional budget", () => {
     await expect(page.getByText("Padel dispute")).toBeVisible();
     await expect(page.getByText("NaN")).toHaveCount(0);
 
-    await page.goto(`http://localhost:5175/deals/${deal.id}/show`);
+    await page.goto(`http://localhost:5175/#/deals/${deal.id}/show`);
     await expect(
       page.getByRole("heading", { name: "Padel dispute" }),
     ).toBeVisible();
