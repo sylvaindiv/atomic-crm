@@ -95,11 +95,12 @@ describe("DealInputs", () => {
     await screen.getByRole("button", { name: /^save$/i }).click();
 
     await expect
-      .poll(() =>
-        screen
-          .getByLabelText("Judge-Referee")
-          .element()
-          .closest('[data-slot="form-item"]')?.textContent,
+      .poll(
+        () =>
+          screen
+            .getByLabelText("Judge-Referee")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
       )
       .toContain("Required");
     expect(onSubmit).not.toHaveBeenCalled();
@@ -119,11 +120,12 @@ describe("DealInputs", () => {
     await screen.getByRole("button", { name: /^save$/i }).click();
 
     await expect
-      .poll(() =>
-        screen
-          .getByLabelText("Judge-Referee")
-          .element()
-          .closest('[data-slot="form-item"]')?.textContent,
+      .poll(
+        () =>
+          screen
+            .getByLabelText("Judge-Referee")
+            .element()
+            .closest('[data-slot="form-item"]')?.textContent,
       )
       .toContain("Required");
     expect(onSubmit).not.toHaveBeenCalled();
