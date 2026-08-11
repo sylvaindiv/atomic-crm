@@ -347,19 +347,40 @@ describe("DealInputs", () => {
           name: "Padel dispute",
           contact_ids: [1],
         }}
+        data={{
+          tasks: [
+            {
+              id: 1,
+              contact_id: 1,
+              text: "Call the judge back",
+              type: "call",
+              due_date: "2025-06-01T10:00:00.000Z",
+              done_date: null,
+              sales_id: 0,
+            } as any,
+          ],
+        }}
         withSaveButton
         saveButtonType="submit"
         onSubmit={onSubmit}
       />,
     );
 
+    // Let the (required) next-action fields prefill from the contact's
+    // existing open task rather than driving the Select via the UI, which
+    // only renders its selected item's text once opened.
+    await expect
+      .poll(
+        () =>
+          (
+            screen
+              .getByLabelText("What's next")
+              .element() as HTMLTextAreaElement
+          ).value,
+      )
+      .toBe("Call the judge back");
+
     await screen.getByLabelText("Budget").clear();
-    await screen.getByLabelText("What's next").fill("Call the judge back");
-
-    await screen.getByLabelText("Due date").fill("2026-03-06T12:30");
-
-    await screen.getByRole("combobox", { name: /^type$/i }).click();
-    await screen.getByRole("listbox").getByText("Call").click();
 
     await screen.getByRole("button", { name: /^save$/i }).click();
 
