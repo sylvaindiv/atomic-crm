@@ -22,7 +22,8 @@ FROM node:22.19.0-bookworm-slim AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production \
-    HUSKY=0
+    HUSKY=0 \
+    TZ=Europe/Paris
 
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund --ignore-scripts && npm cache clean --force
