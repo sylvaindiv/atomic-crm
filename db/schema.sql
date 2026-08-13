@@ -198,3 +198,22 @@ SELECT
        LIMIT 1
     ) AS linked_deal_id
 FROM contacts co;
+
+-- deals_summary: adds club_name, contact_name and the due date of the deal's
+-- next open action (earliest open task of contact_ids[0]).
+DROP VIEW IF EXISTS deals_summary;
+CREATE VIEW deals_summary AS
+SELECT
+    d.*,
+    (SELECT trim(coalesce(co.first_name,'') || ' ' || coalesce(co.last_name,''))
+       FROM contacts co WHERE co.id = json_extract(d.contact_ids, '$[0]')
+    ) AS contact_name,
+    CASE
+      WHEN d.case_type = 'club' THEN (SELECT cmp.name FROM companies cmp WHERE cmp.id = d.company_id)
+      ELSE (SELECT cmp.name FROM contacts co JOIN companies cmp ON cmp.id = co.company_id
+             WHERE co.id = json_extract(d.contact_ids, '$[0]'))
+    END AS club_name,
+    (SELECT MIN(t.due_date) FROM tasks t
+       WHERE t.contact_id = json_extract(d.contact_ids, '$[0]') AND t.done_date IS NULL
+    ) AS next_action_due_date
+FROM deals d;

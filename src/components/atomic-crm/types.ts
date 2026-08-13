@@ -137,6 +137,10 @@ export type Deal = {
   archived_at?: string;
   sales_id: Identifier;
   index: number;
+  // Computed columns from the deals_summary view (read-only, absent on writes).
+  club_name?: string | null;
+  contact_name?: string | null;
+  next_action_due_date?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type DealNote = {
