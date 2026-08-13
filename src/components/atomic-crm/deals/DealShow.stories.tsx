@@ -28,7 +28,6 @@ const baseDeal: Deal = {
 
 export const ClubDeal = () => (
   <StoryWrapper
-    initialEntries={["/deals/1/show"]}
     data={{
       companies: [{ id: 1, name: "Padel Club Paris", sales_id: 0 } as any],
       contacts: [
@@ -50,7 +49,6 @@ export const ClubDeal = () => (
 
 export const JudgeDeal = () => (
   <StoryWrapper
-    initialEntries={["/deals/1/show"]}
     data={{
       contacts: [
         {
