@@ -41,6 +41,12 @@ export const RESOURCES = {
     json: ["contact_ids"],
     bool: [],
   },
+  deals_summary: {
+    table: "deals_summary",
+    readonly: true,
+    json: ["contact_ids"],
+    bool: [],
+  },
   deal_notes: {
     table: "deal_notes",
     json: ["attachments"],
