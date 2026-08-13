@@ -16,11 +16,7 @@ describe("DealShow", () => {
   it("still shows the club's referee contact section for a club deal", async () => {
     const screen = await render(<ClubDeal />);
 
-    await expect
-      .element(screen.getByText(/Padel Club Paris/))
-      .toBeVisible();
-    await expect
-      .element(screen.getByText(/Referee Contact/))
-      .toBeVisible();
+    await expect.element(screen.getByText(/Padel Club Paris/)).toBeVisible();
+    await expect.element(screen.getByText(/Referee Contact/)).toBeVisible();
   });
 });
