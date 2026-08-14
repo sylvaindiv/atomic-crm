@@ -66,9 +66,18 @@ export const mergeCompanies = async (
     data: { company_id: winnerId },
   });
 
+  // Reassignments must settle before the winner update runs: the winner
+  // update's deal-status sync (triggered whenever `status` is sent) reads
+  // the deal set for this company, which the reassignment above just
+  // changed. Racing them lets the sync see a stale/nondeterministic set.
+  await Promise.all([contactsUpdate, dealsUpdate]);
+
   // 3. Update winner company with loser data: fields already set on the
-  // winner are never overwritten.
-  const winnerUpdate = dataProvider.update<Company>("companies", {
+  // winner are never overwritten. `status` is only included when genuinely
+  // filling it from the loser -- sending it unconditionally (even
+  // unchanged) fires the deal-status sync on every merge (see
+  // mergeContacts.ts for the same guard).
+  await dataProvider.update<Company>("companies", {
     id: winnerId,
     data: {
       sector: winnerCompany.sector || loserCompany.sector,
@@ -92,13 +101,12 @@ export const mergeCompanies = async (
       context_links: winnerCompany.context_links?.length
         ? winnerCompany.context_links
         : loserCompany.context_links,
-      status: winnerCompany.status || loserCompany.status,
+      ...(!winnerCompany.status && loserCompany.status
+        ? { status: loserCompany.status }
+        : {}),
     },
     previousData: winnerCompany,
   });
-
-  // Execute all reassignments and the winner update together
-  await Promise.all([contactsUpdate, dealsUpdate, winnerUpdate]);
 
   // 4. Delete the loser company only after all reassignments succeed
   await dataProvider.delete<Company>("companies", {

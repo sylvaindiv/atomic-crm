@@ -198,9 +198,62 @@ describe("mergeCompanies", () => {
         data: expect.objectContaining({
           sector: "Winner sector",
           website: "https://winner.example.com",
-          status: "won",
         }),
       }),
+    );
+  });
+
+  it("does not include status in the winner update when the winner already has a status", async () => {
+    // Arrange: the deal-status sync (server/dealSync.mjs) fires whenever the
+    // update payload carries a `status` key at all, even unchanged -- so the
+    // key must be entirely absent once the winner already has one.
+    const winner = buildCompany({ id: winnerId, status: "won" });
+    const loser = buildCompany({ id: loserId, status: "hot" });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    const dataProvider = buildDataProvider({
+      getOne: vi.fn(getOneFor(winner, loser)),
+      update,
+    });
+
+    // Act
+    await mergeCompanies(loserId, winnerId, dataProvider);
+
+    // Assert
+    const [, { data }] = update.mock.calls[0];
+    expect(data).not.toHaveProperty("status");
+  });
+
+  it("runs the winner update only after both reassignment updateMany calls resolve", async () => {
+    // Arrange
+    const winner = buildCompany({ id: winnerId });
+    const loser = buildCompany({ id: loserId });
+    const updateMany = vi.fn().mockResolvedValue({ data: [] });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    const dataProvider = buildDataProvider({
+      getOne: vi.fn(getOneFor(winner, loser)),
+      getManyReference: vi.fn().mockResolvedValue({
+        data: [{ id: 10 }],
+        total: 1,
+      }),
+      updateMany,
+      update,
+    });
+
+    // Act
+    await mergeCompanies(loserId, winnerId, dataProvider);
+
+    // Assert: both updateMany calls (contacts, deals) resolve before the
+    // winner `companies` update starts.
+    expect(updateMany).toHaveBeenCalledTimes(2);
+    const lastUpdateManyOrder = Math.max(
+      ...updateMany.mock.invocationCallOrder,
+    );
+    expect(update.mock.invocationCallOrder[0]).toBeGreaterThan(
+      lastUpdateManyOrder,
     );
   });
 
