@@ -28,16 +28,16 @@ export const NeedsActionInput = (_: { alwaysOn: boolean; source: string }) => {
   return (
     <div className="mt-auto pb-2.25">
       <div className="flex items-center space-x-2">
-        <Switch
-          id="needs-action"
-          checked={typeof filterValues[FILTER_KEY] !== "undefined"}
-          onCheckedChange={handleChange}
-        />
         <Label htmlFor="needs-action">
           {translate("resources.deals.filters.needs_action", {
             _: "To handle",
           })}
         </Label>
+        <Switch
+          id="needs-action"
+          checked={typeof filterValues[FILTER_KEY] !== "undefined"}
+          onCheckedChange={handleChange}
+        />
       </div>
     </div>
   );
