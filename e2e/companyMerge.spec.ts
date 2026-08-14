@@ -59,7 +59,7 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
   const dialog = page.getByRole("dialog");
 
   // The case-only variant is found and auto-preselected as the merge target.
-  await expect(dialog.getByText("PADEL CLUB PARIS")).toBeVisible();
+  await expect(dialog.getByRole("combobox")).toHaveText("PADEL CLUB PARIS");
 
   // The dialog previews what will be reassigned before confirmation.
   await expect(
@@ -67,6 +67,9 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
   ).toBeVisible();
   await expect(dialog.getByText("1 deal will be reassigned")).toBeVisible();
 
+  await expect(
+    dialog.getByRole("button", { name: "Merge Clubs" }),
+  ).toBeEnabled();
   await dialog.getByRole("button", { name: "Merge Clubs" }).click();
   await dismissToast("Clubs merged successfully");
 
@@ -84,10 +87,14 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
   await expect(page.getByText("Padel Club Paris", { exact: true })).toHaveCount(
     0,
   );
-  await expect(page.getByText("PADEL CLUB PARIS")).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: "PADEL CLUB PARIS", exact: true }),
+  ).toBeVisible();
 
   // The reassigned contact now points at the winner club.
   await page.getByRole("link", { name: "Referees" }).click();
   await page.getByText("Isaac Newton").click();
-  await expect(page.getByText("PADEL CLUB PARIS").first()).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "PADEL CLUB PARIS" }),
+  ).toBeVisible();
 });
