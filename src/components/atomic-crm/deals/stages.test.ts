@@ -117,7 +117,12 @@ describe("getDealsByStage", () => {
         index: 1,
         next_action_due_date: yesterday,
       }),
-      makeDeal({ id: 3, stage: "client", index: 2, next_action_due_date: null }),
+      makeDeal({
+        id: 3,
+        stage: "client",
+        index: 2,
+        next_action_due_date: null,
+      }),
       makeDeal({
         id: 4,
         stage: "client",
