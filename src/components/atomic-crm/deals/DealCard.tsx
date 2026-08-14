@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import { isDueToday, isDueTomorrow, isOverdue } from "../tasks/tasksPredicate";
+import { isDueTomorrow, isOverdue } from "../tasks/tasksPredicate";
 import type { Deal } from "../types";
+import { dealNeedsAction } from "./dealUtils";
 import { DealPartyAvatar, DealPartyName } from "./DealParty";
 
 export const DealCard = ({ deal, index }: { deal: Deal; index: number }) => {
@@ -122,14 +123,14 @@ const DealNextActionChip = ({ dueDate }: { dueDate?: string | null }) => {
   const translate = useTranslate();
   if (!dueDate) return null;
 
-  if (isOverdue(dueDate)) {
-    return (
-      <Badge variant="destructive">
-        {translate("resources.deals.next_action_due.overdue")}
-      </Badge>
-    );
-  }
-  if (isDueToday(dueDate)) {
+  if (dealNeedsAction(dueDate)) {
+    if (isOverdue(dueDate)) {
+      return (
+        <Badge variant="destructive">
+          {translate("resources.deals.next_action_due.overdue")}
+        </Badge>
+      );
+    }
     return (
       <Badge variant="outline" className={greenChipClassName}>
         {translate("resources.deals.next_action_due.today")}

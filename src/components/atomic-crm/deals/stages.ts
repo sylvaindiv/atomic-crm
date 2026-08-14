@@ -1,5 +1,6 @@
 import type { ConfigurationContextValue } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
+import { dealNeedsAction } from "./dealUtils";
 
 export type DealsByStage = Record<Deal["stage"], Deal[]>;
 
@@ -40,10 +41,16 @@ export const getDealsByStage = (
       dealsByStage[deal.stage].push(deal);
     }
   });
-  // order each column by index
+  // Deals that need action (next action due today or overdue) float to the
+  // top of their column; within each group (needs-action / not), order is
+  // preserved by index. Array.prototype.sort is stable, so a comparator
+  // that only decides the needs-action group falls back to index untouched.
   visibleStatuses.forEach((status) => {
     dealsByStage[status.value] = dealsByStage[status.value].sort(
-      (recordA: Deal, recordB: Deal) => recordA.index - recordB.index,
+      (recordA: Deal, recordB: Deal) =>
+        Number(dealNeedsAction(recordB.next_action_due_date)) -
+          Number(dealNeedsAction(recordA.next_action_due_date)) ||
+        recordA.index - recordB.index,
     );
   });
   return dealsByStage;

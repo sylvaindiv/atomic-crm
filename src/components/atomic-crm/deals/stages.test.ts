@@ -96,4 +96,40 @@ describe("getDealsByStage", () => {
     expect(result.mort).toBeUndefined();
     expect(deal.stage).toBe("mort");
   });
+
+  it("sorts deals needing action (overdue or due today) above the rest, index otherwise", () => {
+    const noteStatuses = [makeStatus({ value: "client" })];
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const today = new Date().toISOString();
+    const nextWeek = new Date(
+      Date.now() + 7 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+    const deals = [
+      makeDeal({
+        id: 1,
+        stage: "client",
+        index: 0,
+        next_action_due_date: nextWeek,
+      }),
+      makeDeal({
+        id: 2,
+        stage: "client",
+        index: 1,
+        next_action_due_date: yesterday,
+      }),
+      makeDeal({ id: 3, stage: "client", index: 2, next_action_due_date: null }),
+      makeDeal({
+        id: 4,
+        stage: "client",
+        index: 3,
+        next_action_due_date: today,
+      }),
+    ];
+
+    const result = getDealsByStage(deals, noteStatuses);
+
+    // needs-action deals (2, 4) first, in their original index order,
+    // then the rest (1, 3) in their original index order.
+    expect(result.client.map((d) => d.id)).toEqual([2, 4, 1, 3]);
+  });
 });
