@@ -45,10 +45,23 @@ export async function initSchema() {
 /** Actual column names per writable table, used to drop unknown keys on write. */
 export const tableColumns = {};
 
+/**
+ * Column names per writable table that a write must supply a non-null value
+ * for: NOT NULL, not the primary key (which SQLite fills in on INSERT), and
+ * with no DEFAULT (which fills the column in when omitted). Read from the
+ * same `PRAGMA table_info` introspection as `tableColumns`, exposed to
+ * `server/query.mjs`'s create()/update() so a missing required column fails
+ * fast with a readable message instead of a raw SQLite constraint error.
+ */
+export const requiredColumns = {};
+
 export async function loadTableColumns() {
   for (const cfg of Object.values(RESOURCES)) {
     if (cfg.readonly) continue;
     const { rows } = await db.execute(`PRAGMA table_info("${cfg.table}")`);
     tableColumns[cfg.table] = rows.map((r) => r.name);
+    requiredColumns[cfg.table] = rows
+      .filter((r) => r.notnull === 1 && r.pk === 0 && r.dflt_value === null)
+      .map((r) => r.name);
   }
 }
