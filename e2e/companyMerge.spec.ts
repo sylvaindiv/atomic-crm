@@ -50,7 +50,9 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
 
   await page.getByRole("link", { name: "Clubs" }).click();
   await page.waitForLoadState("networkidle");
-  await page.getByRole("row", { name: /^Padel Club Paris/ }).click();
+  await page
+    .getByRole("cell", { name: "Padel Club Paris", exact: true })
+    .click();
   await page.getByRole("link", { name: "Edit club" }).click();
   await page.getByRole("button", { name: "Merge with another club" }).click();
 
@@ -87,5 +89,5 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
   // The reassigned contact now points at the winner club.
   await page.getByRole("link", { name: "Referees" }).click();
   await page.getByText("Isaac Newton").click();
-  await expect(page.getByText("PADEL CLUB PARIS")).toBeVisible();
+  await expect(page.getByText("PADEL CLUB PARIS").first()).toBeVisible();
 });
