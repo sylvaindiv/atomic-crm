@@ -60,6 +60,23 @@ export const englishCrmMessages = {
         create_item: "Create %{item}",
         create_label: "Start typing to create a new club",
       },
+      merge: {
+        action: "Merge with another club",
+        confirm: "Merge Clubs",
+        current_contact: "Current Club (will be deleted)",
+        description: "Merge this club with another one.",
+        error: "Failed to merge clubs",
+        merging: "Merging...",
+        no_additional_data: "No additional data to merge",
+        select_target: "Please select a club to merge with",
+        success: "Clubs merged successfully",
+        target_contact: "Target Club (will be kept)",
+        title: "Merge Club",
+        warning_description:
+          "All data will be transferred to the second club. This action cannot be undone.",
+        warning_title: "Warning: Destructive Operation",
+        what_will_be_merged: "What will be merged:",
+      },
       filters: {
         only_mine: "Only clubs I manage",
       },
