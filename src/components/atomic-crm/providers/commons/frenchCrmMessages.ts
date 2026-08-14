@@ -223,6 +223,7 @@ export const frenchCrmMessages = {
         amount: "Budget",
         stage: "Étape",
         case_type: "Type d'affaire",
+        club_name: "Club",
       },
       case_types: {
         judge: "Juge",
@@ -251,6 +252,12 @@ export const frenchCrmMessages = {
       },
       next_action_save_error:
         "La prochaine action n'a pas pu être enregistrée. L'affaire n'a pas été enregistrée non plus.",
+      next_action_due: {
+        overdue: "En retard",
+        today: "Aujourd'hui",
+        tomorrow: "Demain",
+        in_days: "Dans %{smart_count} jour |||| Dans %{smart_count} jours",
+      },
       unarchived: {
         action: "Renvoyer au tableau",
         error: "Erreur : affaire non désarchivée",

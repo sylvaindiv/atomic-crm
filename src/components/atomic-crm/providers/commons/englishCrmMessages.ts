@@ -219,6 +219,7 @@ export const englishCrmMessages = {
         amount: "Budget",
         stage: "Stage",
         case_type: "Case type",
+        club_name: "Club",
       },
       case_types: {
         judge: "Judge",
@@ -247,6 +248,12 @@ export const englishCrmMessages = {
       },
       next_action_save_error:
         "The next action could not be saved. The deal was not saved either.",
+      next_action_due: {
+        overdue: "Overdue",
+        today: "Due today",
+        tomorrow: "Due tomorrow",
+        in_days: "In %{smart_count} day |||| In %{smart_count} days",
+      },
       unarchived: {
         action: "Send back to the board",
         error: "Error: deal not unarchived",
