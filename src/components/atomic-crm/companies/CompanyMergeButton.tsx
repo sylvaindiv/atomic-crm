@@ -68,7 +68,11 @@ const CompanyMergeDialog = ({ open, onClose }: CompanyMergeDialogProps) => {
   );
   const [isMerging, setIsMerging] = useState(false);
   const { mutateAsync } = useMutation({
-    mutationKey: ["companies", "merge", { loserId: loserCompany?.id, winnerId }],
+    mutationKey: [
+      "companies",
+      "merge",
+      { loserId: loserCompany?.id, winnerId },
+    ],
     mutationFn: async () => {
       return dataProvider.mergeCompanies(loserCompany?.id, winnerId);
     },
@@ -175,9 +179,7 @@ const CompanyMergeDialog = ({ open, onClose }: CompanyMergeDialogProps) => {
                 _: "Current Club (will be deleted)",
               })}
             </p>
-            <div className="font-medium text-sm mt-4">
-              {loserCompany.name}
-            </div>
+            <div className="font-medium text-sm mt-4">{loserCompany.name}</div>
 
             <div className="flex justify-center my-4">
               <ArrowDown className="h-5 w-5 text-muted-foreground" />
@@ -229,9 +231,12 @@ const CompanyMergeDialog = ({ open, onClose }: CompanyMergeDialogProps) => {
                   )}
                   {!contactsCount && !dealsCount && (
                     <li className="text-muted-foreground/60">
-                      {translate("resources.companies.merge.no_additional_data", {
-                        _: "No additional data to merge",
-                      })}
+                      {translate(
+                        "resources.companies.merge.no_additional_data",
+                        {
+                          _: "No additional data to merge",
+                        },
+                      )}
                     </li>
                   )}
                 </ul>

@@ -24,16 +24,14 @@ export async function findDuplicateCompanies(
   const targetName = normalizeText(company.name || "");
   if (!targetName) return [];
 
-  const { data: companies } = await dataProvider.getList<Company>(
-    "companies",
-    {
-      filter: {},
-      pagination: { page: 1, perPage: CANDIDATE_FETCH_LIMIT },
-      sort: { field: "id", order: "ASC" },
-    },
-  );
+  const { data: companies } = await dataProvider.getList<Company>("companies", {
+    filter: {},
+    pagination: { page: 1, perPage: CANDIDATE_FETCH_LIMIT },
+    sort: { field: "id", order: "ASC" },
+  });
 
   return companies.filter(
-    (other) => other.id !== company.id && normalizeText(other.name || "") === targetName,
+    (other) =>
+      other.id !== company.id && normalizeText(other.name || "") === targetName,
   );
 }
