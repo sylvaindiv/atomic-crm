@@ -62,6 +62,23 @@ export const frenchCrmMessages = {
         create_item: "Créer %{item}",
         create_label: "Commencez à taper pour créer un nouveau club",
       },
+      merge: {
+        action: "Fusionner avec un autre club",
+        confirm: "Fusionner les clubs",
+        current_contact: "Club actuel (sera supprimé)",
+        description: "Fusionnez ce club avec un autre.",
+        error: "Échec de la fusion des clubs",
+        merging: "Fusion...",
+        no_additional_data: "Aucune donnée supplémentaire à fusionner",
+        select_target: "Veuillez sélectionner un club avec lequel fusionner",
+        success: "Clubs fusionnés avec succès",
+        target_contact: "Club cible (sera conservé)",
+        title: "Fusionner le club",
+        warning_description:
+          "Toutes les données seront transférées au deuxième club. Cette action ne peut pas être annulée.",
+        warning_title: "Avertissement : opération destructrice",
+        what_will_be_merged: "Ce qui sera fusionné :",
+      },
       filters: {
         only_mine: "Seulement les clubs que je gère",
       },

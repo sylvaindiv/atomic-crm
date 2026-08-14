@@ -12,7 +12,7 @@ import {
   useTranslate,
 } from "ra-core";
 import type { Identifier } from "ra-core";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +27,10 @@ import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import type { Contact } from "../types";
 import { contactOptionText } from "../misc/ContactOption";
+import {
+  canAutoPreselect,
+  findDuplicateContacts,
+} from "../providers/commons/findDuplicateContacts";
 
 export const ContactMergeButton = () => {
   const translate = useTranslate();
@@ -75,19 +79,13 @@ const ContactMergeDialog = ({ open, onClose }: ContactMergeDialogProps) => {
     },
   });
 
-  // Find potential contacts with matching first and last name
-  const { data: matchingContacts } = useGetList(
-    "contacts",
-    {
-      filter: {
-        first_name: loserContact?.first_name,
-        last_name: loserContact?.last_name,
-        "id@neq": `${loserContact?.id}`, // Exclude current contact
-      },
-      pagination: { page: 1, perPage: 10 },
-    },
-    { enabled: open && !!loserContact },
-  );
+  // Find potential duplicate contacts: matching name (case/accent-insensitive),
+  // shared email, or shared phone number.
+  const { data: duplicateCandidates } = useQuery({
+    queryKey: ["contacts", "findDuplicateContacts", loserContact?.id],
+    queryFn: () => findDuplicateContacts(loserContact as Contact, dataProvider),
+    enabled: open && !!loserContact,
+  });
 
   // Get counts of items to be merged
   const canFetchCounts = open && !!loserContact && !!winnerId;
@@ -131,12 +129,16 @@ const ContactMergeDialog = ({ open, onClose }: ContactMergeDialogProps) => {
   );
 
   useEffect(() => {
-    if (matchingContacts && matchingContacts.length > 0) {
-      const suggestedWinnerId = matchingContacts[0].id;
-      setSuggestedWinnerId(suggestedWinnerId);
-      setWinnerId(suggestedWinnerId);
+    // Only a name or email match corroborates identity well enough to
+    // auto-preselect. A phone-only match stays an option in the target
+    // picker below (it lists every contact) but is never selected for you --
+    // two people can share a club's landline.
+    const strongCandidate = duplicateCandidates?.find(canAutoPreselect);
+    if (strongCandidate) {
+      setSuggestedWinnerId(strongCandidate.contact.id);
+      setWinnerId(strongCandidate.contact.id);
     }
-  }, [matchingContacts]);
+  }, [duplicateCandidates]);
 
   const handleMerge = async () => {
     if (!winnerId || !loserContact) {
