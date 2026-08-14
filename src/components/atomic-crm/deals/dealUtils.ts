@@ -1,4 +1,17 @@
+import { isDueToday, isOverdue } from "../tasks/tasksPredicate";
 import type { LabeledValue } from "../types";
+
+/**
+ * Whether a deal's next action is due today or overdue -- the shared
+ * "needs action" rule. Mirrors `NeedsActionInput`'s server-side filter
+ * (`next_action_due_date@lte` = end of today) and backs both the Kanban
+ * column sort (`stages.ts`) and the countdown chip (`DealCard.tsx`), so the
+ * three layers can't drift apart.
+ */
+export function dealNeedsAction(dueDate?: string | null): boolean {
+  if (!dueDate) return false;
+  return isOverdue(dueDate) || isDueToday(dueDate);
+}
 
 export const findDealLabel = (statuses: LabeledValue[], dealValue: string) => {
   const status = statuses.find((status) => status.value === dealValue);
