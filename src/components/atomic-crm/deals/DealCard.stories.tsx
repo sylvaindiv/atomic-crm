@@ -6,6 +6,7 @@ import type { Deal } from "../types";
 
 const meta = {
   title: "Atomic CRM/Deals/Deal Card",
+  excludeStories: ["judgeContactsData", "baseJudgeDeal"],
 } satisfies Meta;
 
 export default meta;
