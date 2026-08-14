@@ -16,6 +16,7 @@ import type {
 } from "../../types";
 import type { ConfigurationContextValue } from "../../root/ConfigurationContext";
 import { getActivityLog } from "../commons/activity";
+import { mergeCompanies as mergeCompaniesCommon } from "../commons/mergeCompanies";
 import { mergeContacts as mergeContactsCommon } from "../commons/mergeContacts";
 import { cacheCurrentSale, getIsInitialized } from "./authProvider";
 import { baseDataProvider } from "./internal/httpClient";
@@ -193,6 +194,9 @@ const getDataProviderWithCustomMethods = () => {
     },
     async mergeContacts(sourceId: Identifier, targetId: Identifier) {
       return mergeContactsCommon(sourceId, targetId, baseDataProvider);
+    },
+    async mergeCompanies(sourceId: Identifier, targetId: Identifier) {
+      return mergeCompaniesCommon(sourceId, targetId, baseDataProvider);
     },
     async getConfiguration(): Promise<ConfigurationContextValue> {
       const { data } = await baseDataProvider.getOne("configuration", {
