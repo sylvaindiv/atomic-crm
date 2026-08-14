@@ -113,6 +113,8 @@ const DealClubSubRow = ({ clubName }: { clubName: string }) => {
 
 const amberChipClassName =
   "border-amber-500 text-amber-700 dark:border-amber-400 dark:text-amber-400";
+const greenChipClassName =
+  "border-green-500 text-green-700 dark:border-green-400 dark:text-green-400";
 
 // Countdown chip for the deal's next-action due date, colored by urgency
 // bucket (see tasksPredicate.ts for the shared overdue/today/tomorrow rules).
@@ -129,7 +131,7 @@ const DealNextActionChip = ({ dueDate }: { dueDate?: string | null }) => {
   }
   if (isDueToday(dueDate)) {
     return (
-      <Badge variant="outline" className={amberChipClassName}>
+      <Badge variant="outline" className={greenChipClassName}>
         {translate("resources.deals.next_action_due.today")}
       </Badge>
     );

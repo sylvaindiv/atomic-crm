@@ -256,7 +256,7 @@ export const frenchCrmMessages = {
         overdue: "En retard",
         today: "Aujourd'hui",
         tomorrow: "Demain",
-        in_days: "Dans %{smart_count} jour |||| Dans %{smart_count} jours",
+        in_days: "%{smart_count}j",
       },
       unarchived: {
         action: "Renvoyer au tableau",

@@ -77,7 +77,7 @@ describe("DealCard", () => {
     await expect.element(screen.getByText("Due today")).toBeInTheDocument();
   });
 
-  it("shows an 'in N days' chip when the next action is due later this week", async () => {
+  it("shows a compact 'Nd' chip when the next action is due later this week", async () => {
     // End-of-day, not Date.now() + 5 days: differenceInDays counts full
     // 24h periods, so a render delay of even a few ms could otherwise tip
     // an exact 5-day gap down to 4 -- padding to 23:59:59.999 keeps a wide
@@ -97,6 +97,6 @@ describe("DealCard", () => {
       </StoryWrapper>,
     );
 
-    await expect.element(screen.getByText(/In 5 days/)).toBeInTheDocument();
+    await expect.element(screen.getByText("5d")).toBeInTheDocument();
   });
 });
