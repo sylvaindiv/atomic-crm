@@ -24,7 +24,7 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Deal } from "../types";
 import { ContactList } from "./ContactList";
 import { findDealLabel, formatDealAmount } from "./dealUtils";
-import { DealCaseTypeBadge, DealPartyAvatar } from "./DealParty";
+import { DealCaseTypeBadge, DealPartyAvatar, DealPartyName } from "./DealParty";
 
 export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
   const redirect = useRedirect();
@@ -36,7 +36,7 @@ export const DealShow = ({ open, id }: { open: boolean; id?: string }) => {
     <Dialog open={open} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="lg:max-w-4xl p-4 overflow-y-auto max-h-9/10 top-1/20 translate-y-0">
         {id ? (
-          <ShowBase id={id}>
+          <ShowBase resource="deals" id={id}>
             <DealShowContent />
           </ShowBase>
         ) : null}
@@ -59,6 +59,9 @@ const DealShowContent = () => {
           <div className="flex justify-between items-start mb-8">
             <div className="flex items-center gap-4">
               <DealPartyAvatar deal={record} linkToShow />
+              <span className="text-sm text-muted-foreground">
+                <DealPartyName deal={record} />
+              </span>
               <h2 className="text-2xl font-semibold">{record.name}</h2>
               <DealCaseTypeBadge caseType={record.case_type} />
             </div>
@@ -109,7 +112,7 @@ const DealShowContent = () => {
             </div>
           </div>
 
-          {!!record.contact_ids?.length && (
+          {record.case_type !== "judge" && !!record.contact_ids?.length && (
             <div className="m-4">
               <div className="flex flex-col min-h-12 mr-10">
                 <span className="text-xs text-muted-foreground tracking-wide">

@@ -75,6 +75,9 @@ const getDataProviderWithCustomMethods = () => {
       if (resource === "contacts") {
         return baseDataProvider.getList("contacts_summary", params);
       }
+      if (resource === "deals") {
+        return baseDataProvider.getList("deals_summary", params);
+      }
       if (resource === "activity_log") {
         const { filter = {}, pagination } = params;
         const all = await getActivityLog(
@@ -97,6 +100,9 @@ const getDataProviderWithCustomMethods = () => {
       }
       if (resource === "contacts") {
         return baseDataProvider.getOne("contacts_summary", params);
+      }
+      if (resource === "deals") {
+        return baseDataProvider.getOne("deals_summary", params);
       }
       return baseDataProvider.getOne(resource, params);
     },
