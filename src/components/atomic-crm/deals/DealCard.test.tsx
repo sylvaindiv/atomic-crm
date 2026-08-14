@@ -57,13 +57,9 @@ describe("DealCard", () => {
   it("does not show a next-action chip when there is no next action due date", async () => {
     const screen = await render(<JudgeDeal />);
 
-    await expect
-      .element(screen.getByText(/Ada Lovelace/))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText(/Ada Lovelace/)).toBeInTheDocument();
     await expect.element(screen.getByText("Overdue")).not.toBeInTheDocument();
-    await expect
-      .element(screen.getByText("Due today"))
-      .not.toBeInTheDocument();
+    await expect.element(screen.getByText("Due today")).not.toBeInTheDocument();
   });
 
   it("shows a 'Due today' chip when the next action is due today", async () => {
@@ -95,8 +91,6 @@ describe("DealCard", () => {
       </StoryWrapper>,
     );
 
-    await expect
-      .element(screen.getByText(/In 5 days/))
-      .toBeInTheDocument();
+    await expect.element(screen.getByText(/In 5 days/)).toBeInTheDocument();
   });
 });
