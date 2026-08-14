@@ -252,7 +252,7 @@ export const englishCrmMessages = {
         overdue: "Overdue",
         today: "Due today",
         tomorrow: "Due tomorrow",
-        in_days: "In %{smart_count} day |||| In %{smart_count} days",
+        in_days: "%{smart_count}d",
       },
       unarchived: {
         action: "Send back to the board",
