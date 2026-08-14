@@ -233,6 +233,9 @@ export const englishCrmMessages = {
       field_categories: {
         misc: "Misc",
       },
+      filters: {
+        needs_action: "To handle",
+      },
       archived: {
         action: "Archive",
         error: "Error: deal not archived",

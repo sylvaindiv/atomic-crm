@@ -237,6 +237,9 @@ export const frenchCrmMessages = {
       field_categories: {
         misc: "Divers",
       },
+      filters: {
+        needs_action: "À traiter",
+      },
       archived: {
         action: "Archiver",
         error: "Erreur : affaire non archivée",
