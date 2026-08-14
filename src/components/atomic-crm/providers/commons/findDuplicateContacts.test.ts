@@ -5,7 +5,9 @@ import { findDuplicateContacts, normalizeText } from "./findDuplicateContacts";
 /** DataProvider mock exposing only the getList call the helper makes. */
 const buildDataProvider = (contacts: unknown[]): DataProvider =>
   ({
-    getList: vi.fn().mockResolvedValue({ data: contacts, total: contacts.length }),
+    getList: vi
+      .fn()
+      .mockResolvedValue({ data: contacts, total: contacts.length }),
   }) as unknown as DataProvider;
 
 describe("normalizeText", () => {

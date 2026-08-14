@@ -58,9 +58,12 @@ function isUsableName(normalizedName: string): boolean {
 }
 
 /** True when the candidate corroborates identity strongly enough to auto-preselect. */
-export function canAutoPreselect(candidate: DuplicateContactCandidate): boolean {
+export function canAutoPreselect(
+  candidate: DuplicateContactCandidate,
+): boolean {
   return (
-    candidate.matchedBy.includes("name") || candidate.matchedBy.includes("email")
+    candidate.matchedBy.includes("name") ||
+    candidate.matchedBy.includes("email")
   );
 }
 
