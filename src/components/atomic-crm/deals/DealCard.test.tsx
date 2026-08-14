@@ -78,7 +78,13 @@ describe("DealCard", () => {
   });
 
   it("shows an 'in N days' chip when the next action is due later this week", async () => {
-    const inFiveDays = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+    // End-of-day, not Date.now() + 5 days: differenceInDays counts full
+    // 24h periods, so a render delay of even a few ms could otherwise tip
+    // an exact 5-day gap down to 4 -- padding to 23:59:59.999 keeps a wide
+    // margin against that flake.
+    const inFiveDays = new Date();
+    inFiveDays.setDate(inFiveDays.getDate() + 5);
+    inFiveDays.setHours(23, 59, 59, 999);
 
     const screen = await render(
       <StoryWrapper data={judgeContactsData}>
