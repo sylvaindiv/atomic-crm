@@ -13,8 +13,7 @@ const FILTER_KEY = "next_action_due_date@lte";
  */
 export const NeedsActionInput = (_: { alwaysOn: boolean; source: string }) => {
   const translate = useTranslate();
-  const { filterValues, displayedFilters, setFilters } =
-    useListFilterContext();
+  const { filterValues, displayedFilters, setFilters } = useListFilterContext();
 
   const handleChange = () => {
     const newFilterValues = { ...filterValues };
