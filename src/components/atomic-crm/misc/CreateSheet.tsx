@@ -17,6 +17,7 @@ import {
   type FormProps,
 } from "ra-core";
 import { type ReactNode } from "react";
+import { useWatch } from "react-hook-form";
 import { cn } from "@/lib/utils";
 
 export interface CreateSheetProps extends CreateBaseProps {
@@ -49,6 +50,14 @@ export interface CreateSheetProps extends CreateBaseProps {
    * Optional actions to render in the sheet header, next to the title
    */
   headerActions?: ReactNode;
+
+  /**
+   * Evaluated against the live form values on every change; while it returns
+   * true, the Save button stays disabled. Use it to make an in-progress
+   * required selection (e.g. a modal contact picker) structurally block
+   * submission, instead of only surfacing after a failed submit attempt.
+   */
+  disableSaveWhen?: (values: Record<string, unknown>) => boolean;
 }
 
 /**
@@ -88,6 +97,7 @@ export const CreateSheet = ({
   mutationOptions,
   defaultValues,
   headerActions,
+  disableSaveWhen,
   ...createBaseProps
 }: CreateSheetProps) => {
   const resource = useResourceContext(createBaseProps);
@@ -163,11 +173,27 @@ export const CreateSheet = ({
             </div>
 
             <SheetFooter className="border-t flex flex-row w-full gap-4">
-              <SaveButton className="flex-1 h-12" />
+              <GuardedSaveButton disableSaveWhen={disableSaveWhen} />
             </SheetFooter>
           </Form>
         </CreateBase>
       </SheetContent>
     </Sheet>
   );
+};
+
+/**
+ * Renders the sheet's Save button, disabled while `disableSaveWhen` reports
+ * the current form values as incomplete. Watching the whole form (rather than
+ * a single field) keeps this generic across every CreateSheet consumer.
+ */
+const GuardedSaveButton = ({
+  disableSaveWhen,
+}: {
+  disableSaveWhen?: (values: Record<string, unknown>) => boolean;
+}) => {
+  const values = useWatch();
+  const disabled = disableSaveWhen ? disableSaveWhen(values) : false;
+
+  return <SaveButton className="flex-1 h-12" disabled={disabled} />;
 };
