@@ -89,6 +89,13 @@ export const NoteCreateSheet = ({
       mutationOptions={{ onSuccess: handleSuccess }}
       open={open}
       onOpenChange={onOpenChange}
+      // In picker mode, no contact is pre-selected: keep Save disabled until
+      // one is picked so an unselected contact can never reach submit.
+      disableSaveWhen={
+        selectContact
+          ? (values) => !values[foreignKeyMapping["contacts"]]
+          : undefined
+      }
     >
       <NoteInputsMobile selectContact={selectContact} />
     </CreateSheet>
