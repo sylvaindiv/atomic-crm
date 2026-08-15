@@ -9,16 +9,15 @@ import type { Contact, ContactNote } from "../types";
 export const LatestNotes = () => {
   const { identity } = useGetIdentity();
   const translate = useTranslate();
-  const { data: contactNotesData, isPending: contactNotesLoading } =
-    useGetList(
-      "contact_notes",
-      {
-        pagination: { page: 1, perPage: 5 },
-        sort: { field: "date", order: "DESC" },
-        filter: { sales_id: identity?.id },
-      },
-      { enabled: Number.isInteger(identity?.id) },
-    );
+  const { data: contactNotesData, isPending: contactNotesLoading } = useGetList(
+    "contact_notes",
+    {
+      pagination: { page: 1, perPage: 5 },
+      sort: { field: "date", order: "DESC" },
+      filter: { sales_id: identity?.id },
+    },
+    { enabled: Number.isInteger(identity?.id) },
+  );
   if (contactNotesLoading) {
     return null;
   }

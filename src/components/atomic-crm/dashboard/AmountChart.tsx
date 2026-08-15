@@ -111,10 +111,12 @@ export const AmountChart = memo(() => {
     }, {} as any);
 
     const amountByMonth = Object.keys(contactsByMonth).map((month) => {
-      return contactsByMonth[month].reduce(
-        accumulateContactAmount,
-        { date: format(month, "MMM"), won: 0, pending: 0, lost: 0 },
-      );
+      return contactsByMonth[month].reduce(accumulateContactAmount, {
+        date: format(month, "MMM"),
+        won: 0,
+        pending: 0,
+        lost: 0,
+      });
     });
 
     return amountByMonth;

@@ -66,7 +66,6 @@ describe("getDealStageBucket", () => {
       weight: PENDING_STAGE_WEIGHT,
     });
   });
-
 });
 
 describe("accumulateContactAmount", () => {
