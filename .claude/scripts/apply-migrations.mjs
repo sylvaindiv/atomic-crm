@@ -13,9 +13,13 @@
 //    There is no migrations-tracking table, so re-running every file on
 //    each deploy is intentional and safe (see db/migrations/*.mjs).
 //
-//    Each file is run as a child process via `node --env-file=.env <file>`
-//    (spawnSync, not dynamic import()) so a missing-env `process.exit(1)`
-//    inside a migration only ends that child, not this loop.
+//    Each file is run as a child process via `node <file>` (spawnSync, not
+//    dynamic import()) so a missing-env `process.exit(1)` inside a migration
+//    only ends that child, not this loop. `--env-file=.env` is added only
+//    when a `.env` file exists at the repo root: spawnSync already inherits
+//    this process's env, so in environments where credentials are exported
+//    directly (no `.env` on disk, e.g. CI) passing `--env-file=.env` would
+//    make node fail with "not found" for no reason.
 // ─────────────────────────────────────────────────────────────
 import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
@@ -35,7 +39,11 @@ if (!url) {
 const print = (s) => process.stdout.write(s + "\n");
 
 const here = dirname(fileURLToPath(import.meta.url));
-const migrationsDir = join(here, "..", "..", "db", "migrations");
+const repoRoot = join(here, "..", "..");
+const migrationsDir = join(repoRoot, "db", "migrations");
+const envFileArgs = existsSync(join(repoRoot, ".env"))
+  ? ["--env-file=.env"]
+  : [];
 
 if (!existsSync(migrationsDir)) {
   print("No db/migrations/ directory found, nothing to apply.");
@@ -57,7 +65,7 @@ for (const file of migrations) {
   print(`Applying migration: ${file}`);
   const { status } = spawnSync(
     "node",
-    ["--env-file=.env", join(migrationsDir, file)],
+    [...envFileArgs, join(migrationsDir, file)],
     { stdio: "inherit" },
   );
   if (status !== 0) {
