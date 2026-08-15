@@ -3,11 +3,8 @@ const AMOUNT_PLACEHOLDER = "–"; // en dash
 
 /**
  * Formats an optional monetary amount as compact currency, or a placeholder
- * when there is none (amount is always optional -- see Deal['amount'] /
- * Contact['amount']). Deal-free so it can be shared by the contact page, the
- * Kanban card and the dashboard without pulling in the deals module; see
- * `deals/dealUtils.ts` for the re-export kept for the still-existing deal
- * screens.
+ * when there is none (amount is always optional -- see Contact['amount']).
+ * Shared by the contact page, the Kanban card and the dashboard.
  */
 export function formatDealAmount(
   amount: number | null | undefined,

@@ -12,7 +12,6 @@ export const frenchCrmMessages = {
         phone_number: "Numéro de téléphone",
         created_at: "Date de création",
         nb_contacts: "Nombre de juges-arbitres",
-        nb_deals: "Nombre d'affaires",
         revenue: "Chiffre d'affaires",
         sector: "Secteur",
         size: "Taille",
@@ -25,7 +24,6 @@ export const frenchCrmMessages = {
         description: "Description",
         context_links: "URLs de contexte",
         sales_id: "Responsable de compte",
-        status: "Statut",
       },
       empty: {
         description: "Il semble que la liste de vos clubs soit vide.",
@@ -49,7 +47,6 @@ export const frenchCrmMessages = {
       no_contacts: "Aucun juge-arbitre",
       nb_contacts:
         "%{smart_count} juge-arbitre |||| %{smart_count} juges-arbitres",
-      nb_deals: "%{smart_count} affaire |||| %{smart_count} affaires",
       sizes: {
         one_employee: "1 employé",
         two_to_nine_employees: "2-9 employés",
@@ -230,69 +227,6 @@ export const frenchCrmMessages = {
         title: "Prospects chauds",
       },
     },
-    deals: {
-      name: "Affaire |||| Affaires",
-      fields: {
-        name: "Nom",
-        description: "Description",
-        company_id: "Club",
-        // Singular: capped at one linked contact, for both case types. See
-        // the same convention on notes.fields.contact_id / tasks.fields.contact_id.
-        contact_ids: "Juge-arbitre",
-        category: "Catégorie",
-        amount: "Budget",
-        stage: "Étape",
-        case_type: "Type d'affaire",
-        club_name: "Club",
-      },
-      case_types: {
-        judge: "Juge",
-        club: "Club",
-      },
-      action: {
-        back_to_deal: "Retour à l'affaire",
-        create: "Créer une affaire",
-        new: "Nouvelle affaire",
-      },
-      field_categories: {
-        misc: "Divers",
-      },
-      filters: {
-        needs_action: "À traiter",
-      },
-      archived: {
-        action: "Archiver",
-        error: "Erreur : affaire non archivée",
-        list_title: "Affaires archivées",
-        success: "Affaire archivée",
-        title: "Affaire archivée",
-        view: "Afficher les affaires archivées",
-      },
-      inputs: {
-        linked_to: "Lié à",
-        next_action: "Prochaine action",
-        next_action_text: "Prochaine étape",
-      },
-      next_action_save_error:
-        "La prochaine action n'a pas pu être enregistrée. L'affaire n'a pas été enregistrée non plus.",
-      next_action_due: {
-        overdue: "En retard",
-        today: "Aujourd'hui",
-        tomorrow: "Demain",
-        in_days: "%{smart_count}j",
-      },
-      unarchived: {
-        action: "Renvoyer au tableau",
-        error: "Erreur : affaire non désarchivée",
-        success: "Affaire désarchivée",
-      },
-      updated: "Affaire mise à jour",
-      empty: {
-        before_create: "avant de créer une affaire.",
-        description: "Il semble que votre liste d'affaires soit vide.",
-        title: "Aucune affaire trouvée",
-      },
-    },
     notes: {
       name: "Note |||| Notes",
       forcedCaseName: "Note",
@@ -301,7 +235,6 @@ export const frenchCrmMessages = {
         date: "Date",
         attachments: "Pièces jointes",
         contact_id: "Juge-arbitre",
-        deal_id: "Affaire",
       },
       action: {
         add: "Ajouter une note",
@@ -477,17 +410,12 @@ export const frenchCrmMessages = {
       you_added_contact: "Vous avez ajouté le juge-arbitre",
       added_note: "%{name} a ajouté une note sur",
       you_added_note: "Vous avez ajouté une note sur",
-      added_note_about_deal: "%{name} a ajouté une note sur l'affaire",
-      you_added_note_about_deal: "Vous avez ajouté une note sur l'affaire",
-      added_deal: "%{name} a ajouté l'affaire",
-      you_added_deal: "Vous avez ajouté l'affaire",
       at_company: "chez",
       to: "à",
       load_more: "Charger plus d'activité",
     },
     dashboard: {
       amount_chart: "Montant à venir",
-      deals_pipeline: "Pipeline des affaires",
       latest_activity: "Dernière activité",
       latest_activity_error:
         "Erreur lors du chargement de la dernière activité",
@@ -553,18 +481,10 @@ export const frenchCrmMessages = {
         sectors: "Secteurs",
       },
       dark_mode_logo: "Logo du mode sombre",
-      deals: {
-        categories: "Catégories",
-        currency: "Devise",
-        pipeline_help:
-          "Sélectionnez les étapes d'affaire à considérer comme des affaires dans le pipeline.",
-        pipeline_statuses: "Statuts des pipelines",
-        stages: "Étapes",
-      },
       light_mode_logo: "Logo du mode clair",
       notes: {
         statuses: "Statuts",
-        visible_in_kanban: "Visible dans le Kanban des affaires",
+        visible_in_kanban: "Visible dans le Kanban",
       },
       reset_defaults: "Réinitialiser aux valeurs par défaut",
       save_error: "Échec de l'enregistrement de la configuration",
@@ -578,16 +498,6 @@ export const frenchCrmMessages = {
       app_title: "Titre de l'application",
       sections: {
         branding: "Image de marque",
-      },
-      validation: {
-        duplicate: "%{display_name} en double : %{items}",
-        in_use:
-          "Impossible de supprimer %{display_name} encore utilisés par des affaires : %{items}",
-        validating: "Validation…",
-        entities: {
-          categories: "catégories",
-          stages: "étapes",
-        },
       },
     },
     theme: {

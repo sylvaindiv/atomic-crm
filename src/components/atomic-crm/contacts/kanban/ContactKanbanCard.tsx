@@ -96,8 +96,8 @@ const ContactKanbanCardContent = ({
 };
 
 // Small muted sub-row showing the contact's club, as indicative context
-// only -- unlike the deal card, a contact card never hides it (there is no
-// separate case-type distinction to repeat).
+// only -- always shown here (there is no separate case-type distinction
+// to repeat).
 const ContactCompanySubRow = ({ companyName }: { companyName: string }) => {
   const translate = useTranslate();
   return (

@@ -6,9 +6,9 @@ export type ContactsByStatus = Record<Contact["status"], Contact[]>;
 
 /**
  * Note statuses that are rendered as Kanban columns, in configuration
- * order. Reads the same `visibleInDealsKanban` flag the deals Kanban used
- * (renaming this persisted configuration key is deliberately out of scope,
- * see TASK-004 ticket description).
+ * order. Reads the same `visibleInDealsKanban` flag the former deals
+ * module's Kanban used (renaming this persisted configuration key is
+ * deliberately out of scope, see TASK-004 ticket description).
  *
  * A note status persisted before the flag existed has no such property on
  * it: treat a missing flag as visible, so a pre-existing configuration

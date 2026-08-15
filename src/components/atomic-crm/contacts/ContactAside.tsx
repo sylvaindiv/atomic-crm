@@ -17,9 +17,8 @@ import type { Contact } from "../types";
 import { ContactMergeButton } from "./ContactMergeButton";
 
 /**
- * Shows the absorbed deal fields -- budget (`amount`) and case description
- * -- now stored directly on the contact instead of a separate linked deal
- * record (the contact page is the single page of the case it represents).
+ * Shows budget (`amount`) and case description, stored directly on the
+ * contact (the contact page is the single page of the case it represents).
  * The amount row always renders (with the shared placeholder when unset);
  * the description row only when filled.
  */

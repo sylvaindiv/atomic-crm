@@ -228,8 +228,8 @@ const ContactMiscInputs = () => {
         {translate("resources.contacts.field_categories.misc")}
       </h6>
       <TextInput source="background" multiline helperText={false} />
-      {/* Absorbed deal fields: this contact page is the single page of the
-          case ("Affaire") it represents -- see types.ts Contact['amount']. */}
+      {/* This contact page is the single page of the case ("Affaire") it
+          represents -- see types.ts Contact['amount']. */}
       <NumberInput source="amount" defaultValue={0} helperText={false} />
       <TextInput source="description" multiline rows={3} helperText={false} />
       <BooleanInput source="has_newsletter" helperText={false} />

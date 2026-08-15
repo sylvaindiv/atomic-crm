@@ -13,8 +13,8 @@ const greenChipClassName =
 /**
  * Countdown chip for a next-action due date, colored by urgency bucket
  * (see `tasks/tasksPredicate.ts` for the shared overdue/today/tomorrow
- * rules). Deal-free -- fed only by a raw due date string, so it backs the
- * contacts Kanban card (TASK-004) without pulling in the deals module.
+ * rules). Fed only by a raw due date string, so it backs the contacts
+ * Kanban card (TASK-004).
  */
 export const NextActionChip = ({ dueDate }: { dueDate?: string | null }) => {
   const translate = useTranslate();

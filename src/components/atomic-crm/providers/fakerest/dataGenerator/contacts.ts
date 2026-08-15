@@ -116,12 +116,12 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       latest_note_text: "",
       postal_code: "",
       city: "",
-      // Absorbed deal fields (see Contact['amount'] / ['description']).
+      // Budget and case description, absorbed onto the contact (see
+      // Contact['amount'] / ['description']).
       amount: weightedBoolean(60) ? datatype.number(1000) * 100 : null,
       description: lorem.paragraphs(datatype.number({ min: 1, max: 3 })),
       index: 0,
-      // Computed post-generation in finalize.ts, once deals/tasks exist.
-      linked_deal_id: null,
+      // Computed post-generation in finalize.ts, once tasks exist.
       next_action_due_date: null,
     };
 

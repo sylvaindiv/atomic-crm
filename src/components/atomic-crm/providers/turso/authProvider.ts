@@ -48,7 +48,7 @@ export function cacheCurrentSale(_sale: any) {
 // --- Identity resolution -----------------------------------------------------
 // This is a single-user, no-login deployment (see the shared-password gate
 // below): there is no real authentication, but every write (notes, contacts,
-// deals, tasks) still stamps `sales_id`, an INTEGER FK to `sales.id`. We treat
+// tasks) still stamps `sales_id`, an INTEGER FK to `sales.id`. We treat
 // the first `sales` row (by id) as "the" user, and self-provision a default
 // one the first time the table is empty — the removed `/sign-up` onboarding
 // used to create it.
