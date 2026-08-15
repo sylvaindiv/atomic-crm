@@ -4,28 +4,27 @@ import { TrendingUp } from "lucide-react";
 import { useGetList, useTranslate } from "ra-core";
 import { memo, useMemo } from "react";
 
-import { findDealLabel } from "../deals/dealUtils";
 import { useConfigurationContext } from "../root/ConfigurationContext";
-import type { Deal } from "../types";
+import type { Contact } from "../types";
 
-/** Stage value counted as won -- the judge/club "Client" status. */
+/** Status value counted as won -- the judge/club "Client" status. */
 export const WON_STAGE_VALUE = "client";
-/** Stage value counted as lost -- the judge/club "Mort" status. */
+/** Status value counted as lost -- the judge/club "Mort" status. */
 export const LOST_STAGE_VALUE = "mort";
-/** Flat weight applied to every pending deal's amount (no per-stage weighting). */
+/** Flat weight applied to every pending contact's amount (no per-status weighting). */
 export const PENDING_STAGE_WEIGHT = 0.5;
 
 export type DealStageBucket = "won" | "lost" | "pending";
 
 /**
- * Buckets a deal's stage value into won / lost / pending for dashboard
- * aggregation, and returns the weight to apply to the deal's amount.
+ * Buckets a contact's status value into won / lost / pending for dashboard
+ * aggregation, and returns the weight to apply to the contact's amount.
  *
- * Only `client` counts as won and `mort` as lost. Every other stage --
+ * Only `client` counts as won and `mort` as lost. Every other status --
  * including legacy generic-pipeline values (`won`, `lost`, `opportunity`,
  * ...) or any status added later in Settings -- falls into the pending
- * bucket with the same flat weight, since per-stage weighting no longer has
- * meaning once stages are judge/club statuses. Pure and total: it never
+ * bucket with the same flat weight, since per-status weighting no longer has
+ * meaning once statuses are judge/club statuses. Pure and total: it never
  * throws and never returns NaN, whatever string (or empty/undefined value)
  * is passed in.
  */
@@ -42,61 +41,82 @@ export function getDealStageBucket(stage: string | undefined | null): {
   return { bucket: "pending", weight: PENDING_STAGE_WEIGHT };
 }
 
+export type MonthTotals = {
+  date: string;
+  won: number;
+  pending: number;
+  lost: number;
+};
+
+/**
+ * Folds one contact's bucketed, weighted amount into a month's running
+ * totals, returning a new object. Null-safe: a missing/undefined amount
+ * contributes 0 and never produces NaN.
+ */
+export function accumulateContactAmount(
+  totals: MonthTotals,
+  contact: Pick<Contact, "status" | "amount">,
+): MonthTotals {
+  const { bucket, weight } = getDealStageBucket(contact.status);
+  const amount = contact.amount ?? 0;
+  if (bucket === "won") {
+    return { ...totals, won: totals.won + amount };
+  }
+  if (bucket === "lost") {
+    return { ...totals, lost: totals.lost - amount };
+  }
+  return { ...totals, pending: totals.pending + amount * weight };
+}
+
 const threeMonthsAgo = new Date(
   new Date().setMonth(new Date().getMonth() - 6),
 ).toISOString();
 
 const DEFAULT_LOCALE = "en-US";
 
-export const DealsChart = memo(() => {
+export const AmountChart = memo(() => {
   const translate = useTranslate();
   const { noteStatuses, currency } = useConfigurationContext();
   const acceptedLanguages = navigator
     ? navigator.languages || [navigator.language]
     : [DEFAULT_LOCALE];
-  const wonLabel = findDealLabel(noteStatuses, WON_STAGE_VALUE) ?? "Won";
-  const lostLabel = findDealLabel(noteStatuses, LOST_STAGE_VALUE) ?? "Lost";
+  const wonLabel =
+    noteStatuses.find((status) => status.value === WON_STAGE_VALUE)?.label ??
+    "Won";
+  const lostLabel =
+    noteStatuses.find((status) => status.value === LOST_STAGE_VALUE)?.label ??
+    "Lost";
 
-  const { data, isPending } = useGetList<Deal>("deals", {
+  const { data, isPending } = useGetList<Contact>("contacts", {
     pagination: { perPage: 100, page: 1 },
     sort: {
-      field: "created_at",
+      field: "first_seen",
       order: "ASC",
     },
     filter: {
-      "created_at@gte": threeMonthsAgo,
+      "first_seen@gte": threeMonthsAgo,
     },
   });
   const months = useMemo(() => {
     if (!data) return [];
-    const dealsByMonth = data.reduce((acc, deal) => {
-      const month = startOfMonth(deal.created_at ?? new Date()).toISOString();
+    const contactsByMonth = data.reduce((acc, contact) => {
+      const month = startOfMonth(
+        contact.first_seen ?? new Date(),
+      ).toISOString();
       if (!acc[month]) {
         acc[month] = [];
       }
-      acc[month].push(deal);
+      acc[month].push(contact);
       return acc;
     }, {} as any);
 
-    const amountByMonth = Object.keys(dealsByMonth).map((month) => {
-      return dealsByMonth[month].reduce(
-        (
-          acc: { date: string; won: number; pending: number; lost: number },
-          deal: Deal,
-        ) => {
-          const { bucket, weight } = getDealStageBucket(deal.stage);
-          const amount = deal.amount ?? 0;
-          if (bucket === "won") {
-            acc.won += amount;
-          } else if (bucket === "lost") {
-            acc.lost -= amount;
-          } else {
-            acc.pending += amount * weight;
-          }
-          return acc;
-        },
-        { date: format(month, "MMM"), won: 0, pending: 0, lost: 0 },
-      );
+    const amountByMonth = Object.keys(contactsByMonth).map((month) => {
+      return contactsByMonth[month].reduce(accumulateContactAmount, {
+        date: format(month, "MMM"),
+        won: 0,
+        pending: 0,
+        lost: 0,
+      });
     });
 
     return amountByMonth;
@@ -118,7 +138,7 @@ export const DealsChart = memo(() => {
           <TrendingUp className="text-muted-foreground w-6 h-6" />
         </div>
         <h2 className="text-xl font-semibold text-muted-foreground">
-          {translate("crm.dashboard.deals_chart")}
+          {translate("crm.dashboard.amount_chart")}
         </h2>
       </div>
       <div className="h-[400px]">
