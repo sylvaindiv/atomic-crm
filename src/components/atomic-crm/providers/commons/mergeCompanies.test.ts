@@ -98,34 +98,6 @@ describe("mergeCompanies", () => {
     });
   });
 
-  it("reassigns every deal whose company_id is the loser to the winner", async () => {
-    // Arrange
-    const winner = buildCompany({ id: winnerId });
-    const loser = buildCompany({ id: loserId });
-    const updateMany = vi.fn().mockResolvedValue({ data: [] });
-    const dataProvider = buildDataProvider({
-      getOne: vi.fn(getOneFor(winner, loser)),
-      getManyReference: vi.fn((resource: string, params: any) =>
-        resource === "deals" && params.target === "company_id"
-          ? Promise.resolve({
-              data: [{ id: 20 }],
-              total: 1,
-            })
-          : Promise.resolve({ data: [], total: 0 }),
-      ),
-      updateMany,
-    });
-
-    // Act
-    await mergeCompanies(loserId, winnerId, dataProvider);
-
-    // Assert
-    expect(updateMany).toHaveBeenCalledWith("deals", {
-      ids: [20],
-      data: { company_id: winnerId },
-    });
-  });
-
   it("fills fields empty on the winner from the loser", async () => {
     // Arrange
     const winner = buildCompany({
@@ -204,9 +176,9 @@ describe("mergeCompanies", () => {
   });
 
   it("does not include status in the winner update when the winner already has a status", async () => {
-    // Arrange: the deal-status sync (server/dealSync.mjs) fires whenever the
-    // update payload carries a `status` key at all, even unchanged -- so the
-    // key must be entirely absent once the winner already has one.
+    // Arrange: `status` is only ever filled in from the loser, never
+    // overwritten -- the key must be entirely absent once the winner
+    // already has one.
     const winner = buildCompany({ id: winnerId, status: "won" });
     const loser = buildCompany({ id: loserId, status: "hot" });
     const update = vi.fn((_resource: string, params: any) =>
@@ -225,7 +197,7 @@ describe("mergeCompanies", () => {
     expect(data).not.toHaveProperty("status");
   });
 
-  it("runs the winner update only after both reassignment updateMany calls resolve", async () => {
+  it("runs the winner update only after the contact reassignment resolves", async () => {
     // Arrange
     const winner = buildCompany({ id: winnerId });
     const loser = buildCompany({ id: loserId });
@@ -246,14 +218,11 @@ describe("mergeCompanies", () => {
     // Act
     await mergeCompanies(loserId, winnerId, dataProvider);
 
-    // Assert: both updateMany calls (contacts, deals) resolve before the
-    // winner `companies` update starts.
-    expect(updateMany).toHaveBeenCalledTimes(2);
-    const lastUpdateManyOrder = Math.max(
-      ...updateMany.mock.invocationCallOrder,
-    );
+    // Assert: the contacts updateMany call resolves before the winner
+    // `companies` update starts.
+    expect(updateMany).toHaveBeenCalledTimes(1);
     expect(update.mock.invocationCallOrder[0]).toBeGreaterThan(
-      lastUpdateManyOrder,
+      updateMany.mock.invocationCallOrder[0],
     );
   });
 

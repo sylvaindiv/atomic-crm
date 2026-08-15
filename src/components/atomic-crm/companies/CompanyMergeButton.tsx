@@ -99,16 +99,6 @@ const CompanyMergeDialog = ({ open, onClose }: CompanyMergeDialogProps) => {
     { enabled: canFetchCounts },
   );
 
-  const { total: dealsCount } = useGetManyReference(
-    "deals",
-    {
-      target: "company_id",
-      id: loserCompany?.id,
-      pagination: { page: 1, perPage: 1 },
-    },
-    { enabled: canFetchCounts },
-  );
-
   useEffect(() => {
     // A single, name-only match reason (unlike contacts' name/email/phone
     // union), so the first candidate found is auto-preselected.
@@ -223,13 +213,7 @@ const CompanyMergeDialog = ({ open, onClose }: CompanyMergeDialogProps) => {
                       {contactsCount !== 1 ? "s" : ""} will be reassigned
                     </li>
                   )}
-                  {dealsCount != null && dealsCount > 0 && (
-                    <li>
-                      • {dealsCount} deal
-                      {dealsCount !== 1 ? "s" : ""} will be reassigned
-                    </li>
-                  )}
-                  {!contactsCount && !dealsCount && (
+                  {!contactsCount && (
                     <li className="text-muted-foreground/60">
                       {translate(
                         "resources.companies.merge.no_additional_data",
