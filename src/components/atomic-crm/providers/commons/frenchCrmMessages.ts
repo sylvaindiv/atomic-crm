@@ -215,6 +215,7 @@ export const frenchCrmMessages = {
         before_this_month: "Avant ce mois-ci",
         before_this_week: "Avant cette semaine",
         managed_by_me: "Géré par moi",
+        needs_action: "À traiter",
         search: "Rechercher nom, club...",
         this_week: "Cette semaine",
         today: "Aujourd'hui",
@@ -501,6 +502,16 @@ export const frenchCrmMessages = {
     },
     header: {
       import_data: "Importer des données",
+    },
+    kanban: {
+      view_table: "Tableau",
+      view_kanban: "Kanban",
+      next_action_due: {
+        overdue: "En retard",
+        today: "À traiter aujourd'hui",
+        tomorrow: "À traiter demain",
+        in_days: "%{smart_count}j",
+      },
     },
     image_editor: {
       change: "Changer",

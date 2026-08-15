@@ -122,4 +122,34 @@ describe("finalize", () => {
 
     expect(db.deals[0].next_action_due_date).toBe("2026-02-01");
   });
+
+  it("picks the earliest open (not done) task as a contact's own next_action_due_date", () => {
+    const db = makeDb(
+      [makeContact(1)],
+      [],
+      [],
+      [
+        makeTask({ id: 1, contact_id: 1, due_date: "2026-03-01" }),
+        makeTask({
+          id: 2,
+          contact_id: 1,
+          due_date: "2026-01-01",
+          done_date: "2026-01-02",
+        }),
+        makeTask({ id: 3, contact_id: 1, due_date: "2026-02-01" }),
+      ],
+    );
+
+    finalize(db);
+
+    expect(db.contacts[0].next_action_due_date).toBe("2026-02-01");
+  });
+
+  it("leaves a contact's next_action_due_date null when it has no open task", () => {
+    const db = makeDb([makeContact(1)], []);
+
+    finalize(db);
+
+    expect(db.contacts[0].next_action_due_date).toBeNull();
+  });
 });
