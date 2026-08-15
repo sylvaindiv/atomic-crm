@@ -176,9 +176,9 @@ describe("mergeCompanies", () => {
   });
 
   it("does not include status in the winner update when the winner already has a status", async () => {
-    // Arrange: the deal-status sync (server/dealSync.mjs) fires whenever the
-    // update payload carries a `status` key at all, even unchanged -- so the
-    // key must be entirely absent once the winner already has one.
+    // Arrange: `status` is only ever filled in from the loser, never
+    // overwritten -- the key must be entirely absent once the winner
+    // already has one.
     const winner = buildCompany({ id: winnerId, status: "won" });
     const loser = buildCompany({ id: loserId, status: "hot" });
     const update = vi.fn((_resource: string, params: any) =>

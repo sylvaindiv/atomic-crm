@@ -48,9 +48,9 @@ export const mergeCompanies = async (
 
   // 2. Update winner company with loser data: fields already set on the
   // winner are never overwritten. `status` is only included when genuinely
-  // filling it from the loser -- sending it unconditionally (even
-  // unchanged) fires the deal-status sync on every merge (see
-  // mergeContacts.ts for the same guard).
+  // filling it from the loser -- unlike the other fields, an empty string
+  // is not a valid fallback for it (it must be a known status value or
+  // absent entirely).
   await dataProvider.update<Company>("companies", {
     id: winnerId,
     data: {
