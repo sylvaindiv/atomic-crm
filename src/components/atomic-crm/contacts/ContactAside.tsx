@@ -1,11 +1,10 @@
 import { useRecordContext, useTranslate } from "ra-core";
 import { EditButton } from "@/components/admin/edit-button";
 import { DeleteButton } from "@/components/admin";
-import { ReferenceField } from "@/components/admin/reference-field";
 import { ReferenceManyField } from "@/components/admin/reference-many-field";
 import { ShowButton } from "@/components/admin/show-button";
 
-import { findDealLabel } from "../deals/dealUtils";
+import { formatDealAmount } from "../misc/formatAmount";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { AddTask } from "../tasks/AddTask";
 import { TasksIterator } from "../tasks/TasksIterator";
@@ -14,45 +13,42 @@ import { ContactStatusSelector } from "./ContactInputs";
 import { ContactPersonalInfo } from "./ContactPersonalInfo";
 import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
 import { AsideSection } from "../misc/AsideSection";
-import type { Contact, Deal } from "../types";
+import type { Contact } from "../types";
 import { ContactMergeButton } from "./ContactMergeButton";
 
 /**
- * Shows the "judge" deal this contact currently mirrors the status of
- * (`linked_deal_id`, computed by the `contacts_summary` view). Renders
- * nothing when the contact has no linked deal -- no broken reference, no
- * loading spinner.
+ * Shows the absorbed deal fields -- budget (`amount`) and case description
+ * -- now stored directly on the contact instead of a separate linked deal
+ * record (the contact page is the single page of the case it represents).
+ * The amount row always renders (with the shared placeholder when unset);
+ * the description row only when filled.
  */
-export const ContactLinkedDeal = () => {
+export const ContactCaseInfo = () => {
   const record = useRecordContext<Contact>();
   const translate = useTranslate();
+  const { currency } = useConfigurationContext();
 
-  if (!record?.linked_deal_id) return null;
+  if (!record) return null;
 
   return (
     <AsideSection
-      title={translate("resources.contacts.field_categories.linked_deal")}
+      title={translate("resources.contacts.field_categories.case_info")}
     >
-      <ReferenceField source="linked_deal_id" reference="deals" link="show">
-        <LinkedDealSummary />
-      </ReferenceField>
-    </AsideSection>
-  );
-};
-
-const LinkedDealSummary = () => {
-  const deal = useRecordContext<Deal>();
-  const { noteStatuses } = useConfigurationContext();
-
-  if (!deal) return null;
-
-  return (
-    <div>
-      <div className="font-medium">{deal.name}</div>
-      <div className="text-muted-foreground">
-        {findDealLabel(noteStatuses, deal.stage) ?? deal.stage}
+      <div>
+        <div className="text-xs text-muted-foreground tracking-wide">
+          {translate("resources.contacts.fields.amount")}
+        </div>
+        <div>{formatDealAmount(record.amount, currency)}</div>
       </div>
-    </div>
+      {record.description && (
+        <div>
+          <div className="text-xs text-muted-foreground tracking-wide">
+            {translate("resources.contacts.fields.description")}
+          </div>
+          <div className="whitespace-pre-wrap">{record.description}</div>
+        </div>
+      )}
+    </AsideSection>
   );
 };
 
@@ -88,7 +84,7 @@ export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
         <ContactBackgroundInfo />
       </AsideSection>
 
-      <ContactLinkedDeal />
+      <ContactCaseInfo />
 
       <AsideSection
         title={translate("resources.tags.name", { smart_count: 2 })}
