@@ -7,7 +7,10 @@ import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
 import { ContactKanbanColumn } from "./ContactKanbanColumn";
 import type { ContactsByStatus } from "./contactStages";
-import { getContactsByStatus, getVisibleContactStatuses } from "./contactStages";
+import {
+  getContactsByStatus,
+  getVisibleContactStatuses,
+} from "./contactStages";
 
 /**
  * Contacts Kanban board: one column per note status flagged visible in the

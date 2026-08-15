@@ -1,5 +1,8 @@
 import type { Contact, NoteStatus } from "../../types";
-import { getContactsByStatus, getVisibleContactStatuses } from "./contactStages";
+import {
+  getContactsByStatus,
+  getVisibleContactStatuses,
+} from "./contactStages";
 
 const makeStatus = (
   overrides: Partial<NoteStatus> & Pick<NoteStatus, "value">,
@@ -28,9 +31,9 @@ describe("getVisibleContactStatuses", () => {
       makeStatus({ value: "b", visibleInDealsKanban: false }),
     ];
 
-    expect(
-      getVisibleContactStatuses(noteStatuses).map((s) => s.value),
-    ).toEqual(["a"]);
+    expect(getVisibleContactStatuses(noteStatuses).map((s) => s.value)).toEqual(
+      ["a"],
+    );
   });
 
   it("treats a status persisted without the visibility flag as visible", () => {
@@ -38,9 +41,9 @@ describe("getVisibleContactStatuses", () => {
       { value: "legacy", label: "Legacy", color: "#000000" } as NoteStatus,
     ];
 
-    expect(
-      getVisibleContactStatuses(noteStatuses).map((s) => s.value),
-    ).toEqual(["legacy"]);
+    expect(getVisibleContactStatuses(noteStatuses).map((s) => s.value)).toEqual(
+      ["legacy"],
+    );
   });
 });
 

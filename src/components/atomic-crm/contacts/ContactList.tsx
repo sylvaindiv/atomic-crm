@@ -22,7 +22,12 @@ import { SortButton } from "@/components/admin/sort-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { LayoutGrid, PanelLeftClose, PanelLeftOpen, Table2 } from "lucide-react";
+import {
+  LayoutGrid,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Table2,
+} from "lucide-react";
 
 import type { Company, Contact, ContactNote, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";

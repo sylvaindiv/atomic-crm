@@ -1,4 +1,8 @@
-import { Draggable, type DraggableProvided, type DraggableStateSnapshot } from "@hello-pangea/dnd";
+import {
+  Draggable,
+  type DraggableProvided,
+  type DraggableStateSnapshot,
+} from "@hello-pangea/dnd";
 import { RecordContextProvider, useTranslate } from "ra-core";
 import { Link, useSearchParams } from "react-router";
 import { Card, CardContent } from "@/components/ui/card";
