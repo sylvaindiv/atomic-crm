@@ -121,8 +121,8 @@ describe("ContactShow", () => {
     // The amount row always renders, with the shared en-dash placeholder.
     await expect.element(screen.getByText("Case info")).toBeVisible();
     await expect.element(screen.getByText("–")).toBeVisible();
-    expect(
-      screen.container.textContent?.includes("Case description"),
-    ).toBe(false);
+    expect(screen.container.textContent?.includes("Case description")).toBe(
+      false,
+    );
   });
 });
