@@ -37,8 +37,7 @@ export const NoteInputs = ({
   const selectedContactId = useWatch({ control, name: "contact_id" });
   const selectedStatus = useWatch({ control, name: "status" });
   const shouldHydrateStatus =
-    showStatus &&
-    (defaultStatus !== undefined || Boolean(selectReference));
+    showStatus && (defaultStatus !== undefined || Boolean(selectReference));
   const { data: selectedContact } = useGetOne(
     "contacts",
     { id: selectedContactId! },
