@@ -1,12 +1,12 @@
 import type { Identifier, DataProvider } from "ra-core";
 
-import type { Contact, Task, Deal, ContactNote } from "../../types";
+import type { Contact, Task, ContactNote } from "../../types";
 
 /**
  * Merge one contact (loser) into another contact (winner).
  *
  * This function copies properties from the loser to the winner contact,
- * transfers all associated data (tasks, notes, deals) from the loser to the winner,
+ * transfers all associated data (tasks, notes) from the loser to the winner,
  * and deletes the loser contact.
  */
 export const mergeContacts = async (
@@ -70,31 +70,7 @@ export const mergeContacts = async (
       }),
     ) || [];
 
-  // 3. Change contact in deals - replace loser ID with winner ID in contact_ids array
-  const { data: loserDeals } = await dataProvider.getList<Deal>("deals", {
-    filter: { "contact_ids@cs": `{${loserId}}` },
-    pagination: { page: 1, perPage: 1000 },
-    sort: { field: "id", order: "ASC" },
-  });
-
-  const dealUpdates =
-    loserDeals?.map((deal) => {
-      const newContactIds = deal.contact_ids
-        .filter((id) => id !== loserId)
-        .concat(winnerId)
-        .filter(
-          (id: Identifier, index: number, self: Identifier[]) =>
-            self.indexOf(id) === index,
-        ); // Remove duplicates
-
-      return dataProvider.update<Deal>("deals", {
-        id: deal.id,
-        data: { contact_ids: newContactIds },
-        previousData: deal,
-      });
-    }) || [];
-
-  // 4. Repoint contacts referred by the loser to the winner. This must
+  // 3. Repoint contacts referred by the loser to the winner. This must
   // happen before the loser is deleted, otherwise the `referred_by_id`
   // foreign key's `ON DELETE SET NULL` silently orphans those references.
   // The winner itself is excluded so it can never end up referred by itself.
@@ -118,7 +94,7 @@ export const mergeContacts = async (
     data: { referred_by_id: winnerId },
   });
 
-  // 5. Update winner contact with loser data
+  // 4. Update winner contact with loser data
   const mergedEmails = mergeObjectArraysUnique(
     winnerContact.email_jsonb || [],
     loserContact.email_jsonb || [],
@@ -169,12 +145,11 @@ export const mergeContacts = async (
   await Promise.all([
     ...taskUpdates,
     ...noteUpdates,
-    ...dealUpdates,
     referralUpdate,
     winnerUpdate,
   ]);
 
-  // 6. Delete the loser contact
+  // 5. Delete the loser contact
   await dataProvider.delete<Contact>("contacts", {
     id: loserId,
     previousData: loserContact,

@@ -15,10 +15,6 @@ type MockDataProvider = {
     resource: string,
     params: any,
   ) => Promise<{ data: any[]; total: number }>;
-  getList: (
-    resource: string,
-    params?: any,
-  ) => Promise<{ data: any[]; total: number }>;
   update: (resource: string, params: any) => Promise<{ data: any }>;
   updateMany: (resource: string, params: any) => Promise<{ data: any[] }>;
   delete: (resource: string, params: any) => Promise<{ data: any }>;
@@ -39,7 +35,6 @@ const buildDataProvider = (
 ): DataProvider => {
   const dataProvider: MockDataProvider = {
     getOne: vi.fn(),
-    getList: vi.fn().mockResolvedValue({ data: [], total: 0 }),
     getManyReference: vi.fn().mockResolvedValue({ data: [], total: 0 }),
     update: vi.fn((_resource: string, params: any) =>
       Promise.resolve({ data: params.data }),
