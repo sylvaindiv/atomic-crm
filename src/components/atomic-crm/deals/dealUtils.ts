@@ -13,6 +13,12 @@ export function dealNeedsAction(dueDate?: string | null): boolean {
   return isOverdue(dueDate) || isDueToday(dueDate);
 }
 
+// Kept here so the still-existing deal screens (DealShow, DealColumn,
+// CompanyShow) don't need an import-path churn; the actual implementation
+// moved to a deal-free home shared with the contact page (TASK-003) and the
+// Kanban card / dashboard.
+export { formatDealAmount } from "../misc/formatAmount";
+
 export const findDealLabel = (statuses: LabeledValue[], dealValue: string) => {
   const status = statuses.find((status) => status.value === dealValue);
   return status?.label;
@@ -46,27 +52,4 @@ export function getRelativeTimeString(
 
 function ucFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-/** Placeholder shown in place of a formatted amount when a deal has no budget set. */
-const DEAL_AMOUNT_PLACEHOLDER = "–"; // en dash
-
-/**
- * Formats a deal's amount as compact currency, or a placeholder when the
- * deal has no budget (amount is optional -- see Deal['amount']). Factors out
- * the currency-formatting options duplicated across every deal amount
- * display site (DealShow, DealColumn, CompanyShow).
- */
-export function formatDealAmount(
-  amount: number | null | undefined,
-  currency: string,
-): string {
-  if (amount == null) return DEAL_AMOUNT_PLACEHOLDER;
-  return amount.toLocaleString("en-US", {
-    notation: "compact",
-    style: "currency",
-    currency,
-    currencyDisplay: "narrowSymbol",
-    minimumSignificantDigits: 3,
-  });
 }
