@@ -4,6 +4,7 @@ import {
   type DraggableStateSnapshot,
 } from "@hello-pangea/dnd";
 import { RecordContextProvider, useTranslate } from "ra-core";
+import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -58,6 +59,10 @@ const ContactKanbanCardContent = ({
       to={`?${params.toString()}`}
       className="block cursor-pointer"
       {...provided.draggableProps}
+      // @hello-pangea/dnd's `DraggingStyle` predates this project's
+      // `--radix-*` CSS custom-property augmentation of `CSSProperties` --
+      // same object, narrower type expected by `Link`.
+      style={provided.draggableProps.style as CSSProperties}
       {...provided.dragHandleProps}
       ref={provided.innerRef}
     >
