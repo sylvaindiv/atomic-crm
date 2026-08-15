@@ -92,7 +92,7 @@ export const frenchCrmMessages = {
         misc: "Divers",
         personal_info: "Informations personnelles",
         position: "Poste",
-        linked_deal: "Affaire liée",
+        case_info: "Infos de l'affaire",
       },
       fields: {
         first_name: "Prénom",
@@ -107,6 +107,8 @@ export const frenchCrmMessages = {
         phone_number: "Numéro de téléphone",
         linkedin_url: "URL LinkedIn",
         background: "Informations de contexte",
+        amount: "Budget",
+        description: "Description de l'affaire",
         has_newsletter: "Abonné à la newsletter",
         sales_id: "Responsable de compte",
         gender: "Genre",

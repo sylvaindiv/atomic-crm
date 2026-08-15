@@ -30,7 +30,7 @@ import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
 import { ContactTasksList } from "./ContactTasksList";
 import type { Contact } from "../types";
 import { Avatar } from "./Avatar";
-import { ContactAside, ContactLinkedDeal } from "./ContactAside";
+import { ContactAside, ContactCaseInfo } from "./ContactAside";
 import { MobileBackButton } from "../misc/MobileBackButton";
 
 export const ContactShow = (props: ShowBaseProps = {}) => {
@@ -218,7 +218,7 @@ const ContactShowContentMobile = () => {
                   <ContactBackgroundInfo />
                 </div>
               </div>
-              <ContactLinkedDeal />
+              <ContactCaseInfo />
               <div>
                 <h3 className="text-lg font-semibold">
                   {translate("resources.tags.name", { smart_count: 2 })}

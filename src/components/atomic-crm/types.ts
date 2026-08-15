@@ -110,6 +110,16 @@ export type Contact = {
   linked_deal_id?: Identifier | null;
   postal_code?: string;
   city?: string;
+  // Absorbed deal fields: the contact page is now the single page of the
+  // case ("Affaire") it represents, so budget and case description live
+  // directly on the contact instead of a separate linked deal record.
+  amount?: number | null;
+  description?: string;
+  index?: number;
+  // Computed column, mirroring Deal['next_action_due_date'] (contacts_summary
+  // view): the contact's earliest open task due_date. Read by the Kanban
+  // (TASK-004).
+  next_action_due_date?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {
