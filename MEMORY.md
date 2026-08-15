@@ -4,6 +4,11 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## Business Knowledge
 
+- The `deals` and `deal_notes` tables have been dropped entirely: a judge deal is now just a contact row (`amount`, `description`, `index` moved onto `contacts`), and club deals lost their dedicated representation (`companies.status`, `companies_summary.nb_deals` removed) — see `adr/ADR-33662640-TASK-001-fold-deals-into-contacts.md`.
+- The Kanban board now lives on the Contacts page itself (toggled via a table/kanban switcher, `contacts.viewMode` store key), grouped by contact `status` into the `noteStatuses` flagged `visibleInDealsKanban` (the config key name was deliberately kept as-is for compatibility even though it no longer refers to deals).
+- `contacts_summary.next_action_due_date` is now computed directly from the contact's own open tasks (`MIN(due_date)`), replacing the old `deals_summary` indirection through `contact_ids[0]`; `contacts_summary.linked_deal_id` was dropped.
+- The dashboard's amount chart component was renamed from `DealsChart` to `AmountChart`, reflecting that deal amounts now live directly on contacts rather than a separate deals pipeline.
+- `server/dealSync.mjs` (the former bidirectional contact/company-status <-> deal-stage sync) was removed as dead code along with the rest of the `src/components/atomic-crm/deals/` module.
 - The Kanban deal card is compact and shows, for judge deals only, a "club" sub-row (the referee's linked company, via `contact.company_id`) — club deals hide it since it would repeat the party name already shown.
 - Each deal card shows an urgency-colored countdown chip for its next-action due date (destructive if overdue, green if due today, amber if due tomorrow, muted "in N days" otherwise), and deals needing action (overdue or due today) float to the top of their Kanban column.
 - The deals list has a "To handle" toggle filter that shows only deals whose next action is due today or overdue (`next_action_due_date@lte` = end of today), mirroring the same overdue/today rule used for the card's sort order and countdown chip.
@@ -163,3 +168,9 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 **Prochaines étapes / TODOs.**
 - [ ] Affaires club existantes sans contact lié : non éditables tant qu'un contact + une action ne sont pas ajoutés
+
+## 2026-08-15 15:31 — Fusion Affaires (deals) dans Juge-Arbitre (contacts)
+**Résumé.** Le module "Affaires" (deals) a été supprimé et fusionné dans "Juge-Arbitre" (contacts) : une affaire n'était déjà qu'une paire (contact, statut) décorée (`dealSync.mjs` existait juste pour garder `deals.stage` synchro avec `contacts.status`). Plan validé après clarifications utilisateur, puis exécuté via l'agent harness (orchestrator/planner/developer/quality-reviewer/merger) en 9 tickets sur 3 vagues. Tout est implémenté, revu, fusionné et promu sur `deals-cards-layout-fixes` (commit 3fed742). L'utilisateur a approuvé la migration DB ; un orchestrateur dédié a été dispatché pour l'appliquer mais son process a été interrompu par une coupure de session avant confirmation.
+**Décisions prises.** - Suppression du concept `case_type='club'` : toute Affaire est un Juge-Arbitre, le club reste indicatif via `contacts.company_id`. - Kanban conservé en bascule secondaire (table/Kanban) sur la liste contacts. - Champs ajoutés à `contacts` : `amount`, `description`, `index` (pas de `category` ni d'archivage). - Notes fusionnées en un seul flux (`contact_notes`).
+**Fichiers / skills modifiés.** - `db/schema.sql` — champs contacts + suppression `deals`/`deal_notes`/`companies.status`. - `server/dealSync.mjs` — supprimé. - `src/components/atomic-crm/deals/` — dossier supprimé (~30 fichiers). - `contacts/`, `companies/`, `dashboard/`, `activity/` — retargetés.
+**Prochaines étapes / TODOs.** - [ ] Relancer en mode recovery l'orchestrateur de migration (agentId aa3d89c17d92a960c, session_dir .../33662640-...) interrompu par la coupure de session. - [ ] Vérifier manuellement d'éventuelles affaires `case_type='club'` en base avant application définitive.
