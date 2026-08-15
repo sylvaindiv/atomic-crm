@@ -62,6 +62,23 @@ export const frenchCrmMessages = {
         create_item: "Créer %{item}",
         create_label: "Commencez à taper pour créer un nouveau club",
       },
+      merge: {
+        action: "Fusionner avec un autre club",
+        confirm: "Fusionner les clubs",
+        current_contact: "Club actuel (sera supprimé)",
+        description: "Fusionnez ce club avec un autre.",
+        error: "Échec de la fusion des clubs",
+        merging: "Fusion...",
+        no_additional_data: "Aucune donnée supplémentaire à fusionner",
+        select_target: "Veuillez sélectionner un club avec lequel fusionner",
+        success: "Clubs fusionnés avec succès",
+        target_contact: "Club cible (sera conservé)",
+        title: "Fusionner le club",
+        warning_description:
+          "Toutes les données seront transférées au deuxième club. Cette action ne peut pas être annulée.",
+        warning_title: "Avertissement : opération destructrice",
+        what_will_be_merged: "Ce qui sera fusionné :",
+      },
       filters: {
         only_mine: "Seulement les clubs que je gère",
       },
@@ -223,6 +240,7 @@ export const frenchCrmMessages = {
         amount: "Budget",
         stage: "Étape",
         case_type: "Type d'affaire",
+        club_name: "Club",
       },
       case_types: {
         judge: "Juge",
@@ -235,6 +253,9 @@ export const frenchCrmMessages = {
       },
       field_categories: {
         misc: "Divers",
+      },
+      filters: {
+        needs_action: "À traiter",
       },
       archived: {
         action: "Archiver",
@@ -251,6 +272,12 @@ export const frenchCrmMessages = {
       },
       next_action_save_error:
         "La prochaine action n'a pas pu être enregistrée. L'affaire n'a pas été enregistrée non plus.",
+      next_action_due: {
+        overdue: "En retard",
+        today: "Aujourd'hui",
+        tomorrow: "Demain",
+        in_days: "%{smart_count}j",
+      },
       unarchived: {
         action: "Renvoyer au tableau",
         error: "Erreur : affaire non désarchivée",

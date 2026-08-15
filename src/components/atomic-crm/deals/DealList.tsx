@@ -18,6 +18,7 @@ import { DealEdit } from "./DealEdit";
 import { DealEmpty } from "./DealEmpty";
 import { DealListContent } from "./DealListContent";
 import { DealShow } from "./DealShow";
+import { NeedsActionInput } from "./NeedsActionInput";
 
 const DealList = () => {
   const { identity } = useGetIdentity();
@@ -27,6 +28,7 @@ const DealList = () => {
   if (!identity) return null;
 
   const dealFilters = [
+    <NeedsActionInput alwaysOn source="next_action_due_date@lte" />,
     <SearchInput source="q" alwaysOn />,
     <ReferenceInput source="company_id" reference="companies">
       <AutocompleteInput

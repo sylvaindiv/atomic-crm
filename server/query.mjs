@@ -1,6 +1,6 @@
 // CRUD + list query builders over libSQL, matching the react-admin DataProvider
 // method surface. Rows are (de)serialized per the resource's json/bool columns.
-import { db, tableColumns } from "./db.mjs";
+import { db, requiredColumns, tableColumns } from "./db.mjs";
 import { afterUpdate } from "./dealSync.mjs";
 import { buildWhere, quoteId } from "./filter.mjs";
 import { CASCADE, RESOURCES } from "./resources.mjs";
@@ -86,6 +86,27 @@ function assertWritable(cfg) {
   }
 }
 
+/**
+ * Reject a write missing a value for a required column (NOT NULL, not the
+ * primary key, no DEFAULT — see `requiredColumns` in server/db.mjs) with a
+ * readable error, before the INSERT/UPDATE is built. On create every
+ * required column must be present; on update a required column may simply
+ * be omitted (partial update) but not explicitly cleared to null/undefined.
+ */
+function assertRequiredColumns(cfg, data, { requireAllPresent }) {
+  const required = requiredColumns[cfg.table] ?? [];
+  for (const col of required) {
+    const present = Object.prototype.hasOwnProperty.call(data ?? {}, col);
+    if (!present) {
+      if (requireAllPresent) throw new Error(`${col} is required`);
+      continue;
+    }
+    if (data[col] === null || data[col] === undefined) {
+      throw new Error(`${col} is required`);
+    }
+  }
+}
+
 async function listWith(cfg, { filter, sort, pagination }, extra = []) {
   const where = buildWhere(filter, cfg, extra);
   const table = quoteId(cfg.table);
@@ -138,6 +159,7 @@ export async function getMany(cfg, { ids }) {
 
 export async function create(cfg, { data }) {
   assertWritable(cfg);
+  assertRequiredColumns(cfg, data, { requireAllPresent: true });
   const { columns, values } = prepareWrite(cfg, data);
   const table = quoteId(cfg.table);
   const sql =
@@ -152,6 +174,7 @@ export async function create(cfg, { data }) {
 
 export async function update(cfg, { id, data }) {
   assertWritable(cfg);
+  assertRequiredColumns(cfg, data, { requireAllPresent: false });
   const { columns, values } = prepareWrite(cfg, data);
   if (columns.length === 0) return getOne(cfg, { id });
   const assignments = columns.map((c) => `${quoteId(c)} = ?`).join(",");

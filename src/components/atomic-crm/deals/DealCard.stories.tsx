@@ -6,6 +6,7 @@ import type { Deal } from "../types";
 
 const meta = {
   title: "Atomic CRM/Deals/Deal Card",
+  excludeStories: ["judgeContactsData", "baseJudgeDeal"],
 } satisfies Meta;
 
 export default meta;
@@ -36,27 +37,40 @@ export const ClubDeal = () => (
   </StoryWrapper>
 );
 
+export const judgeContactsData = {
+  contacts: [
+    {
+      id: 1,
+      first_name: "Ada",
+      last_name: "Lovelace",
+      email_jsonb: [],
+      phone_jsonb: [],
+      tags: [],
+    } as any,
+  ],
+};
+
+export const baseJudgeDeal: Deal = {
+  ...baseDeal,
+  case_type: "judge",
+  company_id: null as unknown as number,
+  contact_ids: [1],
+};
+
 export const JudgeDeal = () => (
-  <StoryWrapper
-    data={{
-      contacts: [
-        {
-          id: 1,
-          first_name: "Ada",
-          last_name: "Lovelace",
-          email_jsonb: [],
-          phone_jsonb: [],
-          tags: [],
-        } as any,
-      ],
-    }}
-  >
+  <StoryWrapper data={judgeContactsData}>
+    <DealCardContent deal={baseJudgeDeal} />
+  </StoryWrapper>
+);
+
+export const JudgeDealWithClubAndNextAction = () => (
+  <StoryWrapper data={judgeContactsData}>
     <DealCardContent
       deal={{
-        ...baseDeal,
-        case_type: "judge",
-        company_id: null as unknown as number,
-        contact_ids: [1],
+        ...baseJudgeDeal,
+        club_name: "Padel Club Paris",
+        // Well in the past -- always overdue.
+        next_action_due_date: "2025-01-01T00:00:00.000Z",
       }}
     />
   </StoryWrapper>

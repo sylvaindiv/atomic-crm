@@ -4,6 +4,9 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 ## Business Knowledge
 
+- The Kanban deal card is compact and shows, for judge deals only, a "club" sub-row (the referee's linked company, via `contact.company_id`) — club deals hide it since it would repeat the party name already shown.
+- Each deal card shows an urgency-colored countdown chip for its next-action due date (destructive if overdue, green if due today, amber if due tomorrow, muted "in N days" otherwise), and deals needing action (overdue or due today) float to the top of their Kanban column.
+- The deals list has a "To handle" toggle filter that shows only deals whose next action is due today or overdue (`next_action_due_date@lte` = end of today), mirroring the same overdue/today rule used for the card's sort order and countdown chip.
 - A deal (judge or club) can never be saved without a "next action": the deal form upserts the linked contact's earliest open task from a non-persisted `next_action.*` mini-form (text/type/due_date all required), since tasks stay contact-scoped with no `deal_id` column.
 - Every deal, judge or club, now requires exactly one linked contact (`contact_ids`); previously only judge deals did.
 - A deal's `amount` is optional (nullable, no longer required), and `expected_closing_date` was dropped from the `deals` table entirely.

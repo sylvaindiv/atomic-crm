@@ -75,4 +75,13 @@ describe("NoteInputsMobile", () => {
       .element(screen.getByText("A note or an attachment is required"))
       .not.toBeInTheDocument();
   });
+
+  it("shows a validation error when submitting the contact selector without a choice", async () => {
+    const screen = await render(<WithSelectContact />);
+
+    await screen.getByPlaceholder("Add a note").fill("Call summary");
+    await screen.getByRole("button", { name: "Save" }).click();
+
+    await expect.element(screen.getByText("Required")).toBeVisible();
+  });
 });
