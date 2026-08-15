@@ -52,9 +52,7 @@ export const DealCardContent = ({
       <RecordContextProvider value={deal}>
         <Card
           className={`rounded-none border-0 py-3 transition-all duration-200 ${
-            snapshot?.isDragging
-              ? "opacity-90 shadow-lg"
-              : "hover:bg-muted/50"
+            snapshot?.isDragging ? "opacity-90 shadow-lg" : "hover:bg-muted/50"
           }`}
         >
           <CardContent className="px-3 flex flex-col">
