@@ -201,7 +201,11 @@ export type ActivityContactNoteCreated = {
 } & Pick<RaRecord, "id">;
 
 export type Activity = RaRecord &
-  (ActivityCompanyCreated | ActivityContactCreated | ActivityContactNoteCreated);
+  (
+    | ActivityCompanyCreated
+    | ActivityContactCreated
+    | ActivityContactNoteCreated
+  );
 
 export interface RAFile {
   src: string;
