@@ -53,7 +53,7 @@ test.describe("contacts Kanban", () => {
     await page.reload();
     await expect(page.getByRole("row", { name: "Alice Ada" })).toBeVisible();
 
-    await page.getByRole("button", { name: "Kanban" }).click();
+    await page.getByRole("radio", { name: "Kanban" }).click();
 
     const recontacterColumn = page.getByRole("group", {
       name: "A recontacter",
