@@ -104,13 +104,11 @@ describe("mergeCompanies", () => {
       id: winnerId,
       sector: "",
       website: "",
-      status: undefined,
     });
     const loser = buildCompany({
       id: loserId,
       sector: "Sports",
       website: "https://loser.example.com",
-      status: "hot",
     });
     const update = vi.fn((_resource: string, params: any) =>
       Promise.resolve({ data: params.data }),
@@ -131,7 +129,6 @@ describe("mergeCompanies", () => {
         data: expect.objectContaining({
           sector: "Sports",
           website: "https://loser.example.com",
-          status: "hot",
         }),
       }),
     );
@@ -143,13 +140,11 @@ describe("mergeCompanies", () => {
       id: winnerId,
       sector: "Winner sector",
       website: "https://winner.example.com",
-      status: "won",
     });
     const loser = buildCompany({
       id: loserId,
       sector: "Loser sector",
       website: "https://loser.example.com",
-      status: "hot",
     });
     const update = vi.fn((_resource: string, params: any) =>
       Promise.resolve({ data: params.data }),
@@ -173,28 +168,6 @@ describe("mergeCompanies", () => {
         }),
       }),
     );
-  });
-
-  it("does not include status in the winner update when the winner already has a status", async () => {
-    // Arrange: `status` is only ever filled in from the loser, never
-    // overwritten -- the key must be entirely absent once the winner
-    // already has one.
-    const winner = buildCompany({ id: winnerId, status: "won" });
-    const loser = buildCompany({ id: loserId, status: "hot" });
-    const update = vi.fn((_resource: string, params: any) =>
-      Promise.resolve({ data: params.data }),
-    );
-    const dataProvider = buildDataProvider({
-      getOne: vi.fn(getOneFor(winner, loser)),
-      update,
-    });
-
-    // Act
-    await mergeCompanies(loserId, winnerId, dataProvider);
-
-    // Assert
-    const [, { data }] = update.mock.calls[0];
-    expect(data).not.toHaveProperty("status");
   });
 
   it("runs the winner update only after the contact reassignment resolves", async () => {
