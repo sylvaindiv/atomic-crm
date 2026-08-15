@@ -6,26 +6,8 @@ import {
 } from "ra-core";
 import { render } from "vitest-browser-react";
 import { buildContact, StoryWrapper } from "@/test/StoryWrapper";
-import type { Deal } from "../types";
 import { ContactAside } from "./ContactAside";
 import { MobileSuccess } from "./ContactShow.mobile.stories";
-
-const buildLinkedDeal = (overrides: Partial<Deal> = {}): Deal => ({
-  id: 42,
-  name: "Padel Masters vs Riviera Open",
-  company_id: 1,
-  contact_ids: [],
-  category: "other",
-  case_type: "judge",
-  stage: "won",
-  description: "",
-  amount: 0,
-  created_at: "2025-01-01T09:00:00.000Z",
-  updated_at: "2025-01-01T09:00:00.000Z",
-  sales_id: 0,
-  index: 0,
-  ...overrides,
-});
 
 const mockIsMobile = vi.hoisted(() => vi.fn(() => true));
 vi.mock("@/hooks/use-mobile", () => ({
@@ -96,14 +78,16 @@ describe("ContactShow", () => {
       .toHaveTextContent("Visio");
   });
 
-  it("shows the linked deal with a link to it when the contact has one", async () => {
+  it("shows the case amount and description when the contact has them", async () => {
     mockIsMobile.mockReturnValue(false);
 
-    const deal = buildLinkedDeal();
-    const contact = buildContact({ linked_deal_id: deal.id });
+    const contact = buildContact({
+      amount: 500,
+      description: "Padel Masters vs Riviera Open",
+    });
 
     const screen = await render(
-      <StoryWrapper data={{ contacts: [contact], deals: [deal] }}>
+      <StoryWrapper data={{ contacts: [contact] }}>
         <ResourceContextProvider value="contacts">
           <ShowBase id={contact.id}>
             <ContactAside />
@@ -112,21 +96,20 @@ describe("ContactShow", () => {
       </StoryWrapper>,
     );
 
-    await expect.element(screen.getByText("Linked deal")).toBeVisible();
-    await expect.element(screen.getByText(deal.name)).toBeVisible();
-    await expect.element(screen.getByText("Won")).toBeVisible();
+    await expect.element(screen.getByText("Case info")).toBeVisible();
+    await expect.element(screen.getByText("$500")).toBeVisible();
     await expect
-      .element(screen.getByRole("link", { name: new RegExp(deal.name) }))
-      .toHaveAttribute("href", `/deals/${deal.id}/show`);
+      .element(screen.getByText("Padel Masters vs Riviera Open"))
+      .toBeVisible();
   });
 
-  it("renders no linked deal section when the contact has none", async () => {
+  it("shows the amount placeholder and no description row when the contact has neither", async () => {
     mockIsMobile.mockReturnValue(false);
 
-    const contact = buildContact({ linked_deal_id: null });
+    const contact = buildContact({ amount: null, description: undefined });
 
     const screen = await render(
-      <StoryWrapper data={{ contacts: [contact], deals: [] }}>
+      <StoryWrapper data={{ contacts: [contact] }}>
         <ResourceContextProvider value="contacts">
           <ShowBase id={contact.id}>
             <ContactAside />
@@ -135,8 +118,11 @@ describe("ContactShow", () => {
       </StoryWrapper>,
     );
 
-    // The aside still renders fully (no broken reference, no stuck loader).
-    await expect.element(screen.getByRole("combobox")).toBeVisible();
-    expect(screen.container.textContent?.includes("Linked deal")).toBe(false);
+    // The amount row always renders, with the shared en-dash placeholder.
+    await expect.element(screen.getByText("Case info")).toBeVisible();
+    await expect.element(screen.getByText("–")).toBeVisible();
+    expect(
+      screen.container.textContent?.includes("Case description"),
+    ).toBe(false);
   });
 });
