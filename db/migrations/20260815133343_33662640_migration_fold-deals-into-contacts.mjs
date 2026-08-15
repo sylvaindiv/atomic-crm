@@ -9,26 +9,34 @@
 //
 // See adr/ADR-33662640-TASK-001-fold-deals-into-contacts.md.
 //
-// BACKFILL / MANUAL-REVIEW GATE (read before running in production)
+// BACKFILL / MANUAL-REVIEW GATES (read before running in production)
 // -------------------------------------------------------------------------
-// Every 'judge' deal maps 1:1 onto a single contact (contact_ids[0]), so its
-// amount/description/index backfill onto that contact automatically below.
-// 'club' deals are company-scoped (no single obvious contact) and have no
-// clean 1:1 target among the columns moved onto `contacts`. This dev
-// workspace has no DB credentials to check the real Turso database for
-// such rows ahead of time, so this script performs the check itself, at
-// migration time:
+// A live (non-archived) 'judge' deal maps 1:1 onto a single contact
+// (contact_ids[0]) — mirroring the pre-session
+// `contacts_summary.linked_deal_id` semantics
+// (case_type='judge' AND archived_at IS NULL) — so its amount/description/
+// index backfill onto that contact automatically below. 'club' deals are
+// company-scoped (no single obvious contact) and have no clean 1:1 target
+// among the columns moved onto `contacts`. This dev workspace has no DB
+// credentials to check the real Turso database for problem rows ahead of
+// time, so this script performs every check itself, at migration time,
+// and refuses to drop anything if any of the following is non-empty:
 //
-//     SELECT * FROM deals WHERE case_type = 'club'
+//   - 'club' deals                                    (no 1:1 contact target)
+//   - 'judge' deals with a null/empty/invalid contact_ids  (nothing to backfill onto)
+//   - 'judge' deals sharing a live target contact with another 'judge' deal
+//     (no deterministic winner — never pick one arbitrarily)
+//   - 'judge' deals whose backfill UPDATE affected 0 rows (contact_ids[0]
+//     pointed at an already-deleted contact)
 //
-// If that query returns any rows, the script prints them and ABORTS
-// (non-zero exit) *before* touching contacts/deals/deal_notes/views or
+// If any of these is non-empty, the script prints the offending rows and
+// ABORTS (non-zero exit) *before* touching deals/deal_notes/views or
 // companies — no destructive statement runs. Re-running this script is
-// then safe (adding columns and backfilling judge deals is idempotent),
-// but the drop of `deals`/`deal_notes`/`companies.status` only proceeds
-// once that SELECT returns zero rows — i.e. once a human has manually
-// reviewed and resolved the flagged club-type deals (migrate them by
-// hand, or confirm they can be discarded) and re-runs the migration.
+// then safe (adding columns and backfilling clean judge deals is
+// idempotent), but the drop of `deals`/`deal_notes`/`companies.status`
+// only proceeds once every gate above is clear — i.e. once a human has
+// manually reviewed and resolved the flagged rows (migrate them by hand,
+// or confirm they can be discarded) and re-runs the migration.
 //
 // SQLite's `ALTER TABLE ... ADD/DROP COLUMN` has no `IF [NOT] EXISTS`
 // clause, so idempotency is enforced in JS via `pragma_table_info`,
@@ -84,35 +92,98 @@ for (const [column, ddl] of [
 // ── 2. Backfill 'judge' deals onto their single contact ────────────────────
 if (await hasTable("deals")) {
   // json_extract resolves contact_ids[0] in SQL directly — no need to
-  // JSON.parse a potentially malformed string in JS.
+  // JSON.parse a potentially malformed string in JS. Restrict to live
+  // (non-archived) judge deals: an archived deal must never clobber a
+  // contact's current amount/description/index — mirrors the pre-session
+  // `contacts_summary.linked_deal_id` semantics
+  // (case_type='judge' AND archived_at IS NULL).
   const { rows: judgeDeals } = await client.execute(`
-    SELECT amount, description, "index",
+    SELECT id, amount, description, "index",
            json_extract(CASE WHEN json_valid(contact_ids) THEN contact_ids ELSE '[]' END, '$[0]') AS contact_id
-    FROM deals WHERE case_type = 'judge'
+    FROM deals WHERE case_type = 'judge' AND archived_at IS NULL
   `);
-  let backfilled = 0;
+
+  // Deals whose contact_ids is null/empty/invalid have no target — they
+  // would otherwise be silently destroyed by the drop below.
+  const unresolved = judgeDeals.filter((deal) => deal.contact_id == null);
+
+  // Group by target contact: more than one *live* judge deal pointing at
+  // the same contact has no deterministic winner — picking one arbitrarily
+  // (last-write-wins) is exactly the silent-clobber bug this gate exists
+  // to prevent.
+  const byContact = new Map();
   for (const deal of judgeDeals) {
     if (deal.contact_id == null) continue;
-    await client.execute(
+    const bucket = byContact.get(deal.contact_id) ?? [];
+    bucket.push(deal);
+    byContact.set(deal.contact_id, bucket);
+  }
+  const ambiguous = [...byContact.values()]
+    .filter((bucket) => bucket.length > 1)
+    .flat();
+
+  const clean = judgeDeals.filter(
+    (deal) => deal.contact_id != null && byContact.get(deal.contact_id).length === 1,
+  );
+
+  // Deals whose contact_ids[0] points at a contact row that no longer
+  // exists match zero rows — track that explicitly instead of trusting a
+  // bare "it ran" success.
+  const failed = [];
+  let backfilled = 0;
+  for (const deal of clean) {
+    const result = await client.execute(
       'UPDATE contacts SET amount = ?, description = ?, "index" = ? WHERE id = ?',
       [deal.amount, deal.description, deal.index, deal.contact_id],
     );
-    backfilled++;
+    if (result.rowsAffected === 1) {
+      backfilled++;
+    } else {
+      failed.push(deal);
+    }
   }
   print(`Backfilled ${backfilled}/${judgeDeals.length} judge deal(s) onto contacts`);
 
-  // ── 3. Manual-review gate: refuse to drop anything while 'club' deals
-  //      exist — they have no 1:1 contact target. See header comment.
+  // ── 3. Manual-review gate: refuse to drop anything while any judge deal
+  //      failed to backfill cleanly, or a 'club' deal exists — none of
+  //      these have a safe automatic resolution. See header comment.
   const { rows: clubDeals } = await client.execute(
     "SELECT * FROM deals WHERE case_type = 'club'",
   );
-  if (clubDeals.length > 0) {
+  if (
+    unresolved.length > 0 ||
+    ambiguous.length > 0 ||
+    failed.length > 0 ||
+    clubDeals.length > 0
+  ) {
+    if (unresolved.length > 0) {
+      console.error(
+        `\n${unresolved.length} 'judge' deal(s) have no resolvable contact_ids[0]:\n` +
+          JSON.stringify(unresolved, null, 2),
+      );
+    }
+    if (ambiguous.length > 0) {
+      console.error(
+        `\n${ambiguous.length} 'judge' deal(s) share a contact with another live judge deal (no deterministic winner):\n` +
+          JSON.stringify(ambiguous, null, 2),
+      );
+    }
+    if (failed.length > 0) {
+      console.error(
+        `\n${failed.length} 'judge' deal(s) targeted a contact that no longer exists:\n` +
+          JSON.stringify(failed, null, 2),
+      );
+    }
+    if (clubDeals.length > 0) {
+      console.error(
+        `\n${clubDeals.length} 'club' deal(s) found — they have no single contact to backfill onto:\n` +
+          JSON.stringify(clubDeals, null, 2),
+      );
+    }
     console.error(
-      `\nABORTING: ${clubDeals.length} 'club' deal(s) found — they have no single contact to backfill onto:\n` +
-        JSON.stringify(clubDeals, null, 2) +
-        "\n\nManually review and resolve these rows (migrate or confirm discard), " +
+      "\nABORTING: manually review and resolve the row(s) above (migrate or confirm discard), " +
         "then re-run this migration. No destructive statement has been run — " +
-        "contacts columns were added/backfilled above, which is idempotent.",
+        "contacts columns were added/backfilled above for the clean rows, which is idempotent.",
     );
     client.close();
     process.exit(1);
@@ -121,8 +192,16 @@ if (await hasTable("deals")) {
   print("Skipped deals backfill (deals table already dropped)");
 }
 
-// ── 4. Drop deals_summary, deal_notes, deals (only once the gate above
+// ── 4. Drop deals_summary, deal_notes, deals (only once the gates above
 //      cleared, or the table was already dropped by a previous run) ───────
+if (await hasTable("deal_notes")) {
+  const { rows: countRows } = await client.execute(
+    "SELECT count(*) AS n FROM deal_notes",
+  );
+  print(
+    `Dropping deal_notes: ${countRows[0].n} row(s) (including any attachments) will be destroyed`,
+  );
+}
 await client.executeMultiple(`
 DROP VIEW IF EXISTS deals_summary;
 DROP TABLE IF EXISTS deal_notes;
@@ -154,15 +233,11 @@ FROM contacts co;
 `);
 print("Recreated contacts_summary view (added next_action_due_date, dropped linked_deal_id)");
 
-// ── 6. Drop companies.status ────────────────────────────────────────────
-if (await hasColumn("companies", "status")) {
-  await client.execute("ALTER TABLE companies DROP COLUMN status");
-  print("Dropped companies.status");
-} else {
-  print("Skipped companies.status (already absent)");
-}
-
-// ── 7. Recreate companies_summary: drop nb_deals ────────────────────────
+// ── 6. Recreate companies_summary: drop nb_deals. This MUST run before the
+//      companies.status column drop below — SQLite re-parses every view
+//      during ALTER TABLE ... DROP COLUMN, and the old view's nb_deals
+//      subquery still references the (already dropped, step 4) deals
+//      table, which would abort the ALTER with "SQL logic error". ────────
 await client.executeMultiple(`
 DROP VIEW IF EXISTS companies_summary;
 CREATE VIEW companies_summary AS
@@ -172,6 +247,14 @@ SELECT
 FROM companies c;
 `);
 print("Recreated companies_summary view (dropped nb_deals)");
+
+// ── 7. Drop companies.status ────────────────────────────────────────────
+if (await hasColumn("companies", "status")) {
+  await client.execute("ALTER TABLE companies DROP COLUMN status");
+  print("Dropped companies.status");
+} else {
+  print("Skipped companies.status (already absent)");
+}
 
 client.close();
 print(`Migration applied to ${url}`);
