@@ -73,7 +73,7 @@ export const DealListContent = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex gap-4">
+      <div className="flex divide-x divide-border">
         {visibleStatuses.map((status) => (
           <DealColumn
             stage={status.value}
