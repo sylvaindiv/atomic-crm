@@ -66,9 +66,6 @@ export type Company = {
   country: string;
   context_links?: string[];
   nb_contacts?: number;
-  nb_deals?: number;
-  // Same value space as Contact['status'] (see providers/commons/*CrmMessages).
-  status?: string;
 } & Pick<RaRecord, "id">;
 
 export type EmailAndType = {
@@ -103,20 +100,16 @@ export type Contact = {
   company_name?: string;
   referred_by_name?: string;
   latest_note_text?: string;
-  // Most recent non-archived 'judge' deal this contact is a party to
-  // (contacts_summary view). Null when there is none.
-  linked_deal_id?: Identifier | null;
   postal_code?: string;
   city?: string;
-  // Absorbed deal fields: the contact page is now the single page of the
-  // case ("Affaire") it represents, so budget and case description live
-  // directly on the contact instead of a separate linked deal record.
+  // Budget and case description: the contact page is the single page of
+  // the case ("Affaire") it represents, so these live directly on the
+  // contact rather than a separate linked record.
   amount?: number | null;
   description?: string;
   index?: number;
-  // Computed column, mirroring Deal['next_action_due_date'] (contacts_summary
-  // view): the contact's earliest open task due_date. Read by the Kanban
-  // (TASK-004).
+  // Computed column (contacts_summary view): the contact's earliest open
+  // task due_date. Read by the Kanban (TASK-004).
   next_action_due_date?: string | null;
 } & Pick<RaRecord, "id">;
 
@@ -127,39 +120,6 @@ export type ContactNote = {
   sales_id: Identifier;
   status: string;
   attachments?: AttachmentNote[];
-} & Pick<RaRecord, "id">;
-
-export type Deal = {
-  name: string;
-  company_id: Identifier;
-  contact_ids: Identifier[];
-  category: string;
-  // 'judge' | 'club'. Named case_type (not "type") to avoid a conceptual
-  // collision with DealNote['type'] / Task['type'].
-  case_type: "judge" | "club";
-  stage: string;
-  description: string;
-  amount?: number | null;
-  created_at: string;
-  updated_at: string;
-  archived_at?: string;
-  sales_id: Identifier;
-  index: number;
-  // Computed columns from the deals_summary view (read-only, absent on writes).
-  club_name?: string | null;
-  contact_name?: string | null;
-  next_action_due_date?: string | null;
-} & Pick<RaRecord, "id">;
-
-export type DealNote = {
-  deal_id: Identifier;
-  text: string;
-  date: string;
-  sales_id: Identifier;
-  attachments?: AttachmentNote[];
-
-  // This is defined for compatibility with `ContactNote`
-  status?: undefined;
 } & Pick<RaRecord, "id">;
 
 export type Tag = {
@@ -224,7 +184,7 @@ export interface LabeledValue {
 
 export interface NoteStatus extends LabeledValue {
   color: string;
-  // Whether a note-status is one of the deals Kanban columns.
+  // Whether a note-status is one of the contacts Kanban columns.
   visibleInDealsKanban: boolean;
 }
 

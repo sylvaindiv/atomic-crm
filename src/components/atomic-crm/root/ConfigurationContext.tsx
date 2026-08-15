@@ -9,7 +9,6 @@ export const CONFIGURATION_STORE_KEY = "app.configuration";
 export interface ConfigurationContextValue {
   companySectors: LabeledValue[];
   currency: string;
-  dealCategories: LabeledValue[];
   noteStatuses: NoteStatus[];
   taskTypes: LabeledValue[];
   title: string;

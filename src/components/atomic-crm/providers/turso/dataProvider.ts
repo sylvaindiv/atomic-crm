@@ -7,8 +7,6 @@ import {
 } from "ra-core";
 import type {
   ContactNote,
-  Deal,
-  DealNote,
   RAFile,
   Sale,
   SalesFormData,
@@ -76,9 +74,6 @@ const getDataProviderWithCustomMethods = () => {
       if (resource === "contacts") {
         return baseDataProvider.getList("contacts_summary", params);
       }
-      if (resource === "deals") {
-        return baseDataProvider.getList("deals_summary", params);
-      }
       if (resource === "activity_log") {
         const { filter = {}, pagination } = params;
         const all = await getActivityLog(
@@ -101,9 +96,6 @@ const getDataProviderWithCustomMethods = () => {
       }
       if (resource === "contacts") {
         return baseDataProvider.getOne("contacts_summary", params);
-      }
-      if (resource === "deals") {
-        return baseDataProvider.getOne("deals_summary", params);
       }
       return baseDataProvider.getOne(resource, params);
     },
@@ -166,29 +158,6 @@ const getDataProviderWithCustomMethods = () => {
       // No real authentication in this deployment: nothing to reset.
       return true;
     },
-    async unarchiveDeal(deal: Deal) {
-      const { data: deals } = await baseDataProvider.getList<Deal>("deals", {
-        filter: { stage: deal.stage },
-        pagination: { page: 1, perPage: 1000 },
-        sort: { field: "index", order: "ASC" },
-      });
-
-      const updatedDeals = deals.map((d, index) => ({
-        ...d,
-        index: d.id === deal.id ? 0 : index + 1,
-        archived_at: d.id === deal.id ? null : d.archived_at,
-      }));
-
-      return await Promise.all(
-        updatedDeals.map((updatedDeal) =>
-          baseDataProvider.update("deals", {
-            id: updatedDeal.id,
-            data: updatedDeal,
-            previousData: deals.find((d) => d.id === updatedDeal.id),
-          }),
-        ),
-      );
-    },
     async isInitialized() {
       return getIsInitialized();
     },
@@ -236,17 +205,6 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
   {
     resource: "contact_notes",
     beforeSave: async (data: ContactNote, _, __) => {
-      if (data.attachments) {
-        data.attachments = await Promise.all(
-          data.attachments.map((fi) => processRAFile(fi)),
-        );
-      }
-      return data;
-    },
-  },
-  {
-    resource: "deal_notes",
-    beforeSave: async (data: DealNote, _, __) => {
       if (data.attachments) {
         data.attachments = await Promise.all(
           data.attachments.map((fi) => processRAFile(fi)),
@@ -308,12 +266,6 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
     resource: "contacts_summary",
     beforeGetList: async (params) => {
       return applyFullTextSearch(["first_name", "last_name"])(params);
-    },
-  },
-  {
-    resource: "deals",
-    beforeGetList: async (params) => {
-      return applyFullTextSearch(["name", "category", "description"])(params);
     },
   },
 ];

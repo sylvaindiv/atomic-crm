@@ -16,9 +16,9 @@ import {
  * Contacts Kanban board: one column per note status flagged visible in the
  * Kanban (`contactStages.ts`), drag & drop across and within columns
  * persisting `status` + `index` on the `contacts` resource. Ported from
- * `deals/DealListContent.tsx` + `DealColumn.tsx` (TASK-004) -- see
- * `adr/ADR-33662640-TASK-001-fold-deals-into-contacts.md` for why the
- * Kanban moved from deals to contacts.
+ * the former deals module's Kanban (TASK-004) -- see
+ * `adr/ADR-33662640-TASK-001-fold-deals-into-contacts.md` for why it
+ * moved onto contacts.
  */
 export const ContactKanban = () => {
   const { noteStatuses } = useConfigurationContext();

@@ -2,11 +2,9 @@ import { isDueToday, isOverdue } from "../tasks/tasksPredicate";
 
 /**
  * Whether a next-action due date is due today or overdue -- the shared
- * "needs action" rule. Deal-free (fed only by a raw due date, not a Deal or
- * Contact record) so it can back the contacts Kanban column sort and
- * countdown chip (`contacts/kanban/`, TASK-004) as well as the pre-existing
- * deals Kanban (re-exported as `dealNeedsAction` by `deals/dealUtils.ts`)
- * without the two drifting apart.
+ * "needs action" rule. Fed only by a raw due date (not a Contact record)
+ * so it can back the contacts Kanban column sort and countdown chip
+ * (`contacts/kanban/`, TASK-004).
  */
 export function needsAction(dueDate?: string | null): boolean {
   if (!dueDate) return false;

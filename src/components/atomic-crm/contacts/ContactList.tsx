@@ -65,9 +65,9 @@ export const ContactList = () => {
     <List
       title={false}
       actions={<ContactListActions onCreate={() => setCreateOpen(true)} />}
-      // The Kanban loads the full unpaginated contact set (like the former
-      // deals board did) instead of the table's regular page size, so it
-      // gets its own store slot for list params (perPage/sort/filters).
+      // The Kanban loads the full unpaginated contact set instead of the
+      // table's regular page size, so it gets its own store slot for list
+      // params (perPage/sort/filters).
       perPage={isKanban ? 100 : 25}
       pagination={isKanban ? null : undefined}
       sort={
