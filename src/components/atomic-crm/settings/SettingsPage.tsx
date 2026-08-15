@@ -1,22 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 import { RotateCcw, Save } from "lucide-react";
-import type { RaRecord } from "ra-core";
-import {
-  EditBase,
-  Form,
-  useGetList,
-  useInput,
-  useNotify,
-  useTranslate,
-} from "ra-core";
-import { useCallback, useMemo } from "react";
+import { EditBase, Form, useInput, useNotify, useTranslate } from "ra-core";
+import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { toSlug } from "@/lib/toSlug";
 import { ArrayInput } from "@/components/admin/array-input";
-import { AutocompleteInput } from "@/components/admin/autocomplete-input";
 import { BooleanInput } from "@/components/admin/boolean-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 import { TextInput } from "@/components/admin/text-input";
@@ -40,7 +30,6 @@ const SECTIONS = [
     label: "resources.companies.name",
     fallback: "Clubs",
   },
-  { id: "deals", label: "resources.deals.name", fallback: "Deals" },
   { id: "notes", label: "resources.notes.name", fallback: "Notes" },
   { id: "tasks", label: "resources.tasks.name", fallback: "Tasks" },
 ];
@@ -49,74 +38,6 @@ const SECTIONS = [
 const ensureValues = (items: { value?: string; label: string }[] | undefined) =>
   items?.map((item) => ({ ...item, value: item.value || toSlug(item.label) }));
 
-type ValidateItemsInUseMessages = {
-  duplicate?: (displayName: string, duplicates: string[]) => string;
-  inUse?: (displayName: string, inUse: string[]) => string;
-  validating?: string;
-};
-
-/**
- * Validate that no items were removed if they are still referenced by existing deals.
- * Also rejects duplicate slug values.
- * Returns undefined if valid, or an error message string.
- */
-export const validateItemsInUse = (
-  items: { value: string; label: string }[] | undefined,
-  deals: RaRecord[] | undefined,
-  fieldName: string,
-  displayName: string,
-  messages?: ValidateItemsInUseMessages,
-) => {
-  if (!items) return undefined;
-  // Check for duplicate slugs
-  const slugs = items.map((i) => i.value || toSlug(i.label));
-  const seen = new Set<string>();
-  const duplicates = new Set<string>();
-  for (const slug of slugs) {
-    if (seen.has(slug)) duplicates.add(slug);
-    seen.add(slug);
-  }
-  if (duplicates.size > 0) {
-    const duplicatesList = [...duplicates];
-    return (
-      messages?.duplicate?.(displayName, duplicatesList) ??
-      `Duplicate ${displayName}: ${duplicatesList.join(", ")}`
-    );
-  }
-  // Check that no in-use value was removed (skip if deals haven't loaded)
-  if (!deals) return messages?.validating ?? "Validating…";
-  const values = new Set(slugs);
-  const inUse = [
-    ...new Set(
-      deals
-        .filter(
-          (deal) => deal[fieldName] && !values.has(deal[fieldName] as string),
-        )
-        .map((deal) => deal[fieldName] as string),
-    ),
-  ];
-  if (inUse.length > 0) {
-    return (
-      messages?.inUse?.(displayName, inUse) ??
-      `Cannot remove ${displayName} that are still used by deals: ${inUse.join(", ")}`
-    );
-  }
-  return undefined;
-};
-
-const getCurrencyChoices = () => {
-  const displayNames = new Intl.DisplayNames(
-    typeof navigator !== "undefined"
-      ? (navigator.languages as string[])
-      : ["en"],
-    { type: "currency" },
-  );
-  return Intl.supportedValuesOf("currency").map((code) => ({
-    id: code,
-    name: `${code} – ${displayNames.of(code)}`,
-  }));
-};
-
 export const transformFormValues = (data: Record<string, any>) => ({
   config: {
     title: data.title,
@@ -124,7 +45,6 @@ export const transformFormValues = (data: Record<string, any>) => ({
     darkModeLogo: data.darkModeLogo,
     currency: data.currency,
     companySectors: ensureValues(data.companySectors),
-    dealCategories: ensureValues(data.dealCategories),
     taskTypes: ensureValues(data.taskTypes),
     noteStatuses: ensureValues(data.noteStatuses),
   } as ConfigurationContextValue,
@@ -170,7 +90,6 @@ const SettingsForm = () => {
       darkModeLogo: { src: config.darkModeLogo },
       currency: config.currency,
       companySectors: config.companySectors,
-      dealCategories: config.dealCategories,
       taskTypes: config.taskTypes,
       noteStatuses: config.noteStatuses,
     }),
@@ -186,37 +105,10 @@ const SettingsForm = () => {
 
 const SettingsFormFields = () => {
   const translate = useTranslate();
-  const currencyChoices = useMemo(() => getCurrencyChoices(), []);
   const {
     reset,
     formState: { isSubmitting },
   } = useFormContext();
-
-  const categoryDisplayName = translate(
-    "crm.settings.validation.entities.categories",
-  );
-
-  const { data: deals } = useGetList("deals", {
-    pagination: { page: 1, perPage: 1000 },
-  });
-
-  const validateDealCategories = useCallback(
-    (categories: { value: string; label: string }[] | undefined) =>
-      validateItemsInUse(categories, deals, "category", categoryDisplayName, {
-        duplicate: (displayName, duplicates) =>
-          translate("crm.settings.validation.duplicate", {
-            display_name: displayName,
-            items: duplicates.join(", "),
-          }),
-        inUse: (displayName, inUse) =>
-          translate("crm.settings.validation.in_use", {
-            display_name: displayName,
-            items: inUse.join(", "),
-          }),
-        validating: translate("crm.settings.validation.validating"),
-      }),
-    [categoryDisplayName, deals, translate],
-  );
 
   return (
     <div className="flex gap-8 mt-4 pb-20">
@@ -296,43 +188,6 @@ const SettingsFormFields = () => {
               source="companySectors"
               label={false}
               helperText={false}
-            >
-              <SimpleFormIterator disableReordering disableClear>
-                <TextInput source="label" label={false} />
-              </SimpleFormIterator>
-            </ArrayInput>
-          </CardContent>
-        </Card>
-
-        {/* Deals */}
-        <Card id="deals">
-          <CardContent className="space-y-4">
-            <h2 className="text-xl font-semibold text-muted-foreground">
-              {translate("resources.deals.name", {
-                smart_count: 2,
-              })}
-            </h2>
-            <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.deals.currency")}
-            </h3>
-            <AutocompleteInput
-              source="currency"
-              label={false}
-              choices={currencyChoices}
-              inputText={(choice) => choice?.id}
-              modal
-            />
-
-            <Separator />
-
-            <h3 className="text-lg font-medium text-muted-foreground">
-              {translate("crm.settings.deals.categories")}
-            </h3>
-            <ArrayInput
-              source="dealCategories"
-              label={false}
-              helperText={false}
-              validate={validateDealCategories}
             >
               <SimpleFormIterator disableReordering disableClear>
                 <TextInput source="label" label={false} />
