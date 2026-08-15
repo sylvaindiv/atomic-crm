@@ -1,7 +1,6 @@
 // CRUD + list query builders over libSQL, matching the react-admin DataProvider
 // method surface. Rows are (de)serialized per the resource's json/bool columns.
 import { db, requiredColumns, tableColumns } from "./db.mjs";
-import { afterUpdate } from "./dealSync.mjs";
 import { buildWhere, quoteId } from "./filter.mjs";
 import { CASCADE, RESOURCES } from "./resources.mjs";
 
@@ -184,9 +183,7 @@ export async function update(cfg, { id, data }) {
   });
   const rows = serialize(cfg, toObjects(res));
   if (rows.length === 0) throw new Error(`${cfg.table} #${id} not found`);
-  const updated = rows[0];
-  await afterUpdate(db, cfg.table, data, updated);
-  return { data: updated };
+  return { data: rows[0] };
 }
 
 export async function updateMany(cfg, { ids, data }) {
