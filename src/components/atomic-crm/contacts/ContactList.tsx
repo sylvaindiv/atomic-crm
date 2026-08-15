@@ -21,7 +21,13 @@ import { SelectAllButton } from "@/components/admin/select-all-button";
 import { SortButton } from "@/components/admin/sort-button";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  LayoutGrid,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Table2,
+} from "lucide-react";
 
 import type { Company, Contact, ContactNote, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";
@@ -38,13 +44,20 @@ import { TopToolbar } from "../layout/TopToolbar";
 import { InfinitePagination } from "../misc/InfinitePagination";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
+import { ContactKanban } from "./kanban/ContactKanban";
 import { ContactTable } from "./table/ContactTable";
+
+type ContactViewMode = "table" | "kanban";
+
+const VIEW_MODE_STORE_KEY = "contacts.viewMode";
 
 export const ContactList = () => {
   const { identity } = useGetIdentity();
   const [searchParams] = useSearchParams();
   const showId = searchParams.get("show");
   const [createOpen, setCreateOpen] = useState(false);
+  const [viewMode] = useStore<ContactViewMode>(VIEW_MODE_STORE_KEY, "table");
+  const isKanban = viewMode === "kanban";
 
   if (!identity) return null;
 
@@ -52,18 +65,31 @@ export const ContactList = () => {
     <List
       title={false}
       actions={<ContactListActions onCreate={() => setCreateOpen(true)} />}
-      perPage={25}
-      sort={{ field: "last_seen", order: "DESC" }}
+      // The Kanban loads the full unpaginated contact set instead of the
+      // table's regular page size, so it gets its own store slot for list
+      // params (perPage/sort/filters).
+      perPage={isKanban ? 100 : 25}
+      pagination={isKanban ? null : undefined}
+      sort={
+        isKanban
+          ? { field: "index", order: "ASC" }
+          : { field: "last_seen", order: "DESC" }
+      }
+      storeKey={isKanban ? "contacts.kanban.listParams" : undefined}
       exporter={exporter}
     >
-      <ContactListLayoutDesktop />
+      <ContactListLayoutDesktop viewMode={viewMode} />
       <ContactShowSheet open={!!showId} id={showId ?? undefined} />
       <ContactCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
     </List>
   );
 };
 
-const ContactListLayoutDesktop = () => {
+const ContactListLayoutDesktop = ({
+  viewMode,
+}: {
+  viewMode: ContactViewMode;
+}) => {
   const { data, isPending, filterValues } = useListContext();
   const [filterPanelOpen] = useStore<boolean>("contacts.filterPanelOpen", true);
 
@@ -77,13 +103,19 @@ const ContactListLayoutDesktop = () => {
     <div className="flex flex-row gap-8">
       {filterPanelOpen && <ContactListFilter />}
       <div className="w-full flex flex-col gap-4">
-        <Card className="py-0">
-          <ContactTable />
-        </Card>
+        {viewMode === "kanban" ? (
+          <ContactKanban />
+        ) : (
+          <Card className="py-0">
+            <ContactTable />
+          </Card>
+        )}
       </div>
-      <BulkActionsToolbar>
-        <ContactBulkActionButtons />
-      </BulkActionsToolbar>
+      {viewMode === "table" && (
+        <BulkActionsToolbar>
+          <ContactBulkActionButtons />
+        </BulkActionsToolbar>
+      )}
     </div>
   );
 };
@@ -103,11 +135,40 @@ const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
     "contacts.filterPanelOpen",
     true,
   );
+  const [viewMode, setViewMode] = useStore<ContactViewMode>(
+    VIEW_MODE_STORE_KEY,
+    "table",
+  );
 
   return (
     <TopToolbar>
-      <SortButton fields={["first_name", "last_name", "last_seen"]} />
-      <ColumnsButton />
+      <ToggleGroup
+        type="single"
+        value={viewMode}
+        onValueChange={(value) =>
+          value && setViewMode(value as ContactViewMode)
+        }
+        variant="outline"
+      >
+        <ToggleGroupItem
+          value="table"
+          aria-label={translate("crm.kanban.view_table", { _: "Table" })}
+        >
+          <Table2 className="size-4" />
+        </ToggleGroupItem>
+        <ToggleGroupItem
+          value="kanban"
+          aria-label={translate("crm.kanban.view_kanban", { _: "Kanban" })}
+        >
+          <LayoutGrid className="size-4" />
+        </ToggleGroupItem>
+      </ToggleGroup>
+      {viewMode === "table" && (
+        <>
+          <SortButton fields={["first_name", "last_name", "last_seen"]} />
+          <ColumnsButton />
+        </>
+      )}
       <Button
         variant="ghost"
         size="icon"

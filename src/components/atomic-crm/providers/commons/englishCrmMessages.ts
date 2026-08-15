@@ -10,7 +10,6 @@ export const englishCrmMessages = {
         phone_number: "Phone number",
         created_at: "Created at",
         nb_contacts: "Number of judges-referees",
-        nb_deals: "Number of deals",
         revenue: "Revenue",
         sector: "Sector",
         size: "Size",
@@ -23,7 +22,6 @@ export const englishCrmMessages = {
         description: "Description",
         context_links: "Context links",
         sales_id: "Account manager",
-        status: "Status",
       },
       empty: {
         description: "It seems your club list is empty.",
@@ -47,7 +45,6 @@ export const englishCrmMessages = {
       no_contacts: "No judge-referee",
       nb_contacts:
         "%{smart_count} judge-referee |||| %{smart_count} judges-referees",
-      nb_deals: "%{smart_count} deal |||| %{smart_count} deals",
       sizes: {
         one_employee: "1 employee",
         two_to_nine_employees: "2-9 employees",
@@ -92,7 +89,7 @@ export const englishCrmMessages = {
         misc: "Misc",
         personal_info: "Personal info",
         position: "Position",
-        linked_deal: "Linked deal",
+        case_info: "Case info",
       },
       fields: {
         first_name: "First name",
@@ -107,6 +104,8 @@ export const englishCrmMessages = {
         phone_number: "Phone number",
         linkedin_url: "LinkedIn URL",
         background: "Background info (bio, how you met, etc)",
+        amount: "Budget",
+        description: "Case description",
         has_newsletter: "Has newsletter",
         sales_id: "Account manager",
         gender: "Gender",
@@ -210,6 +209,9 @@ export const englishCrmMessages = {
         before_this_month: "Before this month",
         before_this_week: "Before this week",
         managed_by_me: "Managed by me",
+        // Mirrors the Kanban column sort / countdown chip's "needs action"
+        // rule (next action overdue or due today).
+        needs_action: "To handle",
         search: "Search name, club...",
         this_week: "This week",
         today: "Today",
@@ -223,69 +225,6 @@ export const englishCrmMessages = {
         title: "Hot Prospects",
       },
     },
-    deals: {
-      name: "Deal |||| Deals",
-      fields: {
-        name: "Name",
-        description: "Description",
-        company_id: "Club",
-        // Singular: capped at one linked contact, for both case types. See
-        // the same convention on notes.fields.contact_id / tasks.fields.contact_id.
-        contact_ids: "Judge-Referee",
-        category: "Category",
-        amount: "Budget",
-        stage: "Stage",
-        case_type: "Case type",
-        club_name: "Club",
-      },
-      case_types: {
-        judge: "Judge",
-        club: "Club",
-      },
-      action: {
-        back_to_deal: "Back to deal",
-        create: "Create deal",
-        new: "New Deal",
-      },
-      field_categories: {
-        misc: "Misc",
-      },
-      filters: {
-        needs_action: "To handle",
-      },
-      archived: {
-        action: "Archive",
-        error: "Error: deal not archived",
-        list_title: "Archived Deals",
-        success: "Deal archived",
-        title: "Archived Deal",
-        view: "View archived deals",
-      },
-      inputs: {
-        linked_to: "Linked to",
-        next_action: "Next action",
-        next_action_text: "What's next",
-      },
-      next_action_save_error:
-        "The next action could not be saved. The deal was not saved either.",
-      next_action_due: {
-        overdue: "Overdue",
-        today: "Due today",
-        tomorrow: "Due tomorrow",
-        in_days: "%{smart_count}d",
-      },
-      unarchived: {
-        action: "Send back to the board",
-        error: "Error: deal not unarchived",
-        success: "Deal unarchived",
-      },
-      updated: "Deal updated",
-      empty: {
-        before_create: "before creating a deal.",
-        description: "It seems your deal list is empty.",
-        title: "No deals found",
-      },
-    },
     notes: {
       name: "Note |||| Notes",
       forcedCaseName: "Note",
@@ -294,7 +233,6 @@ export const englishCrmMessages = {
         date: "Date",
         attachments: "Attachments",
         contact_id: "Judge-Referee",
-        deal_id: "Deal",
       },
       action: {
         add: "Add note",
@@ -468,17 +406,12 @@ export const englishCrmMessages = {
       you_added_contact: "You added",
       added_note: "%{name} added a note about",
       you_added_note: "You added a note about",
-      added_note_about_deal: "%{name} added a note about deal",
-      you_added_note_about_deal: "You added a note about deal",
-      added_deal: "%{name} added deal",
-      you_added_deal: "You added deal",
       at_company: "at",
       to: "to",
       load_more: "Load more activity",
     },
     dashboard: {
-      deals_chart: "Upcoming Deal Revenue",
-      deals_pipeline: "Deals Pipeline",
+      amount_chart: "Upcoming Amount",
       latest_activity: "Latest Activity",
       latest_activity_error: "Error loading latest activity",
       latest_notes: "My Latest Notes",
@@ -492,6 +425,19 @@ export const englishCrmMessages = {
     },
     header: {
       import_data: "Import data",
+    },
+    // Namespace for the contacts Kanban toggle and its countdown chip
+    // (TASK-004) -- not scoped to `resources.contacts` since it may back
+    // another entity's Kanban later.
+    kanban: {
+      view_table: "Table",
+      view_kanban: "Kanban",
+      next_action_due: {
+        overdue: "Overdue",
+        today: "Due today",
+        tomorrow: "Due tomorrow",
+        in_days: "%{smart_count}d",
+      },
     },
     image_editor: {
       change: "Change",
@@ -533,18 +479,10 @@ export const englishCrmMessages = {
         sectors: "Sectors",
       },
       dark_mode_logo: "Dark Mode Logo",
-      deals: {
-        categories: "Categories",
-        currency: "Currency",
-        pipeline_help:
-          "Select which deal stages should count as pipeline deals.",
-        pipeline_statuses: "Pipeline Statuses",
-        stages: "Stages",
-      },
       light_mode_logo: "Light Mode Logo",
       notes: {
         statuses: "Statuses",
-        visible_in_kanban: "Visible in Deals Kanban",
+        visible_in_kanban: "Visible in Kanban",
       },
       reset_defaults: "Reset to Defaults",
       save_error: "Failed to save configuration",
@@ -558,16 +496,6 @@ export const englishCrmMessages = {
       app_title: "App Title",
       sections: {
         branding: "Branding",
-      },
-      validation: {
-        duplicate: "Duplicate %{display_name}: %{items}",
-        in_use:
-          "Cannot remove %{display_name} that are still used by deals: %{items}",
-        validating: "Validating…",
-        entities: {
-          categories: "categories",
-          stages: "stages",
-        },
       },
     },
     theme: {

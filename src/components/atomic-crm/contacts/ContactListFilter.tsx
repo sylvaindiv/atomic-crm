@@ -1,4 +1,10 @@
-import { endOfYesterday, startOfMonth, startOfWeek, subMonths } from "date-fns";
+import {
+  endOfToday,
+  endOfYesterday,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
 import { CheckSquare, Clock, Tag, TrendingUp, Users } from "lucide-react";
 import {
   useGetIdentity,
@@ -140,6 +146,14 @@ export const ContactListFilter = () => {
           value={{ "nb_tasks@gt": 0 }}
           size={isMobile ? "lg" : undefined}
         />
+        {/* Mirrors the Kanban column sort / countdown chip's "needs action"
+            rule (next action overdue or due today) -- see misc/nextAction.ts. */}
+        <ToggleFilterButton
+          className="w-full justify-between h-10 md:h-8"
+          label="resources.contacts.filters.needs_action"
+          value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
+          size={isMobile ? "lg" : undefined}
+        />
       </FilterCategory>
 
       <FilterCategory
@@ -254,6 +268,12 @@ export const ContactListFilterSummary = () => {
         className="w-auto justify-between h-8"
         label="resources.tasks.filters.with_pending"
         value={{ "nb_tasks@gt": 0 }}
+      />
+
+      <ActiveFilterButton
+        className="w-auto justify-between h-8"
+        label="resources.contacts.filters.needs_action"
+        value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
       />
 
       <ActiveFilterButton

@@ -11,8 +11,6 @@ const adminSupabase = createClient(
 const TABLES = [
   "tasks",
   "contact_notes",
-  "deal_notes",
-  "deals",
   "contacts",
   "companies",
   "tags",
@@ -140,43 +138,6 @@ async function createCompany({
   return data;
 }
 
-async function createDeal({
-  name,
-  stage = "a_recontacter",
-  caseType = "club",
-  companyId = null,
-  amount = null,
-  salesId,
-}: {
-  name: string;
-  stage?: string;
-  caseType?: "judge" | "club";
-  companyId?: string | number | null;
-  amount?: number | null;
-  salesId: string | number;
-}) {
-  const { data, error } = await adminSupabase
-    .from("deals")
-    .insert({
-      name,
-      stage,
-      case_type: caseType,
-      company_id: companyId,
-      contact_ids: [],
-      amount,
-      sales_id: salesId,
-      index: 0,
-    })
-    .select("id")
-    .single();
-
-  if (error) {
-    throw new Error(`Failed to create deal: ${error.message}`);
-  }
-
-  return data;
-}
-
 async function createContact({
   first_name,
   last_name,
@@ -184,6 +145,11 @@ async function createContact({
   company_id = null,
   sales_id,
   notes = [],
+  // Note status (e.g. one of the configured `noteStatuses` values, distinct
+  // from the notes' own "cold"/"warm"/"hot" status below) -- lets a test
+  // place a contact in a specific Kanban column (TASK-004).
+  status = "cold",
+  index = 0,
 }: {
   first_name: string;
   last_name: string;
@@ -195,6 +161,8 @@ async function createContact({
     date?: string;
     status?: "cold" | "warm" | "hot";
   }[];
+  status?: string;
+  index?: number;
 }) {
   const { data, error } = await adminSupabase
     .from("contacts")
@@ -209,7 +177,8 @@ async function createContact({
       has_newsletter: false,
       tags: [],
       gender: "unknown",
-      status: "cold",
+      status,
+      index,
       background: "",
       email_jsonb: [],
       phone_jsonb: [],
@@ -254,7 +223,6 @@ export const test = base.extend<{
   createSales: typeof createSales;
   createCompany: typeof createCompany;
   createContact: typeof createContact;
-  createDeal: typeof createDeal;
   createNotes: typeof createNotes;
   menu: ReturnType<typeof getMenuMethod>;
   dismissToast: (content: string) => Promise<void>;
@@ -284,10 +252,6 @@ export const test = base.extend<{
   // eslint-disable-next-line no-empty-pattern
   createContact: async ({}, cb) => {
     await cb(createContact);
-  },
-  // eslint-disable-next-line no-empty-pattern
-  createDeal: async ({}, cb) => {
-    await cb(createDeal);
   },
   // eslint-disable-next-line no-empty-pattern
   createNotes: async ({}, cb) => {

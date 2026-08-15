@@ -7,7 +7,6 @@ import type { Company } from "../../types";
 import { CompanyAvatar } from "../CompanyAvatar";
 import { getTranslatedCompanySizeLabel } from "../getTranslatedCompanySizeLabel";
 import { sizes } from "../sizes";
-import { EditableStatusCell } from "./EditableStatusCell";
 
 /**
  * Read-only table for the Clubs list, modeled on
@@ -16,10 +15,8 @@ import { EditableStatusCell } from "./EditableStatusCell";
  * column density: see the wrapping `<div>` below, copied from
  * `ContactTable`).
  *
- * Deliberately narrower than `ContactTable`: every cell is read-only except
- * `status` (see `EditableStatusCell`, self-contained click-propagation
- * guard, same pattern as `contacts/table/EditableStatusCell.tsx`), there is
- * no columns picker (the column set is short and fixed), and no
+ * Deliberately narrower than `ContactTable`: every cell is read-only, there
+ * is no columns picker (the column set is short and fixed), and no
  * bulk-actions toolbar (`bulkActionButtons={false}` also drops the
  * selection checkbox column entirely, unlike `ContactTable`'s
  * `bulkActionsToolbar={false}` which keeps checkboxes for a toolbar
@@ -34,9 +31,6 @@ export const CompanyTable = () => {
           <CompanyAvatar width={20} height={20} />
         </DataTable.Col>
         <DataTable.Col source="name" />
-        <DataTable.Col source="status">
-          <EditableStatusCell />
-        </DataTable.Col>
         <DataTable.Col source="sector">
           <CompanySectorCell />
         </DataTable.Col>
@@ -48,7 +42,6 @@ export const CompanyTable = () => {
           <ReferenceField source="sales_id" reference="sales" link={false} />
         </DataTable.Col>
         <DataTable.NumberCol source="nb_contacts" />
-        <DataTable.NumberCol source="nb_deals" />
       </DataTable>
     </div>
   );

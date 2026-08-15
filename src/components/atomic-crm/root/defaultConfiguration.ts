@@ -21,14 +21,6 @@ export const defaultCompanySectors = [
   { value: "utilities", label: "Utilities" },
 ];
 
-export const defaultDealCategories = [
-  { value: "other", label: "Other" },
-  { value: "copywriting", label: "Copywriting" },
-  { value: "print-project", label: "Print project" },
-  { value: "ui-design", label: "UI Design" },
-  { value: "website-design", label: "Website design" },
-];
-
 // Prospecting statuses for the padel-prospecting workflow (mirrors the
 // spreadsheet's colored "Statut" dropdown column). User-extendable via
 // Settings -> Notes.
@@ -86,7 +78,6 @@ export const defaultTaskTypes = [
 export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
   currency: defaultCurrency,
-  dealCategories: defaultDealCategories,
   noteStatuses: defaultNoteStatuses,
   taskTypes: defaultTaskTypes,
   title: defaultTitle,
