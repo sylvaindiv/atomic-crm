@@ -1,5 +1,6 @@
 import {
   company as fakerCompany,
+  datatype,
   internet,
   lorem,
   name,
@@ -31,7 +32,7 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
   // (a contact can only be referred by one already created before it).
   const generatedContacts: Required<Contact>[] = [];
 
-  return Array.from(Array(size).keys()).map((id) => {
+  const contacts = Array.from(Array(size).keys()).map((id) => {
     const has_avatar =
       weightedBoolean(25) && numberOfContacts < nbAvailblePictures;
     const gender = random.arrayElement(contactGender).value;
@@ -115,11 +116,28 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       latest_note_text: "",
       postal_code: "",
       city: "",
-      // Computed post-generation in finalize.ts, once deals exist.
+      // Absorbed deal fields (see Contact['amount'] / ['description']).
+      amount: weightedBoolean(60) ? datatype.number(1000) * 100 : null,
+      description: lorem.paragraphs(datatype.number({ min: 1, max: 3 })),
+      index: 0,
+      // Computed post-generation in finalize.ts, once deals/tasks exist.
       linked_deal_id: null,
+      next_action_due_date: null,
     };
 
     generatedContacts.push(contact);
     return contact;
   });
+
+  // Compute a per-status index, mirroring generateDeals's per-stage index --
+  // keeps demo mode coherent for the contacts Kanban (TASK-004).
+  defaultNoteStatuses.forEach((status) => {
+    contacts
+      .filter((contact) => contact.status === status.value)
+      .forEach((contact, index) => {
+        contact.index = index;
+      });
+  });
+
+  return contacts;
 };
