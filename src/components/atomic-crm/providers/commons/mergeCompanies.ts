@@ -1,15 +1,13 @@
 import type { Identifier, DataProvider } from "ra-core";
 
-import type { Company, Contact, Deal } from "../../types";
+import type { Company, Contact } from "../../types";
 
 /**
  * Merge one company (loser) into another company (winner).
  *
- * Reassigns the loser's contacts (`contacts.company_id`) and deals
- * (`deals.company_id` -- deals carry their own company_id, so club-type
- * deals are reassigned directly and not through their contacts) to the
- * winner, fills the winner's empty fields from the loser, and deletes the
- * loser company.
+ * Reassigns the loser's contacts (`contacts.company_id`) to the winner,
+ * fills the winner's empty fields from the loser, and deletes the loser
+ * company.
  */
 export const mergeCompanies = async (
   loserId: Identifier,
@@ -42,37 +40,13 @@ export const mergeCompanies = async (
     },
   );
 
-  const contactsUpdate = dataProvider.updateMany<Contact>("contacts", {
+  // The reassignment must settle before the loser company is deleted below.
+  await dataProvider.updateMany<Contact>("contacts", {
     ids: (loserContacts || []).map((contact) => contact.id),
     data: { company_id: winnerId },
   });
 
-  // 2. Reassign all deals from loser to winner. Deals carry their own
-  // company_id (not via their contacts), so club-type deals are reassigned
-  // directly here.
-  const { data: loserDeals } = await dataProvider.getManyReference<Deal>(
-    "deals",
-    {
-      target: "company_id",
-      id: loserId,
-      pagination: { page: 1, perPage: 1000 },
-      sort: { field: "id", order: "ASC" },
-      filter: {},
-    },
-  );
-
-  const dealsUpdate = dataProvider.updateMany<Deal>("deals", {
-    ids: (loserDeals || []).map((deal) => deal.id),
-    data: { company_id: winnerId },
-  });
-
-  // Reassignments must settle before the winner update runs: the winner
-  // update's deal-status sync (triggered whenever `status` is sent) reads
-  // the deal set for this company, which the reassignment above just
-  // changed. Racing them lets the sync see a stale/nondeterministic set.
-  await Promise.all([contactsUpdate, dealsUpdate]);
-
-  // 3. Update winner company with loser data: fields already set on the
+  // 2. Update winner company with loser data: fields already set on the
   // winner are never overwritten. `status` is only included when genuinely
   // filling it from the loser -- sending it unconditionally (even
   // unchanged) fires the deal-status sync on every merge (see
@@ -108,7 +82,7 @@ export const mergeCompanies = async (
     previousData: winnerCompany,
   });
 
-  // 4. Delete the loser company only after all reassignments succeed
+  // 3. Delete the loser company only after all reassignments succeed
   await dataProvider.delete<Company>("companies", {
     id: loserId,
     previousData: loserCompany,
