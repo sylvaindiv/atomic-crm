@@ -36,22 +36,6 @@ export const RESOURCES = {
     json: ["attachments"],
     bool: [],
   },
-  deals: {
-    table: "deals",
-    json: ["contact_ids"],
-    bool: [],
-  },
-  deals_summary: {
-    table: "deals_summary",
-    readonly: true,
-    json: ["contact_ids"],
-    bool: [],
-  },
-  deal_notes: {
-    table: "deal_notes",
-    json: ["attachments"],
-    bool: [],
-  },
   sales: {
     table: "sales",
     json: ["avatar"],
@@ -83,13 +67,9 @@ export const RESOURCES = {
 // deletes (mirrors the Postgres ON DELETE CASCADE relationships). Applied
 // recursively so deleting a company also removes its contacts' notes & tasks.
 export const CASCADE = {
-  companies: [
-    ["contacts", "company_id"],
-    ["deals", "company_id"],
-  ],
+  companies: [["contacts", "company_id"]],
   contacts: [
     ["contact_notes", "contact_id"],
     ["tasks", "contact_id"],
   ],
-  deals: [["deal_notes", "deal_id"]],
 };
