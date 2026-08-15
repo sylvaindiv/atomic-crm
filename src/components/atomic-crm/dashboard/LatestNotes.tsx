@@ -2,7 +2,6 @@ import { formatDistance } from "date-fns";
 import { FileText } from "lucide-react";
 import { useGetIdentity, useGetList, useTranslate } from "ra-core";
 import { ReferenceField } from "@/components/admin/reference-field";
-import { TextField } from "@/components/admin/text-field";
 import { Card, CardContent } from "@/components/ui/card";
 
 import type { Contact, ContactNote } from "../types";
@@ -10,42 +9,23 @@ import type { Contact, ContactNote } from "../types";
 export const LatestNotes = () => {
   const { identity } = useGetIdentity();
   const translate = useTranslate();
-  const { data: contactNotesData, isPending: contactNotesLoading } = useGetList(
-    "contact_notes",
-    {
-      pagination: { page: 1, perPage: 5 },
-      sort: { field: "date", order: "DESC" },
-      filter: { sales_id: identity?.id },
-    },
-    { enabled: Number.isInteger(identity?.id) },
-  );
-  const { data: dealNotesData, isPending: dealNotesLoading } = useGetList(
-    "deal_notes",
-    {
-      pagination: { page: 1, perPage: 5 },
-      sort: { field: "date", order: "DESC" },
-      filter: { sales_id: identity?.id },
-    },
-    { enabled: Number.isInteger(identity?.id) },
-  );
-  if (contactNotesLoading || dealNotesLoading) {
+  const { data: contactNotesData, isPending: contactNotesLoading } =
+    useGetList(
+      "contact_notes",
+      {
+        pagination: { page: 1, perPage: 5 },
+        sort: { field: "date", order: "DESC" },
+        filter: { sales_id: identity?.id },
+      },
+      { enabled: Number.isInteger(identity?.id) },
+    );
+  if (contactNotesLoading) {
     return null;
   }
-  // TypeScript guards
-  if (!contactNotesData || !dealNotesData) {
+  // TypeScript guard
+  if (!contactNotesData) {
     return null;
   }
-
-  const allNotes = ([] as any[])
-    .concat(
-      contactNotesData.map((note) => ({
-        ...note,
-        type: "contactNote",
-      })),
-      dealNotesData.map((note) => ({ ...note, type: "dealNote" })),
-    )
-    .sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf())
-    .slice(0, 5);
 
   return (
     <div>
@@ -59,18 +39,10 @@ export const LatestNotes = () => {
       </div>
       <Card>
         <CardContent>
-          {allNotes.map((note) => (
-            <div
-              id={`${note.type}_${note.id}`}
-              key={`${note.type}_${note.id}`}
-              className="mb-8"
-            >
+          {contactNotesData.map((note) => (
+            <div id={`contactNote_${note.id}`} key={note.id} className="mb-8">
               <div className="text-sm text-muted-foreground">
-                {note.type === "dealNote" ? (
-                  <Deal note={note} />
-                ) : (
-                  <Contact note={note} />
-                )}
+                <ContactLabel note={note} />
                 {", "}
                 {translate("crm.dashboard.latest_notes_added_ago", {
                   timeAgo: formatDistance(note.date, new Date(), {
@@ -91,24 +63,7 @@ export const LatestNotes = () => {
   );
 };
 
-const Deal = ({ note }: any) => {
-  const translate = useTranslate();
-  return (
-    <>
-      {translate("resources.deals.forcedCaseName")}{" "}
-      <ReferenceField
-        record={note}
-        source="deal_id"
-        reference="deals"
-        link="show"
-      >
-        <TextField source="name" />
-      </ReferenceField>
-    </>
-  );
-};
-
-const Contact = ({ note }: any) => {
+const ContactLabel = ({ note }: { note: ContactNote }) => {
   const translate = useTranslate();
   return (
     <>

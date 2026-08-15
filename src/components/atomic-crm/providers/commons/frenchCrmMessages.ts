@@ -485,7 +485,7 @@ export const frenchCrmMessages = {
       load_more: "Charger plus d'activité",
     },
     dashboard: {
-      deals_chart: "Revenus des affaires à venir",
+      amount_chart: "Montant à venir",
       deals_pipeline: "Pipeline des affaires",
       latest_activity: "Dernière activité",
       latest_activity_error:

@@ -479,7 +479,7 @@ export const englishCrmMessages = {
       load_more: "Load more activity",
     },
     dashboard: {
-      deals_chart: "Upcoming Deal Revenue",
+      amount_chart: "Upcoming Amount",
       deals_pipeline: "Deals Pipeline",
       latest_activity: "Latest Activity",
       latest_activity_error: "Error loading latest activity",
