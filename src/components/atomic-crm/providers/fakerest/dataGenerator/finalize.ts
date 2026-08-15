@@ -10,6 +10,7 @@ export const finalize = (db: Db) => {
 
   setLinkedDealIds(db);
   setDealSummaryFields(db);
+  setContactNextActionDueDates(db);
 };
 
 /**
@@ -57,5 +58,21 @@ const setDealSummaryFields = (db: Db) => {
       .map((t) => t.due_date)
       .sort();
     deal.next_action_due_date = openDueDates[0] ?? null;
+  });
+};
+
+/**
+ * Mirrors the contacts_summary view's `next_action_due_date` computed
+ * column: each contact's earliest open (not done) task due_date. Backs the
+ * contacts Kanban's needs-action column sort, countdown chip and "To
+ * handle" filter (TASK-004).
+ */
+const setContactNextActionDueDates = (db: Db) => {
+  db.contacts.forEach((contact) => {
+    const openDueDates = db.tasks
+      .filter((t) => t.contact_id === contact.id && !t.done_date)
+      .map((t) => t.due_date)
+      .sort();
+    contact.next_action_due_date = openDueDates[0] ?? null;
   });
 };

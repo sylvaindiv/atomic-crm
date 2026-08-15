@@ -184,6 +184,11 @@ async function createContact({
   company_id = null,
   sales_id,
   notes = [],
+  // Note status (e.g. one of the configured `noteStatuses` values, distinct
+  // from the notes' own "cold"/"warm"/"hot" status below) -- lets a test
+  // place a contact in a specific Kanban column (TASK-004).
+  status = "cold",
+  index = 0,
 }: {
   first_name: string;
   last_name: string;
@@ -195,6 +200,8 @@ async function createContact({
     date?: string;
     status?: "cold" | "warm" | "hot";
   }[];
+  status?: string;
+  index?: number;
 }) {
   const { data, error } = await adminSupabase
     .from("contacts")
@@ -209,7 +216,8 @@ async function createContact({
       has_newsletter: false,
       tags: [],
       gender: "unknown",
-      status: "cold",
+      status,
+      index,
       background: "",
       email_jsonb: [],
       phone_jsonb: [],

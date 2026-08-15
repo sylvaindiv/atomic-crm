@@ -212,6 +212,9 @@ export const englishCrmMessages = {
         before_this_month: "Before this month",
         before_this_week: "Before this week",
         managed_by_me: "Managed by me",
+        // Mirrors the Kanban column sort / countdown chip's "needs action"
+        // rule (next action overdue or due today).
+        needs_action: "To handle",
         search: "Search name, club...",
         this_week: "This week",
         today: "Today",
@@ -494,6 +497,21 @@ export const englishCrmMessages = {
     },
     header: {
       import_data: "Import data",
+    },
+    // Deal-free namespace for the contacts Kanban toggle and its
+    // countdown chip (TASK-004) -- not scoped to `resources.contacts` since
+    // it may back another entity's Kanban later, and not under
+    // `resources.deals` since that namespace is swept away with the deals
+    // module (TASK-009).
+    kanban: {
+      view_table: "Table",
+      view_kanban: "Kanban",
+      next_action_due: {
+        overdue: "Overdue",
+        today: "Due today",
+        tomorrow: "Due tomorrow",
+        in_days: "%{smart_count}d",
+      },
     },
     image_editor: {
       change: "Change",
