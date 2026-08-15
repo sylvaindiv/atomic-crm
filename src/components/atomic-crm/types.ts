@@ -5,8 +5,6 @@ import type {
   COMPANY_CREATED,
   CONTACT_CREATED,
   CONTACT_NOTE_CREATED,
-  DEAL_CREATED,
-  DEAL_NOTE_CREATED,
 } from "./consts";
 
 export type SignUpData = {
@@ -202,28 +200,11 @@ export type ActivityContactNoteCreated = {
   date: string;
 } & Pick<RaRecord, "id">;
 
-export type ActivityDealCreated = {
-  type: typeof DEAL_CREATED;
-  company_id: Identifier;
-  sales_id?: Identifier;
-  deal: Deal;
-  date: string;
-};
-
-export type ActivityDealNoteCreated = {
-  type: typeof DEAL_NOTE_CREATED;
-  sales_id?: Identifier;
-  dealNote: DealNote;
-  date: string;
-};
-
 export type Activity = RaRecord &
   (
     | ActivityCompanyCreated
     | ActivityContactCreated
     | ActivityContactNoteCreated
-    | ActivityDealCreated
-    | ActivityDealNoteCreated
   );
 
 export interface RAFile {
