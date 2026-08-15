@@ -51,13 +51,13 @@ export const DealCardContent = ({
     >
       <RecordContextProvider value={deal}>
         <Card
-          className={`py-2 transition-all duration-200 ${
+          className={`rounded-none border-0 py-3 transition-all duration-200 ${
             snapshot?.isDragging
-              ? "opacity-90 transform rotate-1 shadow-lg"
-              : "shadow-sm hover:shadow-md"
+              ? "opacity-90 shadow-lg"
+              : "hover:bg-muted/50"
           }`}
         >
-          <CardContent className="px-2 flex flex-col">
+          <CardContent className="px-3 flex flex-col">
             <div className="flex-1 flex">
               <p className="flex-1 text-sm font-medium mb-1">
                 <DealPartyName deal={deal} />

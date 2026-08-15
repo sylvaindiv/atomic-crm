@@ -17,7 +17,7 @@ export const DealColumn = ({
   const { noteStatuses, currency } = useConfigurationContext();
   const statusOption = noteStatuses.find((status) => status.value === stage);
   return (
-    <div className="flex-1 pb-8">
+    <div className="flex-1 pb-8 px-3">
       <div className="flex flex-col items-center">
         <h3 className="text-base font-medium flex items-center">
           <Status status={stage} />
@@ -32,7 +32,7 @@ export const DealColumn = ({
           <div
             ref={droppableProvided.innerRef}
             {...droppableProvided.droppableProps}
-            className={`flex flex-col rounded-2xl mt-2 gap-2 bg-card ${
+            className={`flex flex-col mt-2 divide-y divide-border ${
               snapshot.isDraggingOver ? "bg-muted" : ""
             }`}
           >
