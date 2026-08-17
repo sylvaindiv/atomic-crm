@@ -12,6 +12,7 @@ import {
 
 import { SimpleList } from "../simple-list/SimpleList";
 import { Avatar } from "../contacts/Avatar";
+import { contactFullName } from "../contacts/contactModel";
 import type { Contact } from "../types";
 
 export const HotContacts = () => {
@@ -70,9 +71,7 @@ export const HotContacts = () => {
           isPending={contactsLoading}
           resource="contacts"
           className="[&>li:first-child>a]:rounded-t-xl [&>li:last-child>a]:rounded-b-xl"
-          primaryText={(contact) =>
-            `${contact.first_name} ${contact.last_name}`
-          }
+          primaryText={(contact) => contactFullName(contact)}
           secondaryText={(contact) => (
             <>
               {contact.title && contact.company_name
