@@ -24,6 +24,7 @@ import {
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ActivityLog } from "../activity/ActivityLog";
 import { Avatar } from "../contacts/Avatar";
+import { contactFullName } from "../contacts/contactModel";
 import { TagsList } from "../contacts/TagsList";
 import { MobileContent } from "../layout/MobileContent";
 import MobileHeader from "../layout/MobileHeader";
@@ -190,7 +191,7 @@ const ContactsIterator = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium">
-                  {`${contact.first_name} ${contact.last_name}`}
+                  {contactFullName(contact)}
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {contact.title}
