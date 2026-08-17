@@ -7,9 +7,13 @@ export const defaultPhoneJsonb = [{ number: null, type: null }];
 
 const cleanContactArrayFields = (data: Contact) => {
   const cleanedEmailJsonb =
-    data.email_jsonb?.filter((e) => e.email != null) || [];
+    data.email_jsonb
+      ?.filter((e) => e.email != null)
+      .map((e) => ({ ...e, type: e.type ?? "Work" })) || [];
   const cleanedPhoneJsonb =
-    data.phone_jsonb?.filter((p) => p.number != null) || [];
+    data.phone_jsonb
+      ?.filter((p) => p.number != null)
+      .map((p) => ({ ...p, type: p.type ?? "Work" })) || [];
   return {
     ...data,
     phone_jsonb: cleanedPhoneJsonb.length > 0 ? cleanedPhoneJsonb : null,
