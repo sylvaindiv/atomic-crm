@@ -26,7 +26,7 @@ export const NeedsActionInput = () => {
   };
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2 self-center">
       <Label htmlFor="needs-action">
         {translate("resources.contacts.filters.needs_action")}
       </Label>
