@@ -280,14 +280,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/providers/fakerest/dataGenerator/deals.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/providers/fakerest/dataGenerator/dealNotes.ts",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/providers/fakerest/dataGenerator/contacts.ts",
           "type": "registry:component"
         },
@@ -304,6 +296,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/providers/commons/mergeCompanies.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/providers/commons/i18nProvider.ts",
           "type": "registry:component"
         },
@@ -317,6 +313,14 @@
         },
         {
           "path": "src/components/atomic-crm/providers/commons/frenchCrmMessages.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/providers/commons/findDuplicateContacts.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/providers/commons/findDuplicateCompanies.ts",
           "type": "registry:component"
         },
         {
@@ -416,7 +420,15 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/misc/nextAction.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/misc/isLinkedInUrl.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/misc/formatAmount.ts",
           "type": "registry:component"
         },
         {
@@ -433,6 +445,10 @@
         },
         {
           "path": "src/components/atomic-crm/misc/RelativeDate.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/misc/NextActionChip.tsx",
           "type": "registry:component"
         },
         {
@@ -536,74 +552,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/deals/stages.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/index.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/dealUtils.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/dealNextAction.ts",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/OnlyMineInput.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealShow.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealParty.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealListContent.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealList.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealInputs.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealEmpty.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealEdit.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealCreate.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealColumn.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealCard.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/DealArchivedList.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/deals/ContactList.tsx",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/dashboard/Welcome.tsx",
           "type": "registry:component"
         },
@@ -624,10 +572,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/dashboard/DealsChart.tsx",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/dashboard/DashboardStepper.tsx",
           "type": "registry:component"
         },
@@ -637,6 +581,10 @@
         },
         {
           "path": "src/components/atomic-crm/dashboard/Dashboard.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/dashboard/AmountChart.tsx",
           "type": "registry:component"
         },
         {
@@ -657,6 +605,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/TagsList.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/NeedsActionInput.tsx",
           "type": "registry:component"
         },
         {
@@ -800,6 +752,22 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/kanban/contactStages.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/kanban/ContactKanbanColumn.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/kanban/ContactKanbanCard.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/kanban/ContactKanban.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/companies/sizes.ts",
           "type": "registry:component"
         },
@@ -813,6 +781,10 @@
         },
         {
           "path": "src/components/atomic-crm/companies/CompanyShow.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/companies/CompanyMergeButton.tsx",
           "type": "registry:component"
         },
         {
@@ -852,10 +824,6 @@
           "type": "registry:component"
         },
         {
-          "path": "src/components/atomic-crm/companies/table/EditableStatusCell.tsx",
-          "type": "registry:component"
-        },
-        {
           "path": "src/components/atomic-crm/companies/table/CompanyTable.tsx",
           "type": "registry:component"
         },
@@ -865,14 +833,6 @@
         },
         {
           "path": "src/components/atomic-crm/activity/ActivityLogIterator.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/activity/ActivityLogDealNoteCreated.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/activity/ActivityLogDealCreated.tsx",
           "type": "registry:component"
         },
         {

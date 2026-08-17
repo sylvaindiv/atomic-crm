@@ -12,7 +12,6 @@ import { formatDealAmount } from "../../misc/formatAmount";
 import { NextActionChip } from "../../misc/NextActionChip";
 import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
-import { Avatar } from "../Avatar";
 
 export const ContactKanbanCard = ({
   contact,
@@ -77,7 +76,6 @@ const ContactKanbanCardContent = ({
               <p className="flex-1 text-sm font-medium mb-1">
                 {contact.first_name} {contact.last_name}
               </p>
-              <Avatar width={20} height={20} />
             </div>
             {contact.company_name && (
               <ContactCompanySubRow companyName={contact.company_name} />
