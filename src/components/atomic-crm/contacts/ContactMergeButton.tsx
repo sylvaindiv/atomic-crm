@@ -3,7 +3,6 @@ import { Merge, CircleX, AlertTriangle, ArrowDown } from "lucide-react";
 import {
   useDataProvider,
   useRecordContext,
-  useGetList,
   useGetManyReference,
   required,
   Form,
@@ -104,15 +103,6 @@ const ContactMergeDialog = ({ open, onClose }: ContactMergeDialogProps) => {
     {
       target: "contact_id",
       id: loserContact?.id,
-      pagination: { page: 1, perPage: 1 },
-    },
-    { enabled: canFetchCounts },
-  );
-
-  const { total: dealsCount } = useGetList(
-    "deals",
-    {
-      filter: { "contact_ids@cs": `{${loserContact?.id}}` },
       pagination: { page: 1, perPage: 1 },
     },
     { enabled: canFetchCounts },
@@ -250,12 +240,6 @@ const ContactMergeDialog = ({ open, onClose }: ContactMergeDialogProps) => {
                       {tasksCount !== 1 ? "s" : ""} will be reassigned
                     </li>
                   )}
-                  {dealsCount != null && dealsCount > 0 && (
-                    <li>
-                      • {dealsCount} deal
-                      {dealsCount !== 1 ? "s" : ""} will be updated
-                    </li>
-                  )}
                   {referralsCount != null && referralsCount > 0 && (
                     <li>
                       • {referralsCount} contact
@@ -279,7 +263,6 @@ const ContactMergeDialog = ({ open, onClose }: ContactMergeDialogProps) => {
                   )}
                   {!notesCount &&
                     !tasksCount &&
-                    !dealsCount &&
                     !referralsCount &&
                     !loserContact.email_jsonb?.length &&
                     !loserContact.phone_jsonb?.length && (

@@ -15,13 +15,6 @@ vi.mock("./db.mjs", () => ({
   requiredColumns: requiredColumnsFixture,
 }));
 
-// `update()` calls into dealSync.afterUpdate as a side effect unrelated to
-// this ticket; stub it out so these tests only exercise the required-column
-// check.
-vi.mock("./dealSync.mjs", () => ({
-  afterUpdate: vi.fn(async () => {}),
-}));
-
 const cfg = RESOURCES.contact_notes;
 
 describe("query.mjs required-column validation", () => {

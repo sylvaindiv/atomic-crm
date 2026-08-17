@@ -3,7 +3,7 @@
 // SDK). Scheduled once a day at 09:00 local wall-clock time from this
 // long-lived Node process (plain `setTimeout`/`setInterval`, no cron lib).
 //
-// Follows dealSync.mjs's shape: plain functions taking an injectable `db`,
+// Follows query.mjs's shape: plain functions taking an injectable `db`,
 // unit-tested with a fake `{ execute: vi.fn() }`. `db.mjs` is only imported
 // lazily (inside `sendDailyDigest`, when no `db` override is supplied) so
 // this module -- and its tests -- never require TURSO_DATABASE_URL to be
@@ -23,7 +23,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const env = typeof process === "undefined" ? {} : process.env;
 const isNode = typeof process !== "undefined";
 
-/** Turn a libSQL result into plain {col: value} objects (mirrors query.mjs / dealSync.mjs). */
+/** Turn a libSQL result into plain {col: value} objects (mirrors query.mjs). */
 function toObjects({ columns, rows }) {
   return rows.map((r) => {
     const o = {};

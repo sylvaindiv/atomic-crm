@@ -13,6 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { BooleanInput } from "@/components/admin/boolean-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
+import { NumberInput } from "@/components/admin/number-input";
 import { TextInput } from "@/components/admin/text-input";
 import { RadioButtonGroupInput } from "@/components/admin/radio-button-group-input";
 import { SelectInput } from "@/components/admin/select-input";
@@ -227,6 +228,10 @@ const ContactMiscInputs = () => {
         {translate("resources.contacts.field_categories.misc")}
       </h6>
       <TextInput source="background" multiline helperText={false} />
+      {/* This contact page is the single page of the case ("Affaire") it
+          represents -- see types.ts Contact['amount']. */}
+      <NumberInput source="amount" defaultValue={0} helperText={false} />
+      <TextInput source="description" multiline rows={3} helperText={false} />
       <BooleanInput source="has_newsletter" helperText={false} />
       <ReferenceInput
         reference="sales"

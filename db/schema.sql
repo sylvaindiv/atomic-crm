@@ -35,10 +35,7 @@ CREATE TABLE IF NOT EXISTS companies (
     description    TEXT,
     revenue        TEXT,
     tax_identifier TEXT,
-    logo           TEXT,          -- JSON object (RAFile)
-    -- Same value space as contacts.status, no CHECK constraint (consistent
-    -- with the existing contacts.status).
-    status         TEXT
+    logo           TEXT           -- JSON object (RAFile)
 );
 
 -- Contacts --------------------------------------------------------------------
@@ -63,7 +60,12 @@ CREATE TABLE IF NOT EXISTS contacts (
     email_jsonb    TEXT,          -- JSON array of {email,type}
     phone_jsonb    TEXT,          -- JSON array of {number,type}
     postal_code    TEXT,
-    city           TEXT
+    city           TEXT,
+    -- Folded in from the now-dropped deals table — a deal is just a
+    -- contact row. See adr/ADR-33662640-TASK-001-fold-deals-into-contacts.md
+    amount         INTEGER,
+    description    TEXT,
+    "index"        INTEGER
 );
 
 -- Contact notes ---------------------------------------------------------------
@@ -74,37 +76,6 @@ CREATE TABLE IF NOT EXISTS contact_notes (
     date        TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     sales_id    INTEGER REFERENCES sales(id) ON UPDATE CASCADE ON DELETE CASCADE,
     status      TEXT,
-    attachments TEXT              -- JSON array of RAFile
-);
-
--- Deals -----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS deals (
-    id                    INTEGER PRIMARY KEY AUTOINCREMENT,
-    name                  TEXT NOT NULL,
-    company_id            INTEGER REFERENCES companies(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    contact_ids           TEXT,   -- JSON array of contact ids
-    category              TEXT,
-    -- 'judge' | 'club'. Named case_type (not "type") to avoid a conceptual
-    -- collision with deal_notes.type / tasks.type.
-    case_type             TEXT NOT NULL DEFAULT 'club',
-    stage                 TEXT NOT NULL,
-    description           TEXT,
-    amount                INTEGER,
-    created_at            TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-    updated_at            TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-    archived_at           TEXT,
-    sales_id              INTEGER REFERENCES sales(id),
-    "index"               INTEGER
-);
-
--- Deal notes ------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS deal_notes (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    deal_id     INTEGER NOT NULL REFERENCES deals(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    type        TEXT,
-    text        TEXT,
-    date        TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-    sales_id    INTEGER REFERENCES sales(id),
     attachments TEXT              -- JSON array of RAFile
 );
 
@@ -153,18 +124,14 @@ CREATE TABLE IF NOT EXISTS favicons_excluded_domains (
 -- Indexes on foreign keys -----------------------------------------------------
 CREATE INDEX IF NOT EXISTS contact_notes_contact_id_idx ON contact_notes (contact_id);
 CREATE INDEX IF NOT EXISTS contacts_company_id_idx      ON contacts (company_id);
-CREATE INDEX IF NOT EXISTS deal_notes_deal_id_idx        ON deal_notes (deal_id);
-CREATE INDEX IF NOT EXISTS deals_company_id_idx          ON deals (company_id);
-CREATE INDEX IF NOT EXISTS deals_case_type_idx           ON deals (case_type);
 CREATE UNIQUE INDEX IF NOT EXISTS uq__sales__email       ON sales (email);
 
 -- Views -----------------------------------------------------------------------
--- companies_summary: adds aggregate contact/deal counts.
+-- companies_summary: adds aggregate contact count.
 DROP VIEW IF EXISTS companies_summary;
 CREATE VIEW companies_summary AS
 SELECT
     c.*,
-    (SELECT count(*) FROM deals    d  WHERE d.company_id  = c.id) AS nb_deals,
     (SELECT count(*) FROM contacts co WHERE co.company_id = c.id) AS nb_contacts
 FROM companies c;
 
@@ -186,34 +153,6 @@ SELECT
     ) AS referred_by_name,
     (SELECT count(*) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS nb_tasks,
     (SELECT text FROM contact_notes cn WHERE cn.contact_id = co.id ORDER BY date DESC LIMIT 1) AS latest_note_text,
-    -- Most recent non-archived 'judge' deal this contact is a party to.
-    (SELECT d.id FROM deals d
-       WHERE d.case_type = 'judge'
-         AND d.archived_at IS NULL
-         AND EXISTS (
-           SELECT 1 FROM json_each(CASE WHEN json_valid(d.contact_ids) THEN d.contact_ids ELSE '[]' END) je
-           WHERE je.value = co.id
-         )
-       ORDER BY d.created_at DESC
-       LIMIT 1
-    ) AS linked_deal_id
+    -- Due date of this contact's earliest open task (their next action).
+    (SELECT MIN(t.due_date) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS next_action_due_date
 FROM contacts co;
-
--- deals_summary: adds club_name, contact_name and the due date of the deal's
--- next open action (earliest open task of contact_ids[0]).
-DROP VIEW IF EXISTS deals_summary;
-CREATE VIEW deals_summary AS
-SELECT
-    d.*,
-    (SELECT trim(coalesce(co.first_name,'') || ' ' || coalesce(co.last_name,''))
-       FROM contacts co WHERE co.id = json_extract(d.contact_ids, '$[0]')
-    ) AS contact_name,
-    CASE
-      WHEN d.case_type = 'club' THEN (SELECT cmp.name FROM companies cmp WHERE cmp.id = d.company_id)
-      ELSE (SELECT cmp.name FROM contacts co JOIN companies cmp ON cmp.id = co.company_id
-             WHERE co.id = json_extract(d.contact_ids, '$[0]'))
-    END AS club_name,
-    (SELECT MIN(t.due_date) FROM tasks t
-       WHERE t.contact_id = json_extract(d.contact_ids, '$[0]') AND t.done_date IS NULL
-    ) AS next_action_due_date
-FROM deals d;

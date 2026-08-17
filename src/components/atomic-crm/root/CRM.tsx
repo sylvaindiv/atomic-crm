@@ -16,7 +16,6 @@ import companies from "../companies";
 import contacts from "../contacts";
 import { Dashboard } from "../dashboard/Dashboard";
 import { MobileDashboard } from "../dashboard/MobileDashboard";
-import deals from "../deals";
 import { Layout } from "../layout/Layout";
 import { MobileLayout } from "../layout/MobileLayout";
 import { ImportPage } from "../misc/ImportPage";
@@ -38,7 +37,6 @@ import {
   defaultCompanySectors,
   defaultCurrency,
   defaultDarkModeLogo,
-  defaultDealCategories,
   defaultLightModeLogo,
   defaultNoteStatuses,
   defaultTaskTypes,
@@ -75,7 +73,6 @@ export type CRMProps = {
  * @param {LabeledValue[]} companySectors - The list of company sectors used in the application.
  * @param {string} currency - The ISO 4217 currency code used to format monetary values (e.g. "USD", "EUR", "GBP").
  * @param {RaThemeOptions} darkTheme - The theme to use when the application is in dark mode.
- * @param {LabeledValue[]} dealCategories - The categories of deals used in the application.
  * @param {RaThemeOptions} lightTheme - The theme to use when the application is in light mode.
  * @param {string} logo - The logo used in the CRM application.
  * @param {NoteStatus[]} noteStatuses - The statuses of notes used in the application.
@@ -106,7 +103,6 @@ export type CRMProps = {
 export const CRM = ({
   companySectors = defaultCompanySectors,
   currency = defaultCurrency,
-  dealCategories = defaultDealCategories,
   darkModeLogo = defaultDarkModeLogo,
   lightModeLogo = defaultLightModeLogo,
   noteStatuses = defaultNoteStatuses,
@@ -141,7 +137,6 @@ export const CRM = ({
       store.setItem(CONFIGURATION_STORE_KEY, {
         companySectors,
         currency,
-        dealCategories,
         noteStatuses,
         taskTypes,
         title,
@@ -235,11 +230,9 @@ const DesktopAdmin = (
         <Route path={ImportPage.path} element={<ImportPage />} />
         <Route path={ChangelogPage.path} element={<ChangelogPage />} />
       </CustomRoutes>
-      <Resource name="deals" {...deals} />
       <Resource name="contacts" {...contacts} />
       <Resource name="companies" {...companies} />
       <Resource name="contact_notes" />
-      <Resource name="deal_notes" />
       <Resource name="tasks" />
       <Resource name="sales" {...sales} />
       <Resource name="tags" />
