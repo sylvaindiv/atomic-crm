@@ -123,10 +123,12 @@ export function exportToVCard(
   lines.push("VERSION:3.0");
 
   // Name (N: Family Name;Given Name;Additional Names;Honorific Prefixes;Honorific Suffixes)
-  lines.push(`N:${contact.last_name};${contact.first_name};;;`);
+  lines.push(`N:${contact.last_name ?? ""};${contact.first_name};;;`);
 
   // Formatted name
-  lines.push(`FN:${contact.first_name} ${contact.last_name}`);
+  lines.push(
+    `FN:${[contact.first_name, contact.last_name].filter(Boolean).join(" ")}`,
+  );
 
   // Title/Job position
   if (contact.title) {
