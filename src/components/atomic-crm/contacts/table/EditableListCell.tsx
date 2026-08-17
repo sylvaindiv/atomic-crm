@@ -8,16 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-
-import { translatePersonalInfoTypeLabel } from "../contactModel";
 
 /** The `type` tag shared by both email and phone entries (see `Contact` in `../../types`). */
 export type PersonalInfoType = "Work" | "Home" | "Other";
@@ -49,8 +40,6 @@ interface EditableListCellProps {
   formatValue?: (value: string) => string;
 }
 
-const PERSONAL_INFO_TYPES: PersonalInfoType[] = ["Work", "Home", "Other"];
-
 const createEntry = (): EditableListEntry => ({ value: "", type: "Work" });
 
 const sameEntries = (a: EditableListEntry[], b: EditableListEntry[]) =>
@@ -58,8 +47,10 @@ const sameEntries = (a: EditableListEntry[], b: EditableListEntry[]) =>
 
 /**
  * Generic popover editor for a Contact array-of-object column (emails, phone
- * numbers, ...): add, remove, or edit entries, each holding a text `value`
- * and a `type` ("Work" | "Home" | "Other").
+ * numbers, ...): add, remove, or edit entries, each holding a text `value`.
+ * Every entry still carries a `type` ("Work" | "Home" | "Other") on the wire
+ * (`createEntry()` hardcodes `"Work"`), but there is no UI to change it —
+ * the type selector was removed as an unused affordance.
  *
  * Mirrors `TagsListEdit`'s add/remove shape, but unlike tags these entries
  * have no identity of their own (no id, no separate resource) — the whole
@@ -67,12 +58,12 @@ const sameEntries = (a: EditableListEntry[], b: EditableListEntry[]) =>
  * `admin/*-input.tsx`: this cell renders inside a `DataTable` row, not a
  * react-hook-form ancestor, so it manages its own draft state instead.
  *
- * Add, remove, and type changes commit immediately (one discrete action, one
- * commit), matching `EditableBooleanCell`'s always-live toggle. Editing a
- * value keeps a local draft while focused and commits on blur or Enter,
- * matching `EditableTextCell`, so typing doesn't issue a request per
- * keystroke. The draft resets from `entries` each time the popover opens, so
- * it always starts from the latest server state.
+ * Add and remove commit immediately (one discrete action, one commit),
+ * matching `EditableBooleanCell`'s always-live toggle. Editing a value keeps
+ * a local draft while focused and commits on blur or Enter, matching
+ * `EditableTextCell`, so typing doesn't issue a request per keystroke. The
+ * draft resets from `entries` each time the popover opens, so it always
+ * starts from the latest server state.
  *
  * The popover content portals to `document.body` (Radix), but a click
  * originating inside it still bubbles through the React tree (not the DOM
@@ -106,9 +97,6 @@ export const EditableListCell = ({
 
   const handleRemove = (index: number) =>
     commit(draft.filter((_, i) => i !== index));
-
-  const handleTypeChange = (index: number, type: PersonalInfoType) =>
-    commit(draft.map((entry, i) => (i === index ? { ...entry, type } : entry)));
 
   const handleValueChange = (index: number, value: string) =>
     setDraft(
@@ -173,29 +161,6 @@ export const EditableListCell = ({
                   onKeyDown={(event) => handleValueKeyDown(index, event)}
                   className="flex-1"
                 />
-                <Select
-                  value={entry.type}
-                  onValueChange={(type) =>
-                    handleTypeChange(index, type as PersonalInfoType)
-                  }
-                >
-                  <SelectTrigger
-                    size="sm"
-                    className="w-24 min-w-24"
-                    aria-label={translate("resources.contacts.fields.type", {
-                      _: "Type",
-                    })}
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PERSONAL_INFO_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {translatePersonalInfoTypeLabel(type, translate)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
                 <button
                   type="button"
                   onClick={() => handleRemove(index)}
