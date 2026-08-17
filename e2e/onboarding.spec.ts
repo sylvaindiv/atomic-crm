@@ -21,7 +21,6 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
 
   await page.getByText("New Judge-Referee").click();
   await page.waitForLoadState("networkidle");
-  await page.getByLabel("She/Her").click();
   await page.getByLabel("First name").fill("Jane");
   await page.getByLabel("Last name").fill("Smith");
   await page.getByLabel("Title").fill("CEO");
@@ -47,14 +46,8 @@ test("user onboarding", async ({ page, isMobile, menu, dismissToast }) => {
     .click();
 
   await page
-    .getByLabel("LinkedIn URL")
-    .fill("https://www.linkedin.com/in/jane-smith");
-
-  await page
     .getByLabel("Background info (bio, how you met, etc)")
     .fill("Met at a conference.");
-
-  await page.getByLabel("Has newsletter").check();
 
   await expect(page.getByLabel("Account manager *")).toHaveText("John Doe");
 

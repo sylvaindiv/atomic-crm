@@ -1,5 +1,6 @@
 import type { DataProvider, Identifier } from "ra-core";
 
+import { contactFullName } from "../../contacts/contactModel";
 import type { Contact } from "../../types";
 
 // See adr/ADR-02f50f28-TASK-002-duplicate-contact-matching.md
@@ -48,7 +49,7 @@ export function normalizeText(value: string): string {
 }
 
 function normalizedFullName(contact: Contact): string {
-  return normalizeText(`${contact.first_name} ${contact.last_name}`);
+  return normalizeText(contactFullName(contact));
 }
 
 function isUsableName(normalizedName: string): boolean {

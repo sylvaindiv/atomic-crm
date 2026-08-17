@@ -8,7 +8,6 @@ import type { Contact } from "../../types";
 
 import { EditableCompanyCell } from "./EditableCompanyCell";
 import { EditableEmailsCell } from "./EditableEmailsCell";
-import { EditableGenderCell } from "./EditableGenderCell";
 import { EditablePhonesCell } from "./EditablePhonesCell";
 import { EditableReferredByCell } from "./EditableReferredByCell";
 import { EditableSalesCell } from "./EditableSalesCell";
@@ -18,16 +17,12 @@ import { EditableTextCell } from "./EditableTextCell";
 import { LatestNoteCell } from "./LatestNoteCell";
 
 /**
- * Desktop content for the Contacts list: a dense, ~17-column table built on
+ * Desktop content for the Contacts list: a dense, ~15-column table built on
  * `admin/data-table.tsx`'s `<DataTable>`.
  *
  * A handful of columns are read-only/navigate-only (avatar, name, task
  * count, last/first seen); the rest are the inline-editable cell families
- * built in TASK-005/006/007 (text, reference, list, status, tags), plus
- * `EditableGenderCell` completing that family for the one column it didn't
- * cover. `background` and `gender` start hidden via `hiddenColumns`
- * to keep the default view dense — reveal them with `<ColumnsButton />`
- * (wired in `ContactList.tsx`).
+ * built in TASK-005/006/007 (text, reference, list, status, tags).
  *
  * `rowClick={false}` departs from the old card list's (`ContactListContent`)
  * click-anywhere-to-navigate row: an editable cell must mutate on click,
@@ -65,7 +60,6 @@ export const ContactTable = () => {
       <DataTable
         rowClick={false}
         bulkActionsToolbar={false}
-        hiddenColumns={["gender"]}
         resizableColumns
         rowClassName={(record: Contact) =>
           getStatusTint(record) ? "bg-(--row-status-tint)" : undefined
@@ -87,9 +81,6 @@ export const ContactTable = () => {
         <DataTable.Col source="title">
           <EditableTextCell source="title" />
         </DataTable.Col>
-        <DataTable.Col source="linkedin_url">
-          <EditableTextCell source="linkedin_url" />
-        </DataTable.Col>
         <DataTable.Col source="postal_code">
           <EditableTextCell source="postal_code" />
         </DataTable.Col>
@@ -101,9 +92,6 @@ export const ContactTable = () => {
           label="resources.contacts.fields.latest_note_text"
         >
           <LatestNoteCell />
-        </DataTable.Col>
-        <DataTable.Col source="gender">
-          <EditableGenderCell />
         </DataTable.Col>
         <DataTable.Col source="company_id">
           <EditableCompanyCell />
