@@ -39,6 +39,7 @@ import {
   ContactListFilterSummary,
   ContactListFilter,
 } from "./ContactListFilter";
+import { NeedsActionInput } from "./NeedsActionInput";
 import { ContactShowSheet } from "./ContactShowSheet";
 import { TopToolbar } from "../layout/TopToolbar";
 import { InfinitePagination } from "../misc/InfinitePagination";
@@ -142,6 +143,7 @@ const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
 
   return (
     <TopToolbar>
+      <NeedsActionInput />
       <ToggleGroup
         type="single"
         value={viewMode}
