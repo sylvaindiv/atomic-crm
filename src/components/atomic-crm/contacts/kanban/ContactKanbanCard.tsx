@@ -68,7 +68,7 @@ const ContactKanbanCardContent = ({
     >
       <RecordContextProvider value={contact}>
         <Card
-          className={`rounded-none border-0 py-3 transition-all duration-200 ${
+          className={`rounded-none border-0 py-2 transition-all duration-200 ${
             snapshot.isDragging ? "opacity-90 shadow-lg" : "hover:bg-muted/50"
           }`}
         >
