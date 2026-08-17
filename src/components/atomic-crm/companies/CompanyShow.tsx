@@ -190,9 +190,7 @@ const ContactsIterator = () => {
                 <Avatar />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="font-medium">
-                  {contactFullName(contact)}
-                </div>
+                <div className="font-medium">{contactFullName(contact)}</div>
                 <div className="text-sm text-muted-foreground">
                   {contact.title}
                   {contact.nb_tasks

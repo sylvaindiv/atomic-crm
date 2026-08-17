@@ -13,8 +13,7 @@ export const defaultPhoneJsonb = [{ number: null, type: null }];
  */
 export const contactFullName = (
   contact: Pick<Contact, "first_name" | "last_name">,
-): string =>
-  [contact.first_name, contact.last_name].filter(Boolean).join(" ");
+): string => [contact.first_name, contact.last_name].filter(Boolean).join(" ");
 
 const cleanContactArrayFields = (data: Contact) => {
   const cleanedEmailJsonb =
