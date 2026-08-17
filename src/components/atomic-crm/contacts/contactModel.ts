@@ -5,11 +5,25 @@ import type { Company, Contact, ContactGender } from "../types";
 export const defaultEmailJsonb = [{ email: null, type: null }];
 export const defaultPhoneJsonb = [{ number: null, type: null }];
 
+/**
+ * Joins first and last name, skipping either one when missing (null,
+ * undefined, or empty string) so the result never contains the literal
+ * string "undefined". Single source of truth for contact full-name display
+ * across the app -- never inline `${first_name} ${last_name}`.
+ */
+export const contactFullName = (
+  contact: Pick<Contact, "first_name" | "last_name">,
+): string => [contact.first_name, contact.last_name].filter(Boolean).join(" ");
+
 const cleanContactArrayFields = (data: Contact) => {
   const cleanedEmailJsonb =
-    data.email_jsonb?.filter((e) => e.email != null) || [];
+    data.email_jsonb
+      ?.filter((e) => e.email != null)
+      .map((e) => ({ ...e, type: e.type ?? "Work" })) || [];
   const cleanedPhoneJsonb =
-    data.phone_jsonb?.filter((p) => p.number != null) || [];
+    data.phone_jsonb
+      ?.filter((p) => p.number != null)
+      .map((p) => ({ ...p, type: p.type ?? "Work" })) || [];
   return {
     ...data,
     phone_jsonb: cleanedPhoneJsonb.length > 0 ? cleanedPhoneJsonb : null,
@@ -119,10 +133,10 @@ export function exportToVCard(
   lines.push("VERSION:3.0");
 
   // Name (N: Family Name;Given Name;Additional Names;Honorific Prefixes;Honorific Suffixes)
-  lines.push(`N:${contact.last_name};${contact.first_name};;;`);
+  lines.push(`N:${contact.last_name ?? ""};${contact.first_name};;;`);
 
   // Formatted name
-  lines.push(`FN:${contact.first_name} ${contact.last_name}`);
+  lines.push(`FN:${contactFullName(contact)}`);
 
   // Title/Job position
   if (contact.title) {

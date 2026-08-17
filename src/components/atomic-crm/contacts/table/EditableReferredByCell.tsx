@@ -1,6 +1,7 @@
 import { useRecordContext, useTranslate } from "ra-core";
 
 import type { Contact } from "../../types";
+import { contactFullName } from "../contactModel";
 import { EditableReferenceCell } from "./EditableReferenceCell";
 
 /**
@@ -22,7 +23,7 @@ export const EditableReferredByCell = () => {
       reference="contacts"
       label={translate("resources.contacts.fields.referred_by_id")}
       displayValue={record.referred_by_name}
-      optionText={(contact) => `${contact.first_name} ${contact.last_name}`}
+      optionText={contactFullName}
       sort={{ field: "last_name", order: "ASC" }}
       filter={{ "id@neq": record.id }}
       nullable

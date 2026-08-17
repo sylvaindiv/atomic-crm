@@ -2,6 +2,7 @@ import { useDataProvider, useGetIdentity, type DataProvider } from "ra-core";
 import { useCallback, useMemo } from "react";
 
 import type { Company, Contact, ContactNote, Tag } from "../types";
+import { contactFullName } from "./contactModel";
 
 export type ContactImportSchema = {
   first_name: string;
@@ -140,9 +141,7 @@ export function useContactImport() {
           },
         );
         for (const contact of contacts) {
-          const fullName = `${contact.first_name} ${contact.last_name}`
-            .trim()
-            .toLowerCase();
+          const fullName = contactFullName(contact).toLowerCase();
           if (!contactsByNameCache.has(fullName)) {
             contactsByNameCache.set(fullName, contact);
           }

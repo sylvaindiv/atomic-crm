@@ -3,9 +3,8 @@ import { test, expect } from "./fixtures";
 /**
  * Covers the Clubs list rendering as a read-only table (TASK-001, replacing
  * the card grid) instead of exercising every column's resolved value: the
- * column-label -> translation-key wiring (notably the new
- * `resources.companies.fields.nb_deals` key) is asserted via the header row,
- * and the row-click-to-Show behavior -- the only interaction this read-only
+ * column-label -> translation-key wiring is asserted via the header row, and
+ * the row-click-to-Show behavior -- the only interaction this read-only
  * table exposes -- is asserted end to end.
  */
 test("clubs list renders as a table and a row navigates to the club's Show page", async ({
@@ -47,7 +46,6 @@ test("clubs list renders as a table and a row navigates to the club's Show page"
   await expect(headers.getByText("City")).toBeVisible();
   await expect(headers.getByText("Account manager")).toBeVisible();
   await expect(headers.getByText("Number of judges-referees")).toBeVisible();
-  await expect(headers.getByText("Number of deals")).toBeVisible();
 
   const row = page.getByRole("row", { name: /Padel Club Paris/ });
   await expect(row).toBeVisible();

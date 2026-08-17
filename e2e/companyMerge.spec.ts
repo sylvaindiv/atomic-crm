@@ -1,12 +1,11 @@
 import { test, expect } from "./fixtures";
 
-test("merging two clubs that only differ by case reassigns contacts and deals to the winner", async ({
+test("merging two clubs that only differ by case reassigns contacts to the winner", async ({
   page,
   isMobile,
   createSales,
   createCompany,
   createContact,
-  createDeal,
   dismissToast,
 }) => {
   test.skip(isMobile, "Club merge is only available on desktop");
@@ -35,12 +34,6 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
     company_id: loser.id,
     sales_id: sales.id,
   });
-  await createDeal({
-    name: "Court renovation",
-    caseType: "club",
-    companyId: loser.id,
-    salesId: sales.id,
-  });
 
   await page.goto("http://localhost:5175/");
   await page.getByLabel("Email").fill("jane@doe.com");
@@ -65,7 +58,6 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
   await expect(
     dialog.getByText("1 judge-referee will be reassigned"),
   ).toBeVisible();
-  await expect(dialog.getByText("1 deal will be reassigned")).toBeVisible();
 
   await expect(
     dialog.getByRole("button", { name: "Merge Clubs" }),
@@ -73,13 +65,11 @@ test("merging two clubs that only differ by case reassigns contacts and deals to
   await dialog.getByRole("button", { name: "Merge Clubs" }).click();
   await dismissToast("Clubs merged successfully");
 
-  // Redirected to the winner's page, which now carries the loser's contact
-  // and deal.
+  // Redirected to the winner's page, which now carries the loser's contact.
   await expect(
     page.getByRole("heading", { name: "PADEL CLUB PARIS" }),
   ).toBeVisible();
   await expect(page.getByText("1 judge-referee", { exact: true })).toBeVisible();
-  await expect(page.getByText("1 deal", { exact: true })).toBeVisible();
 
   // The loser club no longer appears in the clubs list.
   await page.getByRole("link", { name: "Clubs" }).click();

@@ -1,91 +1,5 @@
 import { describe, it, expect } from "vitest";
-import type { RaRecord } from "ra-core";
-import { transformFormValues, validateItemsInUse } from "./SettingsPage";
-
-describe("validateItemsInUse", () => {
-  const deals: RaRecord[] = [
-    { id: 1, category: "ui-design" },
-    { id: 2, category: "copywriting" },
-    { id: 3, category: "ui-design" },
-  ];
-
-  it("returns undefined when items is undefined", () => {
-    expect(validateItemsInUse(undefined, deals, "category", "categories")).toBe(
-      undefined,
-    );
-  });
-
-  it("returns undefined when all in-use values are present", () => {
-    const items = [
-      { value: "ui-design", label: "UI Design" },
-      { value: "copywriting", label: "Copywriting" },
-    ];
-    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
-      undefined,
-    );
-  });
-
-  it("returns an error when an in-use value is removed", () => {
-    const items = [{ value: "ui-design", label: "UI Design" }];
-    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
-      "Cannot remove categories that are still used by deals: copywriting",
-    );
-  });
-
-  it("lists all missing in-use values", () => {
-    const items: { value: string; label: string }[] = [];
-    const result = validateItemsInUse(items, deals, "category", "categories");
-    expect(result).toContain("ui-design");
-    expect(result).toContain("copywriting");
-  });
-
-  it("returns an error when there are duplicate slugs", () => {
-    const items = [
-      { value: "ui-design", label: "UI Design" },
-      { value: "ui-design", label: "UI Design again" },
-      { value: "copywriting", label: "Copywriting" },
-    ];
-    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
-      "Duplicate categories: ui-design",
-    );
-  });
-
-  it("detects duplicates via slug fallback when value is empty", () => {
-    const items = [
-      { value: "", label: "UI Design" },
-      { value: "ui-design", label: "Already UI Design" },
-      { value: "copywriting", label: "Copywriting" },
-    ];
-    expect(validateItemsInUse(items, deals, "category", "categories")).toBe(
-      "Duplicate categories: ui-design",
-    );
-  });
-
-  it("returns 'Validating…' when deals have not loaded yet", () => {
-    const items = [{ value: "ui-design", label: "UI Design" }];
-    expect(validateItemsInUse(items, undefined, "category", "categories")).toBe(
-      "Validating…",
-    );
-  });
-
-  it("ignores deals with a falsy value for the checked field", () => {
-    const dealsWithEmpty: RaRecord[] = [
-      { id: 1, category: "" },
-      { id: 2, category: null },
-    ];
-    const items = [{ value: "other", label: "Other" }];
-    expect(
-      validateItemsInUse(items, dealsWithEmpty, "category", "categories"),
-    ).toBe(undefined);
-  });
-
-  it("works with the category field", () => {
-    const items = [{ value: "ui-design", label: "UI Design" }];
-    expect(
-      validateItemsInUse(items, deals, "category", "categories"),
-    ).toContain("copywriting");
-  });
-});
+import { transformFormValues } from "./SettingsPage";
 
 describe("transformFormValues", () => {
   it("preserves visibleInDealsKanban per note status item", () => {
@@ -132,5 +46,16 @@ describe("transformFormValues", () => {
     const result = transformFormValues(data);
 
     expect(result.config.noteStatuses?.[0].value).toBe("in-progress");
+  });
+
+  it("no longer includes dealCategories in the transformed config", () => {
+    const data = {
+      title: "My CRM",
+      dealCategories: [{ value: "legacy", label: "Legacy" }],
+    };
+
+    const result = transformFormValues(data);
+
+    expect(result.config).not.toHaveProperty("dealCategories");
   });
 });

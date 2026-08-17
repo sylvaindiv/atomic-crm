@@ -10,26 +10,19 @@ import type { FocusEvent, ClipboardEventHandler } from "react";
 import { useFormContext } from "react-hook-form";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { BooleanInput } from "@/components/admin/boolean-input";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { AutocompleteInput } from "@/components/admin/autocomplete-input";
+import { NumberInput } from "@/components/admin/number-input";
 import { TextInput } from "@/components/admin/text-input";
-import { RadioButtonGroupInput } from "@/components/admin/radio-button-group-input";
 import { SelectInput } from "@/components/admin/select-input";
 import { ArrayInput } from "@/components/admin/array-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 
-import { isLinkedinUrl } from "../misc/isLinkedInUrl";
 import { contactOptionText } from "../misc/ContactOption";
 import { StatusSelector } from "../notes";
 import type { Sale, Contact } from "../types";
 import { Avatar } from "./Avatar";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
-import {
-  contactGender,
-  translateContactGenderLabel,
-  translatePersonalInfoTypeLabel,
-} from "./contactModel.ts";
 
 export const ContactInputs = () => {
   const isMobile = useIsMobile();
@@ -63,19 +56,8 @@ const ContactIdentityInputs = () => {
       <h6 className="text-lg font-semibold">
         {translate("resources.contacts.field_categories.identity")}
       </h6>
-      <RadioButtonGroupInput
-        label={false}
-        row
-        source="gender"
-        choices={contactGender}
-        helperText={false}
-        optionText={(choice) => translateContactGenderLabel(choice, translate)}
-        translateChoice={false}
-        optionValue="value"
-        defaultValue={contactGender[0].value}
-      />
       <TextInput source="first_name" validate={required()} helperText={false} />
-      <TextInput source="last_name" validate={required()} helperText={false} />
+      <TextInput source="last_name" helperText={false} />
     </div>
   );
 };
@@ -111,20 +93,6 @@ const ContactPositionInputs = () => {
 const ContactPersonalInformationInputs = () => {
   const translate = useTranslate();
   const { getValues, setValue } = useFormContext();
-  const personalInfoTypes = [
-    {
-      id: "Work",
-      name: translatePersonalInfoTypeLabel("Work", translate),
-    },
-    {
-      id: "Home",
-      name: translatePersonalInfoTypeLabel("Home", translate),
-    },
-    {
-      id: "Other",
-      name: translatePersonalInfoTypeLabel("Other", translate),
-    },
-  ];
 
   // set first and last name based on email
   const handleEmailChange = (email: string) => {
@@ -174,15 +142,6 @@ const ContactPersonalInformationInputs = () => {
             onPaste={handleEmailPaste}
             onBlur={handleEmailBlur}
           />
-          <SelectInput
-            source="type"
-            helperText={false}
-            label={false}
-            optionText="name"
-            choices={personalInfoTypes}
-            defaultValue="Work"
-            className="w-24 min-w-24"
-          />
         </SimpleFormIterator>
       </ArrayInput>
       <ArrayInput source="phone_jsonb" helperText={false}>
@@ -199,22 +158,8 @@ const ContactPersonalInformationInputs = () => {
             label={false}
             placeholder={translate("resources.contacts.fields.phone_number")}
           />
-          <SelectInput
-            source="type"
-            helperText={false}
-            label={false}
-            optionText="name"
-            choices={personalInfoTypes}
-            defaultValue="Work"
-            className="w-24 min-w-24"
-          />
         </SimpleFormIterator>
       </ArrayInput>
-      <TextInput
-        source="linkedin_url"
-        helperText={false}
-        validate={isLinkedinUrl}
-      />
     </div>
   );
 };
@@ -227,7 +172,10 @@ const ContactMiscInputs = () => {
         {translate("resources.contacts.field_categories.misc")}
       </h6>
       <TextInput source="background" multiline helperText={false} />
-      <BooleanInput source="has_newsletter" helperText={false} />
+      {/* This contact page is the single page of the case ("Affaire") it
+          represents -- see types.ts Contact['amount']. */}
+      <NumberInput source="amount" defaultValue={0} helperText={false} />
+      <TextInput source="description" multiline rows={3} helperText={false} />
       <ReferenceInput
         reference="sales"
         source="sales_id"
