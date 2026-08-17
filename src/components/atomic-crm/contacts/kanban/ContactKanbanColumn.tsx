@@ -23,7 +23,11 @@ export const ContactKanbanColumn = ({
     // `role="group"` + `aria-label` give each column an accessible,
     // stable identity (also the e2e drag-and-drop test's scoping locator)
     // beyond its purely visual heading.
-    <div className="flex-1 pb-8" role="group" aria-label={statusOption?.label}>
+    <div
+      className="flex-1 min-w-0 pb-8"
+      role="group"
+      aria-label={statusOption?.label}
+    >
       <div className="flex flex-col items-center">
         <h3 className="text-base font-medium flex items-center">
           <Status status={status} />
