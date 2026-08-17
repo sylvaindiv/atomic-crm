@@ -37,7 +37,16 @@ export const NoteCreate = ({
   const defaultStatus = record.status;
 
   return (
-    <CreateBase resource={resource} redirect={false}>
+    <CreateBase
+      resource={resource}
+      redirect={false}
+      transform={(data: any) => ({
+        ...data,
+        [foreignKeyMapping[reference]]: record.id,
+        sales_id: identity.id,
+        date: new Date(data.date || getCurrentDate()).toISOString(),
+      })}
+    >
       <Form>
         <div className={cn("space-y-3", className)}>
           <NoteInputs defaultStatus={defaultStatus} showStatus={showStatus} />
@@ -106,12 +115,6 @@ const NoteCreateButton = ({
       <SaveButton
         type="button"
         label={translate("resources.notes.action.add_this")}
-        transform={(data) => ({
-          ...data,
-          [foreignKeyMapping[reference]]: record.id,
-          sales_id: identity.id,
-          date: new Date(data.date || getCurrentDate()).toISOString(),
-        })}
         mutationOptions={{
           onSuccess: handleSuccess,
         }}
