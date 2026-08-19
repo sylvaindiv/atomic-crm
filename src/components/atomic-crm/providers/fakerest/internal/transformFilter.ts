@@ -33,6 +33,13 @@ export function transformFilter(filter: Record<string, any>) {
       continue;
     }
 
+    if (key.endsWith("@isblank")) {
+      // FakeRest's `_eq_any` uses loose equality (`==`), so `[null, ""]`
+      // matches both `null`/`undefined` and empty-string status values.
+      transformedFilters[`${key.slice(0, -8)}_eq_any`] = [null, ""];
+      continue;
+    }
+
     if (key.endsWith("@in")) {
       transformedFilters[`${key.slice(0, -3)}_eq_any`] =
         transformInFilter(value);

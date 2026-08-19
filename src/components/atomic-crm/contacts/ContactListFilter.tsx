@@ -107,7 +107,7 @@ export const ContactListFilter = () => {
         <ToggleFilterButton
           className="w-auto md:w-full justify-between h-10 md:h-8"
           label="resources.contacts.background.status_none"
-          value={{ "status@or": { "status@is": null, status: "" } }}
+          value={{ "status@isblank": true }}
           size={isMobile ? "lg" : undefined}
         />
       </FilterCategory>
@@ -236,7 +236,7 @@ export const ContactListFilterSummary = () => {
       <ActiveFilterButton
         className="w-auto justify-between h-8"
         label="resources.contacts.background.status_none"
-        value={{ "status@or": { "status@is": null, status: "" } }}
+        value={{ "status@isblank": true }}
       />
 
       {data &&
