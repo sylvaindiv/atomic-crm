@@ -10,6 +10,7 @@ import type { ContactsByStatus } from "./contactStages";
 import {
   getContactsByStatus,
   getVisibleContactStatuses,
+  KANBAN_PAGE_SIZE,
 } from "./contactStages";
 
 /**
@@ -162,7 +163,7 @@ const updateContactStatus = async (
       "contacts",
       {
         sort: { field: "index", order: "ASC" },
-        pagination: { page: 1, perPage: 100 },
+        pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
         filter: { status: source.status },
       },
     );
@@ -232,12 +233,12 @@ const updateContactStatus = async (
       await Promise.all([
         dataProvider.getList<Contact>("contacts", {
           sort: { field: "index", order: "ASC" },
-          pagination: { page: 1, perPage: 100 },
+          pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
           filter: { status: source.status },
         }),
         dataProvider.getList<Contact>("contacts", {
           sort: { field: "index", order: "ASC" },
-          pagination: { page: 1, perPage: 100 },
+          pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
           filter: { status: destination.status },
         }),
       ]);
