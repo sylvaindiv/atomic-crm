@@ -4,6 +4,9 @@ import type { Contact } from "../../types";
 
 export type ContactsByStatus = Record<Contact["status"], Contact[]>;
 
+// Kanban board is unpaginated — must fetch every contact, not a page.
+export const KANBAN_PAGE_SIZE = 1000;
+
 /**
  * Note statuses that are rendered as Kanban columns, in configuration
  * order. Reads the same `visibleInDealsKanban` flag the former deals

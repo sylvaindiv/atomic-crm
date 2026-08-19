@@ -46,6 +46,7 @@ import { InfinitePagination } from "../misc/InfinitePagination";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
 import { ContactKanban } from "./kanban/ContactKanban";
+import { KANBAN_PAGE_SIZE } from "./kanban/contactStages";
 import { ContactTable } from "./table/ContactTable";
 
 type ContactViewMode = "table" | "kanban";
@@ -66,10 +67,11 @@ export const ContactList = () => {
     <List
       title={false}
       actions={<ContactListActions onCreate={() => setCreateOpen(true)} />}
-      // The Kanban loads the full unpaginated contact set instead of the
-      // table's regular page size, so it gets its own store slot for list
+      // The Kanban is grouped into columns, not paged, so it must fetch
+      // the full contact set (KANBAN_PAGE_SIZE) instead of the table's
+      // regular page size; it also gets its own store slot for list
       // params (perPage/sort/filters).
-      perPage={isKanban ? 100 : 25}
+      perPage={isKanban ? KANBAN_PAGE_SIZE : 25}
       pagination={isKanban ? null : undefined}
       sort={
         isKanban
