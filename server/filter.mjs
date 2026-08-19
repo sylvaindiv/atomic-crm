@@ -8,6 +8,7 @@
 //   "field@in"        -> value "(1,2,3)" -> field IN (?,?,?)
 //   "field@cs"        -> value "{5}"     -> JSON-array-contains-all
 //   "field@ilike"     -> field LIKE '%'||?||'%'  (case-insensitive substring)
+//   "field@isblank"   -> value true      -> field IS NULL OR field = '' (boolean flag)
 //   "@or"             -> value { "a@ilike": q, "b@ilike": q } -> (a OR b OR ...)
 //
 // All values are parameterized (`?`); identifiers are validated + quoted.
@@ -126,6 +127,14 @@ function condition(key, value, cfg) {
     }
     case "ilike":
       return { sql: `${col} LIKE '%' || ? || '%'`, args: [String(value)] };
+    case "isblank":
+      // Boolean flag: `true` means "no value" (NULL or empty string). We
+      // can't encode "no value" as a literal `null`/`""` filter value
+      // because ra-core's `removeEmpty` strips those before they reach the
+      // data provider.
+      return value
+        ? { sql: `(${col} IS NULL OR ${col} = '')`, args: [] }
+        : null;
     default:
       // Unknown operator: fall back to equality on the base field.
       return { sql: `${col} = ?`, args: [coerce(value)] };

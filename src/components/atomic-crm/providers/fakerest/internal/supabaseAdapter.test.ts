@@ -122,6 +122,26 @@ describe("getList", () => {
     });
   });
 
+  it("should transform '@isblank'", async () => {
+    const getList = vi.fn();
+    const mockDataProvider = {
+      getList,
+    } as unknown as DataProvider;
+
+    getList.mockResolvedValueOnce([{ id: 1 }]);
+
+    const { getList: getListAdapter } =
+      withSupabaseFilterAdapter(mockDataProvider);
+
+    await expect(
+      getListAdapter("resource", { filter: { "status@isblank": true } }),
+    ).resolves.toEqual([{ id: 1 }]);
+
+    expect(getList).toHaveBeenCalledWith("resource", {
+      filter: { status_eq_any: [null, ""] },
+    });
+  });
+
   it("should transform '@lt'", async () => {
     const getList = vi.fn();
     const mockDataProvider = {
@@ -403,6 +423,36 @@ describe("getManyReference", () => {
       pagination: { page: 1, perPage: 10 },
       sort: { field: "id", order: "ASC" },
       filter: { id_neq: null },
+    });
+  });
+
+  it("should transform @isblank", async () => {
+    const getManyReference = vi.fn();
+    const mockDataProvider = {
+      getManyReference,
+    } as unknown as DataProvider;
+
+    getManyReference.mockResolvedValueOnce([{ id: 1 }]);
+
+    const { getManyReference: getManyReferenceAdapter } =
+      withSupabaseFilterAdapter(mockDataProvider);
+
+    await expect(
+      getManyReferenceAdapter("resource", {
+        id: 1,
+        target: "target",
+        pagination: { page: 1, perPage: 10 },
+        sort: { field: "id", order: "ASC" },
+        filter: { "status@isblank": true },
+      }),
+    ).resolves.toEqual([{ id: 1 }]);
+
+    expect(getManyReference).toHaveBeenCalledWith("resource", {
+      id: 1,
+      target: "target",
+      pagination: { page: 1, perPage: 10 },
+      sort: { field: "id", order: "ASC" },
+      filter: { status_eq_any: [null, ""] },
     });
   });
 

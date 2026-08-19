@@ -47,9 +47,12 @@ export default tseslint.config(
   {
     // Node scripts and Claude Code hooks. TypeScript files rely on the
     // compiler for undefined identifiers; plain JS needs no-undef back on.
+    // Vitest globals are added so `.test.mjs` files (e.g. server/*.test.mjs)
+    // don't trip on `describe`/`it`/`expect`/`vi` — same set the vitest
+    // browser project injects at runtime for `*.test.{ts,tsx}`.
     files: ["**/*.mjs"],
     languageOptions: {
-      globals: globals.node,
+      globals: { ...globals.node, ...globals.vitest },
     },
     rules: {
       "no-undef": "error",
