@@ -14,7 +14,7 @@ Removes one or more of the five initial Atomic CRM resources (`contacts`, `compa
 - The user asks to delete, remove, or strip out one or several built-in CRM resources.
 - Not for *custom* entities added during setup only the five built-ins above.
 
-For the backend migration mechanics, see `Skill({skill: "backend-dev"})` and `Skill({skill: "writing-migrations"})`.
+For the backend migration mechanics, see `Skill({skill: "backend-dev"})`.
 
 ## Steps
 

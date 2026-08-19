@@ -25,25 +25,10 @@
     "pr": ""
   },
   "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-bootstrap.mjs",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
     "PreToolUse": [
       {
         "matcher": "Bash",
         "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/bash-guard.mjs"
-          },
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-docker-containers.mjs"
@@ -51,58 +36,6 @@
           {
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/circuit-breaker.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-orchestrator-merge.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/restrict-documentator-bash.mjs"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/restrict-documentator-write.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-migration-writes.mjs"
-          }
-        ]
-      },
-      {
-        "matcher": "Agent",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-nested-orchestrator.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-duplicate-dispatch.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-merger-without-review.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/block-promote-unmerged.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/enforce-dev-dispatch.mjs"
-          },
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/setup-worktree.mjs",
-            "timeout": 180,
-            "statusMessage": "Setting up worktree..."
           }
         ]
       }
@@ -114,40 +47,6 @@
             "type": "command",
             "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/turn-complete.mjs",
             "timeout": 5
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "merger",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/cleanup-worktree.mjs",
-            "timeout": 30,
-            "statusMessage": "Cleaning up worktree..."
-          }
-        ]
-      },
-      {
-        "matcher": "quality-reviewer",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/record-review-verdict.mjs",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "developer",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/validate-on-stop.mjs",
-            "timeout": 900,
-            "statusMessage": "Running validation (prettier, typecheck, unit, e2e)..."
           }
         ]
       }

@@ -15,7 +15,6 @@ Auth API, Storage, and Edge Functions. Read the relevant section before writing 
 - Creating or modifying database views, triggers, or RLS policies.
 - Writing or changing a Supabase edge function, or a custom dataProvider method that calls Supabase.
 
-For the SQL migration mechanics themselves, see `Skill({skill: "writing-migrations"})`.
 For the frontend side of a dataProvider method, see `Skill({skill: "frontend-dev"})`.
 
 ## Deciding where logic belongs

@@ -68,7 +68,7 @@ ctx.log(`key=${key} hash=${keyHash} count=${count}`);
 
 if (count > ITERATION_LIMIT) {
   ctx.block({
-    reason: `Circuit breaker: this subagent has made ${count} Bash calls — likely stuck in a loop. Stop, and report where you are blocked so the orchestrator can re-dispatch with a fresh context.`,
+    reason: `Circuit breaker: this subagent has made ${count} Bash calls — likely stuck in a loop. Stop, and report where you are blocked so the caller can re-dispatch with a fresh context.`,
     log: `BLOCK count=${count}`,
   });
 }

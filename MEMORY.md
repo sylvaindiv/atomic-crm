@@ -174,3 +174,48 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Suppression du concept `case_type='club'` : toute Affaire est un Juge-Arbitre, le club reste indicatif via `contacts.company_id`. - Kanban conservé en bascule secondaire (table/Kanban) sur la liste contacts. - Champs ajoutés à `contacts` : `amount`, `description`, `index` (pas de `category` ni d'archivage). - Notes fusionnées en un seul flux (`contact_notes`).
 **Fichiers / skills modifiés.** - `db/schema.sql` — champs contacts + suppression `deals`/`deal_notes`/`companies.status`. - `server/dealSync.mjs` — supprimé. - `src/components/atomic-crm/deals/` — dossier supprimé (~30 fichiers). - `contacts/`, `companies/`, `dashboard/`, `activity/` — retargetés.
 **Prochaines étapes / TODOs.** - [ ] Relancer en mode recovery l'orchestrateur de migration (agentId aa3d89c17d92a960c, session_dir .../33662640-...) interrompu par la coupure de session. - [ ] Vérifier manuellement d'éventuelles affaires `case_type='club'` en base avant application définitive.
+
+## 2026-08-19 11:17 — Fix pagination Kanban contacts bloquée à 100
+
+**Résumé.** Diagnostic du bug signalé : la vue Kanban des contacts n'affiche pas tous les contacts au-delà de 100, car `ContactList.tsx` fixe `perPage={isKanban ? 100 : 25}` et `pagination={null}` ne fait que masquer le composant de pagination sans lever la limite envoyée au data provider. Le même plafond de 100 est dupliqué 3 fois dans `ContactKanban.tsx` pour les refetchs de colonne lors du drag-and-drop, ce qui peut aussi corrompre l'`index` au-delà de 100 contacts par colonne. Un plan a été rédigé et approuvé, puis délégué à l'agent `orchestrator` du harness pour implémentation. La notification de fin de tâche indique qu'aucun enregistrement de complétion n'a été trouvé pour cet agent — il a possiblement été interrompu par la fin de la session précédente ; le correctif n'est donc pas confirmé appliqué.
+
+**Décisions prises.**
+- Corriger via une constante partagée `KANBAN_PAGE_SIZE` (ex. 1000) exportée depuis `contactStages.ts` plutôt que 4 littéraux `100` dupliqués — pourquoi : source unique de vérité, évite une nouvelle dérive future.
+- Déléguer l'implémentation à l'agent `orchestrator` (workflow harness du projet) plutôt que d'éditer directement — pourquoi : règle projet imposant le passage par le harness pour toute demande de changement de code.
+
+**Fichiers / skills modifiés.**
+- _aucune_ (aucune modification confirmée appliquée sur disque à ce stade ; seul le plan a été écrit dans `~/.claude/plans/system-instruction-you-are-working-harmonic-breeze.md`)
+
+**Prochaines étapes / TODOs.**
+- [ ] Relancer/reprendre l'agent `orchestrator` (agentId a5106cab51ad36821) pour vérifier s'il a terminé son travail ou le relancer depuis zéro
+- [ ] Vérifier l'état réel de `ContactList.tsx` et `ContactKanban.tsx` avant de considérer le bug corrigé
+
+## 2026-08-19 11:30 — Trois correctifs filtres contacts list
+
+**Résumé.** Implémentation de trois changements aux filtres de la liste contacts : ajout d'un bouton "Aucun" pour afficher les contacts sans statut (NULL ou vide), suppression du filtre "Responsable de compte" (sales_id), et remplacement du filtre "Dernière activité" pour utiliser une colonne calculée `last_activity_at` (création + dates notes + dates tâches) au lieu de `last_seen` manuel. Schéma DB appliqué, typecheck et ESLint verts.
+
+**Décisions prises.**
+- Implémenter `last_activity_at` comme colonne calculée en vue SQL (MAX de 4 sources) plutôt qu'au runtime — pourquoi : requête centralisée, réutilisable, données cohérentes côté serveur.
+- Utiliser `status@or` avec deux conditions (NULL et '') pour le filtre "Aucun" — pourquoi : couvre les deux états où un statut peut être vide en base.
+- Supprimer le filtre sales_id du UI complètement — pourquoi : demande utilisateur explicite, `sales_id` reste sur les tables/views pour d'autres usages.
+
+**Fichiers / skills modifiés.**
+- `db/schema.sql` — colonne calculée last_activity_at dans contacts_summary (MAX de first_seen, notes.date, tasks due/done_date)
+- `src/components/atomic-crm/types.ts` — ajout champ `last_activity_at?: string | null` à Contact
+- `src/components/atomic-crm/contacts/ContactListFilter.tsx` — 3 changements: bouton "Aucun" status, suppression FilterCategory sales_id, remplacement last_seen → last_activity_at (5 boutons)
+- `src/components/atomic-crm/providers/fakerest/dataGenerator/contacts.ts` — ajout `last_activity_at: first_seen` aux données générées
+
+**Prochaines étapes / TODOs.**
+- _aucune_ (implémentation complète et vérifiée)
+
+## 2026-08-19 11:31 — Retrait harness orchestrator, plan filtres contacts
+**Résumé.** Plan validé pour la page contacts ("Juge-arbitre") : ajouter un filtre "Aucun" statut, supprimer le filtre "Responsable de compte", et faire filtrer "Dernière activité" sur un vrai `last_activity_at` calculé (au lieu de `last_seen`, mis à jour manuellement). Dispatch vers l'agent `orchestrator` pour implémentation, mais celui-ci s'est arrêté sans terminer (aucun résultat livré). L'utilisateur a signalé une forte insatisfaction envers le dispatch systématique vers l'orchestrator (coût élevé en tokens, peu de valeur, échec silencieux).
+**Décisions prises.** - Suppression du mandat de dispatch harness dans `CLAUDE.md` : la session principale implémente désormais les changements de code directement, sans passer par l'orchestrator, sauf demande explicite (raison : retour utilisateur négatif répété + échec constaté).
+**Fichiers / skills modifiés.** - `CLAUDE.md` — section "Agent Workflow" remplacée (retrait du mandat de dispatch orchestrator). - `~/.claude/plans/system-instruction-you-are-working-curious-forest.md` — plan approuvé pour les 3 changements de filtres contacts (non encore appliqué au code).
+**Prochaines étapes / TODOs.** - [ ] Implémenter directement les 3 changements approuvés : `ContactListFilter.tsx` (option "Aucun" statut, retrait filtre responsable de compte), `db/schema.sql` (colonne `last_activity_at` sur la vue `contacts_summary`), `types.ts` (champ `last_activity_at`), puis `npm run db:apply`.
+
+## 2026-08-19 11:43 — Retrait harness + filtres contacts livrés
+**Résumé.** Implémenté et vérifié les 3 filtres demandés sur la liste contacts (statut "Aucun", retrait "Responsable de compte", `last_activity_at` calculé depuis notes/tâches) ; migration de vue appliquée en base Turso et confirmée par requête. Supprimé entièrement le mode agent harness à la demande explicite de l'utilisateur : 6 agents, ~25 hooks/libs, 5 skills, scripts et commandes harness-*, doc dédiée, cibles Makefile, références résiduelles nettoyées. Vérifié via tests hooks (28/28), typecheck, eslint, prettier.
+**Décisions prises.** - Suppression totale plutôt qu'un simple opt-out `#no-harness` : l'utilisateur juge le harness trop coûteux en tokens pour peu de valeur, et une tentative de dispatch a "stoppé" sans notification claire. - Conservé `circuit-breaker.mjs`, `block-docker-containers.mjs`, `turn-complete.mjs` : génériques, non spécifiques au harness.
+**Fichiers / skills modifiés.** - `CLAUDE.md`, `.claude/settings.json` — retrait section Agent Workflow et hooks harness. - `.claude/agents/*`, la majorité de `.claude/hooks/*` et `.claude/skills/{adr-writing,writing-migrations,resolving-rollback-conflicts,setup-interview,worktree-detection}`, `scripts/harness-*.mjs` — supprimés. - `ContactListFilter.tsx`, `db/schema.sql`, `types.ts`, `providers/fakerest/dataGenerator/contacts.ts` — filtres contacts.
+**Prochaines étapes / TODOs.** _aucune_
