@@ -6,7 +6,7 @@ import {
   subMonths,
 } from "date-fns";
 import { CheckSquare, Clock, Tag, TrendingUp } from "lucide-react";
-import { useGetList, useListContext, useTranslate } from "ra-core";
+import { useGetList, useListContext, useTranslate, useStore } from "ra-core";
 import { ToggleFilterButton } from "@/components/admin/toggle-filter-button";
 import { getContrastingTextColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,8 @@ export const ContactListFilter = () => {
   const { noteStatuses } = useConfigurationContext();
   const isMobile = useIsMobile();
   const translate = useTranslate();
+  const [viewMode] = useStore<string>("contacts.viewMode", "table");
+  const isKanban = viewMode === "kanban";
   const { data } = useGetList("tags", {
     pagination: { page: 1, perPage: 10 },
     sort: { field: "name", order: "ASC" },
@@ -87,74 +89,83 @@ export const ContactListFilter = () => {
         />
       </FilterCategory>
 
-      <FilterCategory
-        label="resources.notes.fields.status"
-        icon={<TrendingUp />}
-      >
-        {noteStatuses.map((status) => (
-          <ToggleFilterButton
-            key={status.value}
-            className="w-auto md:w-full justify-between h-10 md:h-8"
-            label={
-              <span>
-                {status.label} <Status status={status.value} />
-              </span>
-            }
-            value={{ status: status.value }}
-            size={isMobile ? "lg" : undefined}
-          />
-        ))}
-        <ToggleFilterButton
-          className="w-auto md:w-full justify-between h-10 md:h-8"
-          label="resources.contacts.background.status_none"
-          value={{ "status@isblank": true }}
-          size={isMobile ? "lg" : undefined}
-        />
-      </FilterCategory>
-
-      <FilterCategory label="resources.contacts.filters.tags" icon={<Tag />}>
-        {data &&
-          data.map((record) => (
+      {!isKanban && (
+        <>
+          <FilterCategory
+            label="resources.notes.fields.status"
+            icon={<TrendingUp />}
+          >
+            {noteStatuses.map((status) => (
+              <ToggleFilterButton
+                key={status.value}
+                className="w-auto md:w-full justify-between h-10 md:h-8"
+                label={
+                  <span>
+                    {status.label} <Status status={status.value} />
+                  </span>
+                }
+                value={{ status: status.value }}
+                size={isMobile ? "lg" : undefined}
+              />
+            ))}
             <ToggleFilterButton
               className="w-auto md:w-full justify-between h-10 md:h-8"
-              key={record.id}
-              label={
-                <Badge
-                  variant="secondary"
-                  className="text-sm md:text-xs font-normal cursor-pointer"
-                  style={{
-                    backgroundColor: record?.color,
-                    color: getContrastingTextColor(record?.color ?? "#ffffff"),
-                  }}
-                >
-                  {record?.name}
-                </Badge>
-              }
-              value={{ "tags@cs": `{${record.id}}` }}
+              label="resources.contacts.background.status_none"
+              value={{ "status@isblank": true }}
               size={isMobile ? "lg" : undefined}
             />
-          ))}
-      </FilterCategory>
+          </FilterCategory>
 
-      <FilterCategory
-        icon={<CheckSquare />}
-        label="resources.contacts.filters.tasks"
-      >
-        <ToggleFilterButton
-          className="w-full justify-between h-10 md:h-8"
-          label="resources.tasks.filters.with_pending"
-          value={{ "nb_tasks@gt": 0 }}
-          size={isMobile ? "lg" : undefined}
-        />
-        {/* Mirrors the Kanban column sort / countdown chip's "needs action"
-            rule (next action overdue or due today) -- see misc/nextAction.ts. */}
-        <ToggleFilterButton
-          className="w-full justify-between h-10 md:h-8"
-          label="resources.contacts.filters.needs_action"
-          value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
-          size={isMobile ? "lg" : undefined}
-        />
-      </FilterCategory>
+          <FilterCategory
+            label="resources.contacts.filters.tags"
+            icon={<Tag />}
+          >
+            {data &&
+              data.map((record) => (
+                <ToggleFilterButton
+                  className="w-auto md:w-full justify-between h-10 md:h-8"
+                  key={record.id}
+                  label={
+                    <Badge
+                      variant="secondary"
+                      className="text-sm md:text-xs font-normal cursor-pointer"
+                      style={{
+                        backgroundColor: record?.color,
+                        color: getContrastingTextColor(
+                          record?.color ?? "#ffffff",
+                        ),
+                      }}
+                    >
+                      {record?.name}
+                    </Badge>
+                  }
+                  value={{ "tags@cs": `{${record.id}}` }}
+                  size={isMobile ? "lg" : undefined}
+                />
+              ))}
+          </FilterCategory>
+
+          <FilterCategory
+            icon={<CheckSquare />}
+            label="resources.contacts.filters.tasks"
+          >
+            <ToggleFilterButton
+              className="w-full justify-between h-10 md:h-8"
+              label="resources.tasks.filters.with_pending"
+              value={{ "nb_tasks@gt": 0 }}
+              size={isMobile ? "lg" : undefined}
+            />
+            {/* Mirrors the Kanban column sort / countdown chip's "needs action"
+                rule (next action overdue or due today) -- see misc/nextAction.ts. */}
+            <ToggleFilterButton
+              className="w-full justify-between h-10 md:h-8"
+              label="resources.contacts.filters.needs_action"
+              value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
+              size={isMobile ? "lg" : undefined}
+            />
+          </FilterCategory>
+        </>
+      )}
     </ResponsiveFilters>
   );
 };

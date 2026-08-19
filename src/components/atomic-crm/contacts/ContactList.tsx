@@ -79,6 +79,12 @@ export const ContactList = () => {
           : { field: "last_seen", order: "DESC" }
       }
       storeKey={isKanban ? "contacts.kanban.listParams" : undefined}
+      filterDefaultValues={isKanban ? undefined : { "status@isblank": true }}
+      // Table and Kanban share one route/URL, only toggling a store flag.
+      // Without this, ra-core prefers a non-empty URL query over the
+      // per-view perPage/storeKey above, so the table's "rows per page"
+      // (or a stale filter) leaks into the Kanban and caps/filters it.
+      disableSyncWithLocation={isKanban}
       exporter={exporter}
     >
       <ContactListLayoutDesktop viewMode={viewMode} />
@@ -204,6 +210,7 @@ export const ContactListMobile = () => {
       perPage={25}
       sort={{ field: "last_seen", order: "DESC" }}
       exporter={exporter}
+      filterDefaultValues={{ "status@isblank": true }}
       queryOptions={{
         onError: () => {
           /* Disable error notification as ContactListLayoutMobile handles it */
