@@ -123,6 +123,8 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       index: 0,
       // Computed post-generation in finalize.ts, once tasks exist.
       next_action_due_date: null,
+      // Computed column: most recent contact event (creation, note, task date).
+      last_activity_at: first_seen,
     };
 
     generatedContacts.push(contact);

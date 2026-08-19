@@ -111,6 +111,9 @@ export type Contact = {
   // Computed column (contacts_summary view): the contact's earliest open
   // task due_date. Read by the Kanban (TASK-004).
   next_action_due_date?: string | null;
+  // Computed column (contacts_summary view): most recent contact event
+  // (creation, note, task due/done date). Used by the "Dernière activité" filter.
+  last_activity_at?: string | null;
 } & Pick<RaRecord, "id">;
 
 export type ContactNote = {

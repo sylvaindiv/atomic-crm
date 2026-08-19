@@ -5,13 +5,8 @@ import {
   startOfWeek,
   subMonths,
 } from "date-fns";
-import { CheckSquare, Clock, Tag, TrendingUp, Users } from "lucide-react";
-import {
-  useGetIdentity,
-  useGetList,
-  useListContext,
-  useTranslate,
-} from "ra-core";
+import { CheckSquare, Clock, Tag, TrendingUp } from "lucide-react";
+import { useGetList, useListContext, useTranslate } from "ra-core";
 import { ToggleFilterButton } from "@/components/admin/toggle-filter-button";
 import { getContrastingTextColor } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +21,6 @@ import { ActiveFilterButton } from "../misc/ActiveFilterButton";
 export const ContactListFilter = () => {
   const { noteStatuses } = useConfigurationContext();
   const isMobile = useIsMobile();
-  const { identity } = useGetIdentity();
   const translate = useTranslate();
   const { data } = useGetList("tags", {
     pagination: { page: 1, perPage: 10 },
@@ -47,8 +41,8 @@ export const ContactListFilter = () => {
           className="w-auto md:w-full justify-between h-10 md:h-8"
           label="resources.contacts.filters.today"
           value={{
-            "last_seen@gte": endOfYesterday().toISOString(),
-            "last_seen@lte": undefined,
+            "last_activity_at@gte": endOfYesterday().toISOString(),
+            "last_activity_at@lte": undefined,
           }}
           size={isMobile ? "lg" : undefined}
         />
@@ -56,8 +50,8 @@ export const ContactListFilter = () => {
           className="w-auto md:w-full justify-between h-10 md:h-8"
           label="resources.contacts.filters.this_week"
           value={{
-            "last_seen@gte": startOfWeek(new Date()).toISOString(),
-            "last_seen@lte": undefined,
+            "last_activity_at@gte": startOfWeek(new Date()).toISOString(),
+            "last_activity_at@lte": undefined,
           }}
           size={isMobile ? "lg" : undefined}
         />
@@ -65,8 +59,8 @@ export const ContactListFilter = () => {
           className="w-auto md:w-full justify-between h-10 md:h-8"
           label="resources.contacts.filters.before_this_week"
           value={{
-            "last_seen@gte": undefined,
-            "last_seen@lte": startOfWeek(new Date()).toISOString(),
+            "last_activity_at@gte": undefined,
+            "last_activity_at@lte": startOfWeek(new Date()).toISOString(),
           }}
           size={isMobile ? "lg" : undefined}
         />
@@ -74,8 +68,8 @@ export const ContactListFilter = () => {
           className="w-auto md:w-full justify-between h-10 md:h-8"
           label="resources.contacts.filters.before_this_month"
           value={{
-            "last_seen@gte": undefined,
-            "last_seen@lte": startOfMonth(new Date()).toISOString(),
+            "last_activity_at@gte": undefined,
+            "last_activity_at@lte": startOfMonth(new Date()).toISOString(),
           }}
           size={isMobile ? "lg" : undefined}
         />
@@ -83,8 +77,8 @@ export const ContactListFilter = () => {
           className="w-auto md:w-full justify-between h-10 md:h-8"
           label="resources.contacts.filters.before_last_month"
           value={{
-            "last_seen@gte": undefined,
-            "last_seen@lte": subMonths(
+            "last_activity_at@gte": undefined,
+            "last_activity_at@lte": subMonths(
               startOfMonth(new Date()),
               1,
             ).toISOString(),
@@ -110,6 +104,12 @@ export const ContactListFilter = () => {
             size={isMobile ? "lg" : undefined}
           />
         ))}
+        <ToggleFilterButton
+          className="w-auto md:w-full justify-between h-10 md:h-8"
+          label="resources.contacts.background.status_none"
+          value={{ "status@or": { "status@is": null, status: "" } }}
+          size={isMobile ? "lg" : undefined}
+        />
       </FilterCategory>
 
       <FilterCategory label="resources.contacts.filters.tags" icon={<Tag />}>
@@ -155,25 +155,12 @@ export const ContactListFilter = () => {
           size={isMobile ? "lg" : undefined}
         />
       </FilterCategory>
-
-      <FilterCategory
-        icon={<Users />}
-        label="resources.contacts.fields.sales_id"
-      >
-        <ToggleFilterButton
-          className="w-full justify-between h-10 md:h-8"
-          label="crm.common.me"
-          value={{ sales_id: identity?.id }}
-          size={isMobile ? "lg" : undefined}
-        />
-      </FilterCategory>
     </ResponsiveFilters>
   );
 };
 
 export const ContactListFilterSummary = () => {
   const { noteStatuses } = useConfigurationContext();
-  const { identity } = useGetIdentity();
   const { data } = useGetList("tags", {
     pagination: { page: 1, perPage: 10 },
     sort: { field: "name", order: "ASC" },
@@ -193,40 +180,43 @@ export const ContactListFilterSummary = () => {
         className="w-auto justify-between h-8"
         label="resources.contacts.filters.today"
         value={{
-          "last_seen@gte": endOfYesterday().toISOString(),
-          "last_seen@lte": undefined,
+          "last_activity_at@gte": endOfYesterday().toISOString(),
+          "last_activity_at@lte": undefined,
         }}
       />
       <ActiveFilterButton
         className="w-auto justify-between h-8"
         label="resources.contacts.filters.this_week"
         value={{
-          "last_seen@gte": startOfWeek(new Date()).toISOString(),
-          "last_seen@lte": undefined,
+          "last_activity_at@gte": startOfWeek(new Date()).toISOString(),
+          "last_activity_at@lte": undefined,
         }}
       />
       <ActiveFilterButton
         className="w-auto justify-between h-8"
         label="resources.contacts.filters.before_this_week"
         value={{
-          "last_seen@gte": undefined,
-          "last_seen@lte": startOfWeek(new Date()).toISOString(),
+          "last_activity_at@gte": undefined,
+          "last_activity_at@lte": startOfWeek(new Date()).toISOString(),
         }}
       />
       <ActiveFilterButton
         className="w-auto justify-between h-8"
         label="resources.contacts.filters.before_this_month"
         value={{
-          "last_seen@gte": undefined,
-          "last_seen@lte": startOfMonth(new Date()).toISOString(),
+          "last_activity_at@gte": undefined,
+          "last_activity_at@lte": startOfMonth(new Date()).toISOString(),
         }}
       />
       <ActiveFilterButton
         className="w-auto justify-between h-8"
         label="resources.contacts.filters.before_last_month"
         value={{
-          "last_seen@gte": undefined,
-          "last_seen@lte": subMonths(startOfMonth(new Date()), 1).toISOString(),
+          "last_activity_at@gte": undefined,
+          "last_activity_at@lte": subMonths(
+            startOfMonth(new Date()),
+            1,
+          ).toISOString(),
         }}
       />
 
@@ -242,6 +232,12 @@ export const ContactListFilterSummary = () => {
           value={{ status: status.value }}
         />
       ))}
+
+      <ActiveFilterButton
+        className="w-auto justify-between h-8"
+        label="resources.contacts.background.status_none"
+        value={{ "status@or": { "status@is": null, status: "" } }}
+      />
 
       {data &&
         data.map((record) => (
@@ -274,12 +270,6 @@ export const ContactListFilterSummary = () => {
         className="w-auto justify-between h-8"
         label="resources.contacts.filters.needs_action"
         value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
-      />
-
-      <ActiveFilterButton
-        className="w-auto justify-between h-8"
-        label="resources.contacts.filters.managed_by_me"
-        value={{ sales_id: identity?.id }}
       />
     </div>
   );

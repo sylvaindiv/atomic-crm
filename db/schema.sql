@@ -154,5 +154,12 @@ SELECT
     (SELECT count(*) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS nb_tasks,
     (SELECT text FROM contact_notes cn WHERE cn.contact_id = co.id ORDER BY date DESC LIMIT 1) AS latest_note_text,
     -- Due date of this contact's earliest open task (their next action).
-    (SELECT MIN(t.due_date) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS next_action_due_date
+    (SELECT MIN(t.due_date) FROM tasks t WHERE t.contact_id = co.id AND t.done_date IS NULL) AS next_action_due_date,
+    -- Most recent contact event: creation, note date, or task due/done date.
+    (SELECT MAX(x) FROM (
+       SELECT co.first_seen AS x
+       UNION ALL SELECT MAX(cn.date) FROM contact_notes cn WHERE cn.contact_id = co.id
+       UNION ALL SELECT MAX(t.due_date)  FROM tasks t WHERE t.contact_id = co.id
+       UNION ALL SELECT MAX(t.done_date) FROM tasks t WHERE t.contact_id = co.id
+    )) AS last_activity_at
 FROM contacts co;
