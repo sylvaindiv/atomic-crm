@@ -496,6 +496,26 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/map/useGeocodedContacts.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/map/mapWithConcurrency.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/map/geocodeAddress.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/map/MapPage.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/map/ContactMap.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/login/StartPage.tsx",
           "type": "registry:component"
         },
