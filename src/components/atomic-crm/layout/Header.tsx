@@ -9,6 +9,7 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { ImportPage } from "../misc/ImportPage";
 import { ChangelogPage } from "../misc/ChangelogPage";
+import { MapPage } from "../map/MapPage";
 
 const Header = () => {
   const { darkModeLogo, lightModeLogo, title } = useConfigurationContext();
@@ -22,6 +23,8 @@ const Header = () => {
     currentPath = "/contacts";
   } else if (matchPath("/companies/*", location.pathname)) {
     currentPath = "/companies";
+  } else if (matchPath("/map/*", location.pathname)) {
+    currentPath = "/map";
   } else {
     currentPath = false;
   }
@@ -68,6 +71,11 @@ const Header = () => {
                     })}
                     to="/companies"
                     isActive={currentPath === "/companies"}
+                  />
+                  <NavigationTab
+                    label={translate("crm.map.title")}
+                    to={MapPage.path}
+                    isActive={currentPath === "/map"}
                   />
                 </nav>
               </div>

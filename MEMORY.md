@@ -219,3 +219,57 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Suppression totale plutôt qu'un simple opt-out `#no-harness` : l'utilisateur juge le harness trop coûteux en tokens pour peu de valeur, et une tentative de dispatch a "stoppé" sans notification claire. - Conservé `circuit-breaker.mjs`, `block-docker-containers.mjs`, `turn-complete.mjs` : génériques, non spécifiques au harness.
 **Fichiers / skills modifiés.** - `CLAUDE.md`, `.claude/settings.json` — retrait section Agent Workflow et hooks harness. - `.claude/agents/*`, la majorité de `.claude/hooks/*` et `.claude/skills/{adr-writing,writing-migrations,resolving-rollback-conflicts,setup-interview,worktree-detection}`, `scripts/harness-*.mjs` — supprimés. - `ContactListFilter.tsx`, `db/schema.sql`, `types.ts`, `providers/fakerest/dataGenerator/contacts.ts` — filtres contacts.
 **Prochaines étapes / TODOs.** _aucune_
+
+## 2026-08-19 14:45 — Ajout page Carte des contacts
+
+**Résumé.** Implémenté une nouvelle page `/map` affichant les contacts sur une carte de France (Leaflet + OSM), un point coloré par statut, avec filtre par statut persistant dans l'URL. Géocodage côté client via l'API gratuite api-adresse.data.gouv.fr avec cache localStorage et timeout 8s. Vérifié end-to-end via agent-browser (login, marqueurs, popup, filtre) ; typecheck/lint/tests OK.
+
+**Décisions prises.**
+- Géocodage client-side sans migration DB — pas de lat/lng en base, l'API française gratuite scope naturellement à la France sans champ `country`
+- Lien mobile placé dans Settings → About plutôt que la bottom nav — la bottom nav n'a que 5 slots fixes et n'inclut déjà pas Companies
+- Ajout leaflet + react-leaflet comme seule nouvelle dépendance — aucune lib de carte déjà présente
+
+**Fichiers / skills modifiés.**
+- `src/components/atomic-crm/map/` — nouveau dossier (geocodeAddress.ts, useGeocodedContacts.ts, ContactMap.tsx, MapPage.tsx, geocodeAddress.test.ts)
+- `src/components/atomic-crm/root/CRM.tsx` — route `/map` (desktop + mobile)
+- `src/components/atomic-crm/layout/Header.tsx` — onglet nav "Carte"
+- `src/components/atomic-crm/settings/SettingsPageMobile.tsx` — lien mobile vers la carte
+- `src/components/atomic-crm/providers/commons/{english,french}CrmMessages.ts` — clés i18n `crm.map.*`
+- `package.json` — deps leaflet, react-leaflet, @types/leaflet
+
+**Prochaines étapes / TODOs.** _aucune_
+
+## 2026-08-19 14:57 — Ajout page Carte (Map) + fix geocoding
+
+**Résumé.** Ajout d'une page `/map` affichant les contacts sur une carte de France (Leaflet + OSM), points colorés par statut, filtre par statut persisté dans l'URL. Géocodage côté client via l'API gratuite api-adresse.data.gouv.fr (pas de lat/lng en base). Après premier retour utilisateur ("Aucun contact n'a pu être localisé"), diagnostic DB (354/495 contacts avec adresse OK) puis correction de deux bugs : burst de ~300 requêtes simultanées non throttlé, et cache localStorage qui persistait un `null` même sur échec réseau (pas seulement "adresse introuvable"), rendant l'état vide permanent.
+
+**Décisions prises.**
+- Géocodage client-side sans migration DB (pas de colonne lat/lng) — évite backfill, scope naturellement à la France — car ajouter une colonne était jugé disproportionné pour ce besoin.
+- Concurrence limitée à 5 requêtes simultanées (`mapWithConcurrency.ts`) pour éviter le rate-limiting de l'API publique.
+- Cache clé versionnée `map-geocode:v2:` pour invalider automatiquement les entrées `null` empoisonnées par le bug initial, sans action manuelle utilisateur.
+
+**Fichiers / skills modifiés.**
+- `src/components/atomic-crm/map/` — nouveau dossier (MapPage, ContactMap, geocodeAddress, useGeocodedContacts, mapWithConcurrency + tests)
+- `src/components/atomic-crm/root/CRM.tsx`, `layout/Header.tsx`, `settings/SettingsPageMobile.tsx` — intégration route + nav
+- `providers/commons/{english,french}CrmMessages.ts` — clés `crm.map.*`
+- `package.json` — ajout `leaflet`, `react-leaflet`
+
+**Prochaines étapes / TODOs.**
+- [ ] Utilisateur à confirmer que les marqueurs s'affichent après le fix (non reconfirmé en sandbox, réseau externe instable côté agent)
+
+## 2026-08-19 15:27 — Page Carte : géocodage contacts + fixes réseau
+
+**Résumé.** Ajout d'une page `/map` affichant les contacts sur une carte de France (Leaflet + OSM), points colorés par statut, filtre par statut persisté dans l'URL. Géocodage client-side via l'API IGN (postal_code+city → lat/lng), cache localStorage. Découverte et correction de plusieurs bugs en prod : burst de ~350 requêtes simultanées non throttlé, cache qui figeait des échecs réseau en `null` permanent, endpoint api-adresse.data.gouv.fr décommissionné, et rate-limiting 429 non géré. Ajustement final UX : popup au survol (au lieu du clic) et points plus gros.
+
+**Décisions prises.**
+- api-adresse.data.gouv.fr abandonné au profit de data.geopf.fr/geocodage/search (même format GeoJSON) — l'ancien domaine renvoie ERR_CONNECTION_REFUSED depuis 3 réseaux indépendants
+- Concurrence de géocodage limitée à 3 requêtes simultanées + retry avec backoff exponentiel sur 429, pour éviter le rate-limiting
+- Cache localStorage versionné (`v2:`) et ne persiste plus les échecs réseau/429, seulement les vraies réponses API
+
+**Fichiers / skills modifiés.**
+- `src/components/atomic-crm/map/` — nouveau module (MapPage, ContactMap, geocodeAddress, useGeocodedContacts, mapWithConcurrency + tests)
+- `src/components/atomic-crm/root/CRM.tsx`, `layout/Header.tsx`, `settings/SettingsPageMobile.tsx` — intégration route/nav
+- `providers/commons/{english,french}CrmMessages.ts` — clés i18n `crm.map.*`
+- `package.json` — ajout leaflet, react-leaflet
+
+**Prochaines étapes / TODOs.** _aucune_

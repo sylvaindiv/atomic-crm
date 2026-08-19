@@ -38,6 +38,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MobileContent } from "../layout/MobileContent";
 import MobileHeader from "../layout/MobileHeader";
 import { ChangelogPage } from "../misc/ChangelogPage";
+import { MapPage } from "../map/MapPage";
 import ImageEditorField from "../misc/ImageEditorField";
 import type { CrmDataProvider } from "../providers/types";
 import type { SalesFormData } from "../types";
@@ -452,6 +453,19 @@ const AboutSection = () => {
     <div>
       <SectionLabel>{translate("crm.settings.about")}</SectionLabel>
       <ItemGroup className="rounded-lg border overflow-hidden">
+        <Item asChild size="sm" className="cursor-pointer">
+          <Link to={MapPage.path}>
+            <ItemContent>
+              <ItemTitle className="font-normal">
+                {translate("crm.map.title")}
+              </ItemTitle>
+            </ItemContent>
+            <ItemActions>
+              <ChevronRight className="size-4 text-muted-foreground" />
+            </ItemActions>
+          </Link>
+        </Item>
+        <ItemSeparator />
         <Item asChild size="sm" className="cursor-pointer">
           <Link to={ChangelogPage.path}>
             <ItemContent>
