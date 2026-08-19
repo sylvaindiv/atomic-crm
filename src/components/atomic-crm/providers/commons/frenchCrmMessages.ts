@@ -403,6 +403,10 @@ export const frenchCrmMessages = {
     changelog: {
       title: "Notes de version",
     },
+    map: {
+      title: "Carte",
+      empty: "Aucun contact n'a pu être localisé sur la carte.",
+    },
     activity: {
       added_company: "%{name} a ajouté le club",
       you_added_company: "Vous avez ajouté le club",

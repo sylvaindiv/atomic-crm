@@ -20,6 +20,7 @@ import { Layout } from "../layout/Layout";
 import { MobileLayout } from "../layout/MobileLayout";
 import { ImportPage } from "../misc/ImportPage";
 import { ChangelogPage } from "../misc/ChangelogPage";
+import { MapPage } from "../map/MapPage";
 import {
   getAuthProvider as defaultAuthProviderBuilder,
   getDataProvider as defaultDataProviderBuilder,
@@ -229,6 +230,7 @@ const DesktopAdmin = (
         <Route path={SettingsPage.path} element={<SettingsPage />} />
         <Route path={ImportPage.path} element={<ImportPage />} />
         <Route path={ChangelogPage.path} element={<ChangelogPage />} />
+        <Route path={MapPage.path} element={<MapPage />} />
       </CustomRoutes>
       <Resource name="contacts" {...contacts} />
       <Resource name="companies" {...companies} />
@@ -278,6 +280,7 @@ const MobileAdmin = (
             element={<SettingsPageMobile />}
           />
           <Route path={ChangelogPage.path} element={<ChangelogPage />} />
+          <Route path={MapPage.path} element={<MapPage />} />
         </CustomRoutes>
         <Resource
           name="contacts"

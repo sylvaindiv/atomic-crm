@@ -399,6 +399,10 @@ export const englishCrmMessages = {
     changelog: {
       title: "Changelog",
     },
+    map: {
+      title: "Map",
+      empty: "No contact could be located on the map.",
+    },
     activity: {
       added_company: "%{name} added club",
       you_added_company: "You added club",
