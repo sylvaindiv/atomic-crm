@@ -29,6 +29,10 @@ export const ContactListFilter = () => {
     sort: { field: "name", order: "ASC" },
   });
 
+  // Kanban must show every contact with no active filter -- see
+  // contacts.kanban.listParams.v2 in ContactList.tsx.
+  if (isKanban) return null;
+
   return (
     <ResponsiveFilters
       searchInput={{
@@ -89,83 +93,74 @@ export const ContactListFilter = () => {
         />
       </FilterCategory>
 
-      {!isKanban && (
-        <>
-          <FilterCategory
-            label="resources.notes.fields.status"
-            icon={<TrendingUp />}
-          >
-            {noteStatuses.map((status) => (
-              <ToggleFilterButton
-                key={status.value}
-                className="w-auto md:w-full justify-between h-10 md:h-8"
-                label={
-                  <span>
-                    {status.label} <Status status={status.value} />
-                  </span>
-                }
-                value={{ status: status.value }}
-                size={isMobile ? "lg" : undefined}
-              />
-            ))}
+      <FilterCategory
+        label="resources.notes.fields.status"
+        icon={<TrendingUp />}
+      >
+        {noteStatuses.map((status) => (
+          <ToggleFilterButton
+            key={status.value}
+            className="w-auto md:w-full justify-between h-10 md:h-8"
+            label={
+              <span>
+                {status.label} <Status status={status.value} />
+              </span>
+            }
+            value={{ status: status.value }}
+            size={isMobile ? "lg" : undefined}
+          />
+        ))}
+        <ToggleFilterButton
+          className="w-auto md:w-full justify-between h-10 md:h-8"
+          label="resources.contacts.background.status_none"
+          value={{ "status@isblank": true }}
+          size={isMobile ? "lg" : undefined}
+        />
+      </FilterCategory>
+
+      <FilterCategory label="resources.contacts.filters.tags" icon={<Tag />}>
+        {data &&
+          data.map((record) => (
             <ToggleFilterButton
               className="w-auto md:w-full justify-between h-10 md:h-8"
-              label="resources.contacts.background.status_none"
-              value={{ "status@isblank": true }}
+              key={record.id}
+              label={
+                <Badge
+                  variant="secondary"
+                  className="text-sm md:text-xs font-normal cursor-pointer"
+                  style={{
+                    backgroundColor: record?.color,
+                    color: getContrastingTextColor(record?.color ?? "#ffffff"),
+                  }}
+                >
+                  {record?.name}
+                </Badge>
+              }
+              value={{ "tags@cs": `{${record.id}}` }}
               size={isMobile ? "lg" : undefined}
             />
-          </FilterCategory>
+          ))}
+      </FilterCategory>
 
-          <FilterCategory
-            label="resources.contacts.filters.tags"
-            icon={<Tag />}
-          >
-            {data &&
-              data.map((record) => (
-                <ToggleFilterButton
-                  className="w-auto md:w-full justify-between h-10 md:h-8"
-                  key={record.id}
-                  label={
-                    <Badge
-                      variant="secondary"
-                      className="text-sm md:text-xs font-normal cursor-pointer"
-                      style={{
-                        backgroundColor: record?.color,
-                        color: getContrastingTextColor(
-                          record?.color ?? "#ffffff",
-                        ),
-                      }}
-                    >
-                      {record?.name}
-                    </Badge>
-                  }
-                  value={{ "tags@cs": `{${record.id}}` }}
-                  size={isMobile ? "lg" : undefined}
-                />
-              ))}
-          </FilterCategory>
-
-          <FilterCategory
-            icon={<CheckSquare />}
-            label="resources.contacts.filters.tasks"
-          >
-            <ToggleFilterButton
-              className="w-full justify-between h-10 md:h-8"
-              label="resources.tasks.filters.with_pending"
-              value={{ "nb_tasks@gt": 0 }}
-              size={isMobile ? "lg" : undefined}
-            />
-            {/* Mirrors the Kanban column sort / countdown chip's "needs action"
+      <FilterCategory
+        icon={<CheckSquare />}
+        label="resources.contacts.filters.tasks"
+      >
+        <ToggleFilterButton
+          className="w-full justify-between h-10 md:h-8"
+          label="resources.tasks.filters.with_pending"
+          value={{ "nb_tasks@gt": 0 }}
+          size={isMobile ? "lg" : undefined}
+        />
+        {/* Mirrors the Kanban column sort / countdown chip's "needs action"
                 rule (next action overdue or due today) -- see misc/nextAction.ts. */}
-            <ToggleFilterButton
-              className="w-full justify-between h-10 md:h-8"
-              label="resources.contacts.filters.needs_action"
-              value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
-              size={isMobile ? "lg" : undefined}
-            />
-          </FilterCategory>
-        </>
-      )}
+        <ToggleFilterButton
+          className="w-full justify-between h-10 md:h-8"
+          label="resources.contacts.filters.needs_action"
+          value={{ "next_action_due_date@lte": endOfToday().toISOString() }}
+          size={isMobile ? "lg" : undefined}
+        />
+      </FilterCategory>
     </ResponsiveFilters>
   );
 };

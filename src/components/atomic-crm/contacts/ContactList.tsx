@@ -78,7 +78,7 @@ export const ContactList = () => {
           ? { field: "index", order: "ASC" }
           : { field: "last_seen", order: "DESC" }
       }
-      storeKey={isKanban ? "contacts.kanban.listParams" : undefined}
+      storeKey={isKanban ? "contacts.kanban.listParams.v2" : undefined}
       filterDefaultValues={isKanban ? undefined : { "status@isblank": true }}
       // Table and Kanban share one route/URL, only toggling a store flag.
       // Without this, ra-core prefers a non-empty URL query over the
@@ -151,7 +151,7 @@ const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
 
   return (
     <TopToolbar>
-      <NeedsActionInput />
+      {viewMode === "table" && <NeedsActionInput />}
       <ToggleGroup
         type="single"
         value={viewMode}

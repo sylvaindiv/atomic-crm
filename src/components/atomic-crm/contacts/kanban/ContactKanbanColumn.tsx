@@ -5,39 +5,39 @@ import { Status } from "../../misc/Status";
 import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
 import { ContactKanbanCard } from "./ContactKanbanCard";
+import { NO_STATUS, NO_STATUS_DROPPABLE_ID } from "./contactStages";
 
 export const ContactKanbanColumn = ({
   status,
+  label,
   contacts,
 }: {
   status: string;
+  label: string;
   contacts: Contact[];
 }) => {
   const totalAmount = contacts.reduce(
     (sum, contact) => sum + (contact.amount ?? 0),
     0,
   );
-  const { noteStatuses, currency } = useConfigurationContext();
-  const statusOption = noteStatuses.find((s) => s.value === status);
+  const { currency } = useConfigurationContext();
   return (
     // `role="group"` + `aria-label` give each column an accessible,
     // stable identity (also the e2e drag-and-drop test's scoping locator)
     // beyond its purely visual heading.
-    <div
-      className="flex-1 min-w-0 pb-8"
-      role="group"
-      aria-label={statusOption?.label}
-    >
+    <div className="flex-1 min-w-0 pb-8" role="group" aria-label={label}>
       <div className="flex flex-col items-center">
         <h3 className="text-base font-medium flex items-center">
           <Status status={status} />
-          {statusOption?.label}
+          {label}
         </h3>
         <p className="text-sm text-muted-foreground">
           {formatDealAmount(totalAmount, currency)}
         </p>
       </div>
-      <Droppable droppableId={status}>
+      <Droppable
+        droppableId={status === NO_STATUS ? NO_STATUS_DROPPABLE_ID : status}
+      >
         {(droppableProvided, snapshot) => (
           <div
             ref={droppableProvided.innerRef}

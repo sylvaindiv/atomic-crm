@@ -273,3 +273,22 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 - `package.json` — ajout leaflet, react-leaflet
 
 **Prochaines étapes / TODOs.** _aucune_
+
+## 2026-08-20 15:38 — Fix Kanban contacts vue incomplète
+
+**Résumé.** Corrigé le bug récurrent où le Kanban Juges-arbitres (Contacts) n'affichait pas tous les contacts. Deux causes : des filtres (dates, recherche, "À traiter") non désactivés en mode Kanban qui restaient bloqués dans le localStorage dédié, et surtout les contacts sans statut (227/495, le défaut de tout nouveau contact) qui étaient structurellement exclus du board sans aucune colonne pour les accueillir. Ajout d'une colonne "Aucun" en tête de board, avec correction d'un crash `@hello-pangea/dnd` (droppableId vide) et du filtre de fetch pour le drag & drop dans cette colonne. Vérifié en local (agent-browser) : 475/495 contacts visibles (20 "Mort" volontairement masqués), zéro filtre actif, aucune erreur console.
+
+**Décisions prises.**
+- Panel de filtres entièrement masqué en Kanban (return null) plutôt que garder des gardes par bloc — plus robuste contre une régression future du même type
+- Clé de store Kanban bumpée en `.v2` pour purger les filtres restés coincés côté utilisateur
+- Contacts au statut caché (ex. "Mort") restent volontairement exclus du board (comportement voulu, différent du statut vide)
+
+**Fichiers / skills modifiés.**
+- `src/components/atomic-crm/contacts/ContactListFilter.tsx` — no-op complet en Kanban
+- `src/components/atomic-crm/contacts/ContactList.tsx` — storeKey v2, NeedsActionInput masqué en Kanban
+- `src/components/atomic-crm/contacts/kanban/contactStages.ts` — colonne NO_STATUS + sentinel DnD
+- `src/components/atomic-crm/contacts/kanban/ContactKanban.tsx` — colonne "Aucun", filtre isblank pour DnD
+- `src/components/atomic-crm/contacts/kanban/ContactKanbanColumn.tsx` — label en prop, droppableId sentinel
+
+**Prochaines étapes / TODOs.**
+- [ ] Ajouter un test e2e couvrant la colonne "Aucun" (affichage + drag & drop) — aucun test ajouté cette session

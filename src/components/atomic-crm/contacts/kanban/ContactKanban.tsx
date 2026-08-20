@@ -1,6 +1,11 @@
 import { DragDropContext, type OnDragEndResponder } from "@hello-pangea/dnd";
 import isEqual from "lodash/isEqual";
-import { useDataProvider, useListContext, type DataProvider } from "ra-core";
+import {
+  useDataProvider,
+  useListContext,
+  useTranslate,
+  type DataProvider,
+} from "ra-core";
 import { useEffect, useState } from "react";
 
 import { useConfigurationContext } from "../../root/ConfigurationContext";
@@ -11,7 +16,12 @@ import {
   getContactsByStatus,
   getVisibleContactStatuses,
   KANBAN_PAGE_SIZE,
+  NO_STATUS,
+  NO_STATUS_DROPPABLE_ID,
 } from "./contactStages";
+
+const toStatusValue = (droppableId: string) =>
+  droppableId === NO_STATUS_DROPPABLE_ID ? NO_STATUS : droppableId;
 
 /**
  * Contacts Kanban board: one column per note status flagged visible in the
@@ -22,8 +32,19 @@ import {
  * moved onto contacts.
  */
 export const ContactKanban = () => {
+  const translate = useTranslate();
   const { noteStatuses } = useConfigurationContext();
   const visibleStatuses = getVisibleContactStatuses(noteStatuses);
+  // Leading column for contacts with no status yet (the default for every
+  // new contact) -- not a configured note status, so it's prepended here
+  // rather than living in noteStatuses.
+  const columns = [
+    {
+      value: NO_STATUS,
+      label: translate("resources.contacts.background.status_none"),
+    },
+    ...visibleStatuses,
+  ];
   const {
     data: unorderedContacts,
     isPending,
@@ -64,8 +85,8 @@ export const ContactKanban = () => {
       return;
     }
 
-    const sourceStatus = source.droppableId;
-    const destinationStatus = destination.droppableId;
+    const sourceStatus = toStatusValue(source.droppableId);
+    const destinationStatus = toStatusValue(destination.droppableId);
     const sourceContact = contactsByStatus[sourceStatus][source.index]!;
     const destinationContact = contactsByStatus[destinationStatus][
       destination.index
@@ -95,9 +116,10 @@ export const ContactKanban = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="flex divide-x divide-border">
-        {visibleStatuses.map((status) => (
+        {columns.map((status) => (
           <ContactKanbanColumn
             status={status.value}
+            label={status.label}
             contacts={contactsByStatus[status.value] ?? []}
             key={status.value}
           />
@@ -143,6 +165,12 @@ const updateContactStatusLocal = (
   }
 };
 
+// NO_STATUS covers both NULL and "" (see server/filter.mjs's isblank
+// operator) -- an exact-match `status` filter would only catch "", so
+// blank-status contacts must be fetched with isblank instead.
+const statusFilter = (status: string) =>
+  status === NO_STATUS ? { "status@isblank": true } : { status };
+
 // Persists a drag & drop move on the `contacts` resource. Only ever sends
 // `status` and/or `index` in the update payload -- never any other contact
 // field -- and issues one update per moved card (never a full-column
@@ -164,7 +192,7 @@ const updateContactStatus = async (
       {
         sort: { field: "index", order: "ASC" },
         pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
-        filter: { status: source.status },
+        filter: statusFilter(source.status),
       },
     );
     const destinationIndex = destination.index ?? columnContacts.length + 1;
@@ -234,12 +262,12 @@ const updateContactStatus = async (
         dataProvider.getList<Contact>("contacts", {
           sort: { field: "index", order: "ASC" },
           pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
-          filter: { status: source.status },
+          filter: statusFilter(source.status),
         }),
         dataProvider.getList<Contact>("contacts", {
           sort: { field: "index", order: "ASC" },
           pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
-          filter: { status: destination.status },
+          filter: statusFilter(destination.status),
         }),
       ]);
     const destinationIndex =
