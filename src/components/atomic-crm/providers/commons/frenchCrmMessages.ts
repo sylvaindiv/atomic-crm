@@ -448,7 +448,7 @@ export const frenchCrmMessages = {
     image_editor: {
       change: "Changer",
       drop_hint:
-        "Déposez un fichier à télécharger ou cliquez pour le sélectionner.",
+        "Déposez un fichier à télécharger, cliquez pour le sélectionner, ou collez une image (Ctrl+V).",
       editable_content: "Contenu modifiable",
       title: "Télécharger et redimensionner l'image",
       update_image: "Mettre à jour l'image",

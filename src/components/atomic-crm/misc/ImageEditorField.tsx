@@ -1,5 +1,5 @@
 import { useFieldValue, useTranslate } from "ra-core";
-import { createRef, useCallback, useState } from "react";
+import { createRef, useCallback, useEffect, useState } from "react";
 import type { ReactCropperElement } from "react-cropper";
 import { Cropper } from "react-cropper";
 import { useDropzone } from "react-dropzone";
@@ -101,6 +101,23 @@ const ImageEditorDialog = (props: ImageEditorDialogProps) => {
     setFile(files[0]);
     setImageSrc(preview);
   }, []);
+
+  useEffect(() => {
+    if (!props.open) return;
+    const handlePaste = (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          const pastedFile = item.getAsFile();
+          if (pastedFile) onDrop([pastedFile]);
+          break;
+        }
+      }
+    };
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [props.open, onDrop]);
 
   const updateImage = () => {
     const cropper = cropperRef.current?.cropper;
