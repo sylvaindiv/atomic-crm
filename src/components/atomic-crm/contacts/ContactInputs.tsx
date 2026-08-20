@@ -19,18 +19,26 @@ import { ArrayInput } from "@/components/admin/array-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 
 import { contactOptionText } from "../misc/ContactOption";
+import ImageEditorField from "../misc/ImageEditorField";
 import { StatusSelector } from "../notes";
 import type { Sale, Contact } from "../types";
-import { Avatar } from "./Avatar";
 import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
 
 export const ContactInputs = () => {
   const isMobile = useIsMobile();
+  const record = useRecordContext<Contact>();
 
   return (
     <div className="flex flex-col gap-2 p-1 relative md:static">
       <div className="absolute top-0 right-1 md:static">
-        <Avatar />
+        <ImageEditorField
+          source="avatar"
+          type="avatar"
+          width={40}
+          height={40}
+          emptyText={`${record?.first_name?.charAt(0) ?? ""}${record?.last_name?.charAt(0) ?? ""}`.toUpperCase()}
+          linkPosition="none"
+        />
       </div>
       <div className="flex gap-10 md:gap-6 flex-col md:flex-row">
         <div className="flex flex-col gap-10 flex-1">

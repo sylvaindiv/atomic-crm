@@ -311,3 +311,20 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Prochaines étapes / TODOs.**
 - [ ] Ajouter un test e2e couvrant la colonne "Aucun" (affichage + drag & drop)
 - [ ] Suivre la review de la PR #28
+
+## 2026-08-20 17:03 — Upload photo juge-arbitre par copier-coller
+
+**Résumé.** Implémenté le collage d'image depuis le presse-papier pour uploader la photo d'un juge-arbitre (contact). Découverte que les contacts n'avaient aucune UI d'upload d'avatar (contrairement aux clubs/profils) et que le data provider Turso ne persistait pas non plus l'avatar contact (`beforeSave` manquant). Ajout du support paste (Ctrl+V) au composant partagé `ImageEditorField`, bénéficiant aussi aux logos de clubs et à l'avatar de profil. Testé en conditions réelles via agent-browser sur la vraie base Turso (contact "TOULOUSE LARROUY"), avec nettoyage de la donnée de test après vérification.
+
+**Décisions prises.**
+- Réutiliser `ImageEditorField` (drag&drop + crop existant) plutôt que créer un nouveau composant, pour bénéficier du crop et garder la cohérence avec clubs/profil.
+- Écouteur `paste` scopé à l'ouverture de la dialog (pas global sur `document` en permanence) pour ne pas interférer avec le paste-texte existant sur le champ email des contacts.
+
+**Fichiers / skills modifiés.**
+- `src/components/atomic-crm/contacts/ContactInputs.tsx` — avatar en lecture seule remplacé par `ImageEditorField`
+- `src/components/atomic-crm/misc/ImageEditorField.tsx` — ajout listener paste image
+- `src/components/atomic-crm/providers/turso/dataProvider.ts` — hook `beforeSave` avatar contacts
+- `src/components/atomic-crm/providers/commons/{french,english}CrmMessages.ts` — texte d'aide
+
+**Prochaines étapes / TODOs.**
+- [ ] Aucune (branche prête, non commitée par l'agent — git-policy)

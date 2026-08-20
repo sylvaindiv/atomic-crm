@@ -6,6 +6,7 @@ import {
   type ResourceCallbacks,
 } from "ra-core";
 import type {
+  Contact,
   ContactNote,
   RAFile,
   Sale,
@@ -234,6 +235,12 @@ const lifeCycleCallbacks: ResourceCallbacks[] = [
         "phone",
         "background",
       ])(params);
+    },
+    beforeSave: async (data: Contact, _, __) => {
+      if (data.avatar) {
+        data.avatar = await processRAFile(data.avatar as RAFile);
+      }
+      return data;
     },
   },
   {
