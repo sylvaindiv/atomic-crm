@@ -328,3 +328,9 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 
 **Prochaines étapes / TODOs.**
 - [ ] Aucune (branche prête, non commitée par l'agent — git-policy)
+
+## 2026-08-20 17:33 — Création de la PR upload photo juge-arbitre
+**Résumé.** Commit des 6 fichiers en attente (dont l'entrée MEMORY.md auto-générée), push de la branche `paste-referee-photo-upload` vers origin (pas d'upstream existant), et création de la PR #29 vers `main` sur GitHub avec le template du repo rempli (Problème / Solution / Comment tester).
+**Décisions prises.** - Suivre les PR instructions fournies telles quelles (git status → diff → commit → push → GetWorkspaceDiff → gh pr create), aucun skill dédié PR trouvé donc flux git natif utilisé.
+**Fichiers / skills modifiés.** _aucune_ (session de commit/push/PR uniquement, aucun nouveau changement de code)
+**Prochaines étapes / TODOs.** - [ ] Suivre la review de la PR #29 (https://github.com/sylvaindiv/atomic-crm/pull/29)
