@@ -121,10 +121,25 @@ CREATE TABLE IF NOT EXISTS favicons_excluded_domains (
     domain TEXT NOT NULL
 );
 
+-- Record history (audit log) ---------------------------------------------------
+-- Append-only log of create/update writes across all resources, populated by
+-- server/query.mjs (create/update/updateMany) — there are no DB triggers in
+-- this SQLite deployment (see note above). No FK: table_name is polymorphic.
+CREATE TABLE IF NOT EXISTS record_history (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    table_name  TEXT NOT NULL,
+    record_id   TEXT NOT NULL,
+    action      TEXT NOT NULL CHECK (action IN ('create', 'update')),
+    data        TEXT,          -- JSON snapshot of the written row/fields
+    created_at  TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+);
+
 -- Indexes on foreign keys -----------------------------------------------------
 CREATE INDEX IF NOT EXISTS contact_notes_contact_id_idx ON contact_notes (contact_id);
 CREATE INDEX IF NOT EXISTS contacts_company_id_idx      ON contacts (company_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq__sales__email       ON sales (email);
+CREATE INDEX IF NOT EXISTS record_history_table_record_idx ON record_history (table_name, record_id);
+CREATE INDEX IF NOT EXISTS record_history_created_at_idx   ON record_history (created_at);
 
 -- Views -----------------------------------------------------------------------
 -- companies_summary: adds aggregate contact count.

@@ -61,6 +61,12 @@ export const RESOURCES = {
     json: [],
     bool: [],
   },
+  record_history: {
+    table: "record_history",
+    readonly: true,
+    json: ["data"],
+    bool: [],
+  },
 };
 
 // Parent -> [ [childTable, childForeignKeyColumn], ... ] for explicit cascade

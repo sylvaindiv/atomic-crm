@@ -334,3 +334,17 @@ Durable Atomic CRM knowledge. One sentence per bullet, freshest first. Maintaine
 **Décisions prises.** - Suivre les PR instructions fournies telles quelles (git status → diff → commit → push → GetWorkspaceDiff → gh pr create), aucun skill dédié PR trouvé donc flux git natif utilisé.
 **Fichiers / skills modifiés.** _aucune_ (session de commit/push/PR uniquement, aucun nouveau changement de code)
 **Prochaines étapes / TODOs.** - [ ] Suivre la review de la PR #29 (https://github.com/sylvaindiv/atomic-crm/pull/29)
+
+## 2026-08-26 12:21 — Hidden /logs audit trail added
+
+**Résumé.** Ajout d'un système de logs des créations/modifications d'éléments CRM avec date/heure, via une table `record_history` append-only alimentée depuis les handlers génériques `create`/`update`/`updateMany` de `server/query.mjs`. La page de consultation est accessible uniquement via l'URL `/logs`, sans aucun lien ni entrée de menu visible dans l'app. Vérifié en local (DB SQLite isolée, pas la Turso partagée) : création d'un contact → ligne loggée correctement, sidebar sans trace de la page.
+**Décisions prises.** - Log create+update seulement (pas delete), snapshot JSON brut plutôt qu'un diff champ-par-champ, pas de tracking "qui" (app single-user) — pour rester minimal comme demandé. - Page `/logs` implémentée via `<CustomRoutes>` (comme `MapPage`/`SettingsPage`) plutôt qu'un `<Resource>`, car un `<Resource>` avec `list` génère automatiquement une entrée de sidebar — incompatible avec l'exigence "aucun lien visible".
+**Fichiers / skills modifiés.** - `db/schema.sql`, `db/migrations/20260826101013_cec4d43d_migration_add-record-history.mjs` — nouvelle table `record_history`. - `server/resources.mjs`, `server/query.mjs` — enregistrement read-only + hook `logHistory()`. - `src/components/atomic-crm/logs/LogsPage.tsx`, `src/components/atomic-crm/root/CRM.tsx`, `src/components/atomic-crm/types.ts` — page cachée + type `RecordHistory`.
+**Prochaines étapes / TODOs.** - [ ] Appliquer la migration à la Turso DB réelle (`.env` pointe dessus, non exécuté volontairement dans cette session). - [ ] Vérifier le hard-reload direct sur `/logs` en environnement propre (test interrompu par une collision de tab `agent-browser` avec une autre session concurrente).
+
+## 2026-08-26 13:17 — Logs enrichis avec noms résolus
+
+**Résumé.** Amélioration du système de logs `/logs` : la colonne "Élément" affichait des IDs bruts illisibles ("Note #340"), remplacée par une résolution en direct du nom du juge-arbitre concerné, y compris pour les notes/tâches (via lookup live du `contact_id` de la note, pas du snapshot loggé). Migration `record_history` appliquée avec succès sur la Turso DB de production. Vérifié en environnement isolé (ports/DB dédiés) que le nom s'affiche correctement même quand le payload d'update ne contient pas `contact_id`.
+**Décisions prises.** - Résoudre le nom via `<ReferenceField>` imbriqué (note→contact) en live plutôt que depuis les données loggées, car un update partiel peut ne pas contenir `contact_id`. - `update` logue désormais uniquement les champs modifiés (pas tout le row) pour rendre "Détails" lisible.
+**Fichiers / skills modifiés.** - `src/components/atomic-crm/logs/LogsPage.tsx` — colonnes Élément (nom résolu) et Détails (champs modifiés). - `server/query.mjs` — `update` logue le payload changé, pas le row complet. - Migration `record_history` exécutée sur Turso prod.
+**Prochaines étapes / TODOs.** - [ ] Vérifier visuellement `/logs` en environnement non partagé si besoin (déjà validé via instance isolée cette session).

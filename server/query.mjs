@@ -85,6 +85,14 @@ function assertWritable(cfg) {
   }
 }
 
+/** Append-only audit trail for create/update writes (see db/schema.sql). */
+async function logHistory(table, recordId, action, data) {
+  await db.execute({
+    sql: `INSERT INTO "record_history" ("table_name","record_id","action","data") VALUES (?,?,?,?)`,
+    args: [table, String(recordId), action, JSON.stringify(data ?? null)],
+  });
+}
+
 /**
  * Reject a write missing a value for a required column (NOT NULL, not the
  * primary key, no DEFAULT — see `requiredColumns` in server/db.mjs) with a
@@ -168,7 +176,9 @@ export async function create(cfg, { data }) {
           .map(() => "?")
           .join(",")}) RETURNING *`;
   const res = await db.execute({ sql, args: values });
-  return { data: serialize(cfg, toObjects(res))[0] };
+  const row = serialize(cfg, toObjects(res))[0];
+  await logHistory(cfg.table, row.id, "create", row);
+  return { data: row };
 }
 
 export async function update(cfg, { id, data }) {
@@ -183,6 +193,7 @@ export async function update(cfg, { id, data }) {
   });
   const rows = serialize(cfg, toObjects(res));
   if (rows.length === 0) throw new Error(`${cfg.table} #${id} not found`);
+  await logHistory(cfg.table, rows[0].id, "update", data);
   return { data: rows[0] };
 }
 
@@ -197,6 +208,9 @@ export async function updateMany(cfg, { ids, data }) {
     sql: `UPDATE ${quoteId(cfg.table)} SET ${assignments} WHERE "id" IN (${ph})`,
     args: [...values, ...list],
   });
+  await Promise.all(
+    list.map((id) => logHistory(cfg.table, id, "update", data)),
+  );
   return { data: list };
 }
 
