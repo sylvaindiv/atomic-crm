@@ -20,6 +20,7 @@ import { Layout } from "../layout/Layout";
 import { MobileLayout } from "../layout/MobileLayout";
 import { ImportPage } from "../misc/ImportPage";
 import { ChangelogPage } from "../misc/ChangelogPage";
+import { LogsPage } from "../logs/LogsPage";
 import { MapPage } from "../map/MapPage";
 import {
   getAuthProvider as defaultAuthProviderBuilder,
@@ -231,6 +232,7 @@ const DesktopAdmin = (
         <Route path={ImportPage.path} element={<ImportPage />} />
         <Route path={ChangelogPage.path} element={<ChangelogPage />} />
         <Route path={MapPage.path} element={<MapPage />} />
+        <Route path={LogsPage.path} element={<LogsPage />} />
       </CustomRoutes>
       <Resource name="contacts" {...contacts} />
       <Resource name="companies" {...companies} />

@@ -140,6 +140,15 @@ export type Task = {
   sales_id?: Identifier;
 } & Pick<RaRecord, "id">;
 
+export type RecordHistory = {
+  id: Identifier;
+  table_name: string;
+  record_id: string;
+  action: "create" | "update";
+  data: Record<string, unknown> | null;
+  created_at: string;
+};
+
 export type ActivityCompanyCreated = {
   type: typeof COMPANY_CREATED;
   company_id: Identifier;
