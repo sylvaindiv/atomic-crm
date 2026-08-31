@@ -1,4 +1,4 @@
-import { Form } from "ra-core";
+import { EditBase, Form } from "ra-core";
 import { render } from "vitest-browser-react";
 import { StoryWrapper, buildContact } from "@/test/StoryWrapper";
 import { ContactInputs } from "./ContactInputs";
@@ -7,9 +7,11 @@ describe("ContactInputs", () => {
   it("renders postal_code and city fields in the address section", async () => {
     const screen = await render(
       <StoryWrapper data={{ contacts: [buildContact()] }}>
-        <Form defaultValues={buildContact()}>
-          <ContactInputs />
-        </Form>
+        <EditBase resource="contacts" id={1}>
+          <Form defaultValues={buildContact()}>
+            <ContactInputs />
+          </Form>
+        </EditBase>
       </StoryWrapper>,
     );
 
@@ -27,9 +29,11 @@ describe("ContactInputs", () => {
 
     const screen = await render(
       <StoryWrapper data={{ contacts: [contact] }}>
-        <Form defaultValues={contact}>
-          <ContactInputs />
-        </Form>
+        <EditBase resource="contacts" id={1}>
+          <Form defaultValues={contact}>
+            <ContactInputs />
+          </Form>
+        </EditBase>
       </StoryWrapper>,
     );
 
@@ -43,9 +47,11 @@ describe("ContactInputs", () => {
   it("shows a visible affordance to change the avatar photo", async () => {
     const screen = await render(
       <StoryWrapper data={{ contacts: [buildContact()] }}>
-        <Form defaultValues={buildContact()}>
-          <ContactInputs />
-        </Form>
+        <EditBase resource="contacts" id={1}>
+          <Form defaultValues={buildContact()}>
+            <ContactInputs />
+          </Form>
+        </EditBase>
       </StoryWrapper>,
     );
 
