@@ -84,6 +84,7 @@ export const frenchCrmMessages = {
       name: "Juge-arbitre |||| Juges-arbitres",
       forcedCaseName: "Juge-arbitre",
       field_categories: {
+        address: "Adresse",
         background_info: "Informations complémentaires",
         identity: "Identité",
         misc: "Divers",

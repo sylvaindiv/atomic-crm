@@ -65,7 +65,7 @@ describe("query.mjs required-column validation", () => {
 
       // Assert
       expect(data).toEqual({ id: 1, contact_id: 5 });
-      expect(mockExecute).toHaveBeenCalledTimes(1);
+      expect(mockExecute).toHaveBeenCalledTimes(2); // 1 INSERT + 1 logHistory
     });
 
     it("accepts a nullable/defaulted column omitted from the payload", async () => {
@@ -80,7 +80,7 @@ describe("query.mjs required-column validation", () => {
       await expect(
         create(cfg, { data: { contact_id: 5 } }),
       ).resolves.toBeDefined();
-      expect(mockExecute).toHaveBeenCalledTimes(1);
+      expect(mockExecute).toHaveBeenCalledTimes(2); // 1 INSERT + 1 logHistory
     });
   });
 
@@ -108,7 +108,7 @@ describe("query.mjs required-column validation", () => {
 
       // Assert
       expect(data).toEqual({ id: 1, contact_id: 5, text: "updated" });
-      expect(mockExecute).toHaveBeenCalledTimes(1);
+      expect(mockExecute).toHaveBeenCalledTimes(2); // 1 UPDATE + 1 logHistory
     });
   });
 });

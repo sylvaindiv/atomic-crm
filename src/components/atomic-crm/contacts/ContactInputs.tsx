@@ -37,13 +37,14 @@ export const ContactInputs = () => {
           width={40}
           height={40}
           emptyText={`${record?.first_name?.charAt(0) ?? ""}${record?.last_name?.charAt(0) ?? ""}`.toUpperCase()}
-          linkPosition="none"
+          linkPosition="bottom"
         />
       </div>
       <div className="flex gap-10 md:gap-6 flex-col md:flex-row">
         <div className="flex flex-col gap-10 flex-1">
           <ContactIdentityInputs />
           <ContactPositionInputs />
+          <ContactAddressInputs />
         </div>
         {isMobile ? null : (
           <Separator orientation="vertical" className="flex-shrink-0" />
@@ -94,6 +95,21 @@ const ContactPositionInputs = () => {
           helperText={false}
         />
       </ReferenceInput>
+    </div>
+  );
+};
+
+const ContactAddressInputs = () => {
+  const translate = useTranslate();
+  return (
+    <div className="flex flex-col gap-4">
+      <h6 className="text-lg font-semibold">
+        {translate("resources.contacts.field_categories.address", {
+          _: "Address",
+        })}
+      </h6>
+      <TextInput source="postal_code" helperText={false} />
+      <TextInput source="city" helperText={false} />
     </div>
   );
 };
