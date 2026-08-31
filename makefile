@@ -56,6 +56,9 @@ test-app:
 test-e2e: ## run the Playwright end-to-end suite (start the stack first with `make start`)
 	npx playwright test
 
+test-e2e-ci: ## run the Playwright end-to-end suite in CI (build and serve)
+	npm run build && serve -l 5173 dist & wait-on http://localhost:5173 && npx playwright test
+
 lint:
 	npm run lint
 	npm run prettier
