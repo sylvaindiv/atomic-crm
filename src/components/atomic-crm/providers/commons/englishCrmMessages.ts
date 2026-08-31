@@ -84,6 +84,7 @@ export const englishCrmMessages = {
       name: "Referee |||| Referees",
       forcedCaseName: "Referee",
       field_categories: {
+        address: "Address",
         background_info: "Background info",
         identity: "Identity",
         misc: "Misc",
