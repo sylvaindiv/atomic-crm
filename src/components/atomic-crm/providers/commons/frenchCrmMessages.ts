@@ -227,6 +227,13 @@ export const frenchCrmMessages = {
           'Les juges-arbitres avec un statut "Visio" apparaîtront ici.',
         title: "Prospects chauds",
       },
+      other_judges_notes:
+        "Notes des autres juges-arbitres |||| Notes des autres juges-arbitres",
+      other_judges_notes_empty:
+        "Aucune note de ces juges-arbitres pour le moment.",
+      other_judges_notes_view_profile: "Voir la fiche",
+      other_judges_notes_more:
+        "+ %{smart_count} note de plus sur sa fiche |||| + %{smart_count} notes de plus sur sa fiche",
     },
     notes: {
       name: "Note |||| Notes",

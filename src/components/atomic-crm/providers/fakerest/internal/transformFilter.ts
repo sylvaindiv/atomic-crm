@@ -8,6 +8,18 @@ export function transformFilter(filter: Record<string, any>) {
   }
   const transformedFilters: Record<string, any> = {};
   for (const [key, value] of Object.entries(filter)) {
+    if (typeof value === "object" && value !== null) {
+      // Handle nested filter objects (e.g., { id: { $ne: 1 }, contact_id: { $in: [1, 2, 3] } })
+      if ("$ne" in value) {
+        transformedFilters[`${key}_neq`] = value.$ne;
+        continue;
+      }
+      if ("$in" in value) {
+        transformedFilters[`${key}_eq_any`] = value.$in;
+        continue;
+      }
+    }
+
     if (
       key.endsWith("@eq") ||
       key.endsWith("@neq") ||

@@ -82,6 +82,25 @@ function condition(key, value, cfg) {
     return parts.length ? { sql: `(${parts.join(" OR ")})`, args } : null;
   }
 
+  // Handle nested filter objects like { id: { $ne: 1 }, contact_id: { $in: [1, 2, 3] } }
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    const field = key;
+    const col = quoteId(field);
+    const isBool = cfg?.bool?.includes(field);
+    const coerce = (v) => (isBool ? toBool(v) : v);
+
+    if ("$ne" in value) {
+      return { sql: `${col} != ?`, args: [coerce(value.$ne)] };
+    }
+
+    if ("$in" in value) {
+      const list = value.$in;
+      if (list.length === 0) return { sql: "0 = 1", args: [] };
+      const ph = list.map(() => "?").join(",");
+      return { sql: `${col} IN (${ph})`, args: list.map(coerce) };
+    }
+  }
+
   const at = key.lastIndexOf("@");
   const field = at === -1 ? key : key.slice(0, at);
   const op = at === -1 ? "eq" : key.slice(at + 1);

@@ -225,6 +225,12 @@ export const englishCrmMessages = {
         empty_hint: 'Judges-referees with a "Visio" status will appear here.',
         title: "Hot Prospects",
       },
+      other_judges_notes:
+        "Notes from other judges-referees |||| Notes from other judges-referees",
+      other_judges_notes_empty: "No notes from these judges-referees yet.",
+      other_judges_notes_view_profile: "View profile",
+      other_judges_notes_more:
+        "+ %{smart_count} more note on their profile |||| + %{smart_count} more notes on their profile",
     },
     notes: {
       name: "Note |||| Notes",
