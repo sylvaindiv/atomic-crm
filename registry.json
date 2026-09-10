@@ -344,6 +344,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/notes/useGetNotesForContacts.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/notes/noteModel.ts",
           "type": "registry:component"
         },
@@ -357,6 +361,10 @@
         },
         {
           "path": "src/components/atomic-crm/notes/StatusSelector.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/notes/OtherJudgesNotes.tsx",
           "type": "registry:component"
         },
         {
@@ -609,6 +617,10 @@
         },
         {
           "path": "src/components/atomic-crm/dashboard/AmountChart.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/useGetContactsFromSameCompany.ts",
           "type": "registry:component"
         },
         {
