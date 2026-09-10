@@ -22,6 +22,8 @@ import { MobileContent } from "../layout/MobileContent";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
 import { NoteCreate, NotesIterator, NotesIteratorMobile } from "../notes";
 import { NoteCreateSheet } from "../notes/NoteCreateSheet";
+import { OtherJudgesNotes } from "../notes/OtherJudgesNotes";
+import { useGetContactsFromSameCompany } from "./useGetContactsFromSameCompany";
 import { TagsListEdit } from "./TagsListEdit";
 import { ContactEditSheet } from "./ContactEditSheet";
 import { ContactStatusSelector } from "./ContactInputs";
@@ -59,6 +61,11 @@ const ContactShowContentMobile = () => {
   const { defaultTitle, record, isPending } = useShowContext<Contact>();
   const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const { contacts: otherContacts } = useGetContactsFromSameCompany(
+    record?.company_id ?? null,
+    record?.id ?? 0,
+  );
+  const hasOtherJudges = otherContacts.length > 0;
   if (isPending || !record) return null;
 
   const taskCount = record.nb_tasks ?? 0;
@@ -134,10 +141,19 @@ const ContactShowContentMobile = () => {
         </div>
 
         <Tabs defaultValue="notes" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 h-10">
+          <TabsList
+            className={`grid w-full h-10 ${hasOtherJudges ? "grid-cols-4" : "grid-cols-3"}`}
+          >
             <TabsTrigger value="notes">
               {translate("resources.notes.name", { smart_count: 2 })}
             </TabsTrigger>
+            {hasOtherJudges && (
+              <TabsTrigger value="other_notes">
+                {translate("resources.contacts.other_judges_notes", {
+                  smart_count: 1,
+                })}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="tasks">
               {translate("crm.common.task_count", {
                 smart_count: taskCount ?? 0,
@@ -180,6 +196,12 @@ const ContactShowContentMobile = () => {
               <NotesIteratorMobile contactId={record.id} showStatus />
             </InfiniteListBase>
           </TabsContent>
+
+          {hasOtherJudges && (
+            <TabsContent value="other_notes" className="mt-2">
+              <OtherJudgesNotes contact={record} />
+            </TabsContent>
+          )}
 
           <TabsContent value="tasks" className="mt-4">
             <ContactTasksList />
@@ -239,7 +261,17 @@ const ContactShowContentMobile = () => {
 export const ContactShowContent = () => {
   const translate = useTranslate();
   const { record, isPending } = useShowContext<Contact>();
+  const { contacts: otherContacts } = useGetContactsFromSameCompany(
+    record?.company_id ?? null,
+    record?.id ?? 0,
+  );
   if (isPending || !record) return null;
+
+  const scrollToOtherJudgesNotes = () => {
+    document
+      .getElementById("other-judges-notes")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="mt-2 mb-2 flex gap-8">
@@ -267,6 +299,15 @@ export const ContactShowContent = () => {
                       &nbsp;
                       <TextField source="name" />
                     </ReferenceField>
+                  )}
+                  {otherContacts.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={scrollToOtherJudgesNotes}
+                      className="ml-1 inline-flex items-center rounded-full border px-2 py-0.5 text-xs text-muted-foreground hover:bg-muted cursor-pointer"
+                    >
+                      +{otherContacts.length}
+                    </button>
                   )}
                 </div>
               </div>
@@ -296,6 +337,8 @@ export const ContactShowContent = () => {
             </InfiniteListBase>
           </CardContent>
         </Card>
+
+        <OtherJudgesNotes contact={record} />
       </div>
       <ContactAside />
     </div>
