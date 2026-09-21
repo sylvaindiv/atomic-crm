@@ -1,7 +1,6 @@
 // Daily task-digest email: query the tasks due today, render a monochrome
 // HTML email, and send it through the Resend REST API (plain `fetch`, no
-// SDK). Scheduled once a day at 09:00 local wall-clock time from this
-// long-lived Node process (plain `setTimeout`/`setInterval`, no cron lib).
+// SDK). It can be sent manually to an explicit recipient.
 //
 // Follows query.mjs's shape: plain functions taking an injectable `db`,
 // unit-tested with a fake `{ execute: vi.fn() }`. `db.mjs` is only imported
@@ -10,9 +9,6 @@
 // set just to load.
 
 const FROM = "CRM Padel Arcade <crm@appnotif.fr>";
-const DEFAULT_TO = "contact@numero28consulting.fr";
-const SEND_HOUR = 9; // 09:00 local wall-clock time, per process.env.TZ
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 // This module's tests run inside the "app" Vitest project, which executes in
 // a real browser (no Node `process` global) even though the code itself is
@@ -61,7 +57,13 @@ export async function getTasksDueToday(db) {
 
 /** Escape a string for safe inclusion in HTML markup (task text is user-supplied). */
 function escapeHtml(value) {
-  const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
   return String(value ?? "").replace(/[&<>"']/g, (ch) => map[ch]);
 }
 
@@ -147,16 +149,11 @@ export function renderDigestEmail(tasks) {
  * Resend REST API. No-ops (with a log line, no network call) when nothing
  * is due. Throws on a non-2xx Resend response -- callers must handle it.
  *
- * `db` is only for tests (an injected fake); production callers (the
- * scheduler and the manual self-check below) omit it and get the real
- * client, imported lazily so this module never needs TURSO_DATABASE_URL
- * just to load.
+ * `db` is only for tests (an injected fake); manual production callers omit
+ * it and get the real client, imported lazily so this module never needs
+ * TURSO_DATABASE_URL just to load.
  */
-export async function sendDailyDigest({
-  fetchImpl = fetch,
-  to = DEFAULT_TO,
-  db,
-} = {}) {
+export async function sendDailyDigest({ fetchImpl = fetch, to, db } = {}) {
   const resolvedDb = db ?? (await import("./db.mjs")).db;
   const tasks = await getTasksDueToday(resolvedDb);
 
@@ -165,6 +162,10 @@ export async function sendDailyDigest({
       process.stdout.write("[dailyDigest] No task due today, skipping send.\n");
     }
     return;
+  }
+
+  if (!to) {
+    throw new Error("A recipient is required to send the daily digest.");
   }
 
   const { subject, html } = renderDigestEmail(tasks);
@@ -183,34 +184,10 @@ export async function sendDailyDigest({
   }
 }
 
-/** Milliseconds until the next SEND_HOUR:00 local wall-clock time. */
-function msUntilNextRun(now = new Date()) {
-  const next = new Date(now);
-  next.setHours(SEND_HOUR, 0, 0, 0);
-  if (next <= now) next.setDate(next.getDate() + 1);
-  return next.getTime() - now.getTime();
-}
-
-/**
- * Schedules `sendDailyDigest` for the next 09:00 local time, then every 24h
- * after that. A send failure is logged, never crashes the process.
- */
-export function startDailyDigestScheduler() {
-  const runDigest = () => {
-    sendDailyDigest().catch((err) => {
-      console.error("[dailyDigest] send failed", err);
-    });
-  };
-  setTimeout(() => {
-    runDigest();
-    setInterval(runDigest, ONE_DAY_MS);
-  }, msUntilNextRun());
-}
-
-// Manual send: `node --env-file=.env server/dailyDigest.mjs [to]`
+// Manual send: `node --env-file=.env server/dailyDigest.mjs <to>`
 if (isNode && import.meta.url === `file://${process.argv[1]}`) {
   const manualTo = process.argv[2];
-  sendDailyDigest(manualTo ? { to: manualTo } : {})
+  sendDailyDigest({ to: manualTo })
     .then(() => process.stdout.write("[dailyDigest] Sent.\n"))
     .catch((err) => {
       console.error("[dailyDigest] send failed", err);

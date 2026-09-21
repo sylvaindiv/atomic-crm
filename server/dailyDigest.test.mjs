@@ -1,4 +1,8 @@
-import { getTasksDueToday, renderDigestEmail, sendDailyDigest } from "./dailyDigest.mjs";
+import {
+  getTasksDueToday,
+  renderDigestEmail,
+  sendDailyDigest,
+} from "./dailyDigest.mjs";
 
 /** Fake libSQL client: replays `responses` in order, records every call. */
 function makeDb(responses = []) {
@@ -26,7 +30,13 @@ function makeFetch(ok = true, status = 200, text = "") {
 }
 
 const tasksRow = {
-  columns: ["type", "text", "due_date", "contact_first_name", "contact_last_name"],
+  columns: [
+    "type",
+    "text",
+    "due_date",
+    "contact_first_name",
+    "contact_last_name",
+  ],
   rows: [
     ["call", "Confirm court booking", "2026-08-11", "Jane", "Doe"],
     ["email", "Send invoice", "2026-08-11", "John", "Smith"],
@@ -142,17 +152,18 @@ describe("dailyDigest.sendDailyDigest", () => {
     expect(body.html).toContain("Send invoice");
   });
 
-  it("defaults to the fixed recipient when no `to` override is given", async () => {
+  it("requires a recipient without calling Resend when tasks exist", async () => {
     // Arrange
     const db = makeDb([tasksRow]);
     const { fetchImpl, calls } = makeFetch();
 
     // Act
-    await sendDailyDigest({ fetchImpl, db });
+    await expect(sendDailyDigest({ fetchImpl, db })).rejects.toThrow(
+      "A recipient is required to send the daily digest.",
+    );
 
     // Assert
-    const body = JSON.parse(calls[0].init.body);
-    expect(body.to).toBe("contact@numero28consulting.fr");
+    expect(calls).toHaveLength(0);
   });
 
   it("throws with status and body on a non-2xx Resend response", async () => {
@@ -161,8 +172,8 @@ describe("dailyDigest.sendDailyDigest", () => {
     const { fetchImpl } = makeFetch(false, 422, "Invalid `to` field");
 
     // Act / Assert
-    await expect(sendDailyDigest({ fetchImpl, db })).rejects.toThrow(
-      /422.*Invalid `to` field/,
-    );
+    await expect(
+      sendDailyDigest({ fetchImpl, db, to: "someone@example.test" }),
+    ).rejects.toThrow(/422.*Invalid `to` field/);
   });
 });
