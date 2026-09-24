@@ -17,8 +17,8 @@ import type { ConfigurationContextValue } from "../../root/ConfigurationContext"
 import { getActivityLog } from "../commons/activity";
 import { mergeCompanies as mergeCompaniesCommon } from "../commons/mergeCompanies";
 import { mergeContacts as mergeContactsCommon } from "../commons/mergeContacts";
-import { cacheCurrentSale, getIsInitialized } from "./authProvider";
-import { baseDataProvider } from "./internal/httpClient";
+import { getIsInitialized, setAuthSession } from "./authProvider";
+import { apiPatch, apiPost, baseDataProvider } from "./internal/httpClient";
 
 // --- Attachment / image handling -------------------------------------------
 // Supabase Storage is replaced by base64-in-database storage: uploaded files
@@ -101,20 +101,10 @@ const getDataProviderWithCustomMethods = () => {
       return baseDataProvider.getOne(resource, params);
     },
 
-    async signUp({ email, password, first_name, last_name }: SignUpData) {
-      const initialized = await getIsInitialized();
-      const { data: sale } = await baseDataProvider.create<Sale>("sales", {
-        data: {
-          email,
-          first_name,
-          last_name,
-          administrator: !initialized, // the first user is the administrator
-          disabled: false,
-          user_id: crypto.randomUUID(),
-        } as Partial<Sale>,
-      });
-      cacheCurrentSale(sale);
-      return { id: sale.id, email, password };
+    async signUp(
+      _data: SignUpData,
+    ): Promise<{ id: string; email: string; password: string }> {
+      throw new Error("L’inscription publique est désactivée.");
     },
     async salesCreate(body: SalesFormData) {
       const avatar = body.avatar
@@ -124,18 +114,15 @@ const getDataProviderWithCustomMethods = () => {
               : (body.avatar as RAFile),
           )
         : undefined;
-      const { data } = await baseDataProvider.create<Sale>("sales", {
-        data: {
-          email: body.email,
-          first_name: body.first_name,
-          last_name: body.last_name,
-          administrator: body.administrator ?? false,
-          disabled: body.disabled ?? false,
-          avatar,
-          user_id: crypto.randomUUID(),
-        } as Partial<Sale>,
+      const { user } = await apiPost<{ user: Sale }>("auth/users", {
+        email: body.email,
+        first_name: body.first_name,
+        last_name: body.last_name,
+        password: body.password,
+        disabled: body.disabled ?? false,
+        avatar,
       });
-      return data;
+      return user;
     },
     async salesUpdate(
       id: Identifier,
@@ -148,15 +135,25 @@ const getDataProviderWithCustomMethods = () => {
           typeof avatar === "string" ? ({ src: avatar } as RAFile) : avatar,
         );
       }
-      const { data: updated } = await baseDataProvider.update<Sale>("sales", {
-        id,
-        data: patch,
-        previousData: { id } as Sale,
-      });
-      return updated;
+      const { user } = await apiPatch<{ user: Sale }>(
+        `auth/users/${id}`,
+        patch,
+      );
+      return user;
     },
-    async updatePassword(_id: Identifier) {
-      // No real authentication in this deployment: nothing to reset.
+    async updatePassword(
+      _id: Identifier,
+      data: { currentPassword: string; newPassword: string },
+    ) {
+      const nextSession = await apiPost<{
+        user: { id: number; first_name: string; last_name: string };
+        must_change_password: boolean;
+      }>("auth/password", data);
+      setAuthSession(nextSession);
+      return true;
+    },
+    async resetPassword(id: Identifier, data: { newPassword: string }) {
+      await apiPost(`auth/users/${id}/password`, data);
       return true;
     },
     async isInitialized() {

@@ -88,7 +88,36 @@ CREATE TABLE IF NOT EXISTS sales (
     administrator INTEGER NOT NULL DEFAULT 0,   -- boolean
     user_id       TEXT,                          -- legacy Supabase auth id (unused, kept for shape)
     avatar        TEXT,                          -- JSON object (RAFile)
-    disabled      INTEGER NOT NULL DEFAULT 0     -- boolean
+    disabled      INTEGER NOT NULL DEFAULT 1     -- boolean; credentials activate accounts explicitly
+);
+
+-- Authentication --------------------------------------------------------------
+-- `sales` remains the business directory. These private tables are deliberately
+-- absent from server/resources.mjs and are only reachable through server/auth.mjs.
+CREATE TABLE IF NOT EXISTS auth_credentials (
+    sales_id            INTEGER PRIMARY KEY REFERENCES sales(id) ON DELETE CASCADE,
+    email               TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    password_hash       TEXT NOT NULL,
+    must_change_password INTEGER NOT NULL DEFAULT 1,
+    temporary_expires_at TEXT,
+    credential_version  INTEGER NOT NULL DEFAULT 1,
+    created_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+    updated_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS auth_sessions (
+    token_hash          TEXT PRIMARY KEY,
+    sales_id            INTEGER NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
+    credential_version  INTEGER NOT NULL,
+    expires_at          TEXT NOT NULL,
+    created_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS auth_login_attempts (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    email               TEXT NOT NULL COLLATE NOCASE,
+    remote_address      TEXT NOT NULL,
+    attempted_at        TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
 
 -- Tags ------------------------------------------------------------------------
@@ -138,6 +167,10 @@ CREATE TABLE IF NOT EXISTS record_history (
 CREATE INDEX IF NOT EXISTS contact_notes_contact_id_idx ON contact_notes (contact_id);
 CREATE INDEX IF NOT EXISTS contacts_company_id_idx      ON contacts (company_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq__sales__email       ON sales (email);
+CREATE INDEX IF NOT EXISTS auth_sessions_sales_id_idx ON auth_sessions (sales_id);
+CREATE INDEX IF NOT EXISTS auth_sessions_expires_at_idx ON auth_sessions (expires_at);
+CREATE INDEX IF NOT EXISTS auth_login_attempts_email_idx ON auth_login_attempts (email, attempted_at);
+CREATE INDEX IF NOT EXISTS auth_login_attempts_address_idx ON auth_login_attempts (remote_address, attempted_at);
 CREATE INDEX IF NOT EXISTS record_history_table_record_idx ON record_history (table_name, record_id);
 CREATE INDEX IF NOT EXISTS record_history_created_at_idx   ON record_history (created_at);
 

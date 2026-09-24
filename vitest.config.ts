@@ -55,6 +55,7 @@ export default defineConfig({
             "doc/**",
             "supabase/**",
             ".supabase-e2e/**",
+            "server/**",
             "e2e/**/*.spec.{ts,tsx}",
             // Harness hook tests are Node-only (they import node:fs / node:path
             // and spawn subprocesses); they run under the "claude" project below.
@@ -76,6 +77,14 @@ export default defineConfig({
           // so they need more headroom than the default 5s.
           testTimeout: 30000,
           hookTimeout: 30000,
+        },
+      },
+      {
+        test: {
+          name: "server",
+          environment: "node",
+          include: ["server/auth.test.mjs"],
+          testTimeout: 30000,
         },
       },
     ],

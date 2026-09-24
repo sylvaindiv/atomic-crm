@@ -12,6 +12,7 @@ import { SimpleForm } from "@/components/admin/simple-form";
 import { CancelButton } from "@/components/admin/cancel-button";
 import { SaveButton } from "@/components/admin/form";
 import { Card, CardContent } from "@/components/ui/card";
+import { TextInput } from "@/components/admin/text-input";
 
 import type { CrmDataProvider } from "../providers/types";
 import type { Sale, SalesFormData } from "../types";
@@ -44,15 +45,25 @@ export function SalesEdit() {
           }),
         );
       }
-      return dataProvider.salesUpdate(record.id, data);
+      const { password, ...sale } = data;
+      const updated = await dataProvider.salesUpdate(record.id, sale);
+      if (password) {
+        await dataProvider.resetPassword(record.id, { newPassword: password });
+      }
+      return { passwordChanged: Boolean(password), updated };
     },
-    onSuccess: () => {
+    onSuccess: ({ passwordChanged }) => {
       redirect("/sales");
-      notify("resources.sales.edit.success", {
-        messageArgs: {
-          _: "User updated successfully",
+      notify(
+        passwordChanged
+          ? "resources.sales.edit.password_reset"
+          : "resources.sales.edit.success",
+        {
+          messageArgs: {
+            _: "User updated successfully",
+          },
         },
-      });
+      );
     },
     onError: () => {
       notify("resources.sales.edit.error", {
@@ -79,6 +90,7 @@ export function SalesEdit() {
           >
             <SaleEditTitle />
             <SalesInputs />
+            <TextInput source="password" type="password" helperText={false} />
           </SimpleForm>
         </CardContent>
       </Card>

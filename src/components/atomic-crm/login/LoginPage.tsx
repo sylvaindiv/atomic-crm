@@ -1,65 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLogin } from "ra-core";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const ATTEMPTS_KEY = "app_login_attempts";
-
-function getBlockedUntil(): number | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const data = JSON.parse(localStorage.getItem(ATTEMPTS_KEY) || "{}");
-    if (data.blockedUntil && Date.now() < data.blockedUntil) {
-      return data.blockedUntil;
-    }
-  } catch {
-    // ignore
-  }
-  return null;
-}
+import { Input } from "@/components/ui/input";
 
 export const LoginPage = () => {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [blockedUntil, setBlockedUntil] = useState<number | null>(null);
-  const [remaining, setRemaining] = useState("");
   const login = useLogin();
 
-  useEffect(() => {
-    const blocked = getBlockedUntil();
-    if (blocked) {
-      setBlockedUntil(blocked);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!blockedUntil) return;
-    const update = () => {
-      const diff = blockedUntil - Date.now();
-      if (diff <= 0) {
-        setBlockedUntil(null);
-        setRemaining("");
-        return;
-      }
-      const mins = Math.ceil(diff / 60000);
-      setRemaining(`${mins} minute${mins > 1 ? "s" : ""}`);
-    };
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  }, [blockedUntil]);
-
-  const isBlocked = blockedUntil !== null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     setError("");
     try {
-      await login({ password });
-    } catch (err: any) {
-      setError(err.message || "Erreur de connexion");
-      const blocked = getBlockedUntil();
-      if (blocked) setBlockedUntil(blocked);
+      await login({ email, password });
+    } catch (reason: any) {
+      setError(reason.message || "Erreur de connexion");
     }
   };
 
@@ -67,34 +23,46 @@ export const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-zinc-900">
       <div className="w-full max-w-sm p-8">
         <h1 className="text-2xl font-semibold text-white text-center mb-8">
-          Accès
+          Connexion
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <label className="block text-sm text-zinc-200" htmlFor="email">
+            E-mail
+          </label>
           <Input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            required
+            className="text-white placeholder:text-zinc-500 bg-zinc-800 border-zinc-700 focus-visible:ring-zinc-600"
+          />
+          <label className="block text-sm text-zinc-200" htmlFor="password">
+            Mot de passe
+          </label>
+          <Input
+            id="password"
             type="password"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError("");
-            }}
-            placeholder="Mot de passe"
-            disabled={isBlocked}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
+            required
             className="text-white placeholder:text-zinc-500 bg-zinc-800 border-zinc-700 focus-visible:ring-zinc-600"
             autoFocus
           />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          {isBlocked && remaining && (
-            <p className="text-amber-400 text-sm">
-              Bloqué. Réessayez dans {remaining}.
+          {error && (
+            <p className="text-red-400 text-sm" role="alert">
+              {error}
             </p>
           )}
           <Button
             type="submit"
-            disabled={isBlocked || !password}
+            disabled={!email || !password}
             className="w-full cursor-pointer"
             variant="secondary"
           >
-            {isBlocked ? "Bloqué" : "Connexion"}
+            Connexion
           </Button>
         </form>
       </div>

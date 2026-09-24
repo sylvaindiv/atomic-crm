@@ -1,5 +1,11 @@
 import { useMutation } from "@tanstack/react-query";
-import { useDataProvider, useNotify, useRedirect, useTranslate } from "ra-core";
+import {
+  CanAccess,
+  useDataProvider,
+  useNotify,
+  useRedirect,
+  useTranslate,
+} from "ra-core";
 import type { SubmitHandler } from "react-hook-form";
 import { SimpleForm } from "@/components/admin/simple-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +28,7 @@ export function SalesCreate() {
     onSuccess: () => {
       notify("resources.sales.create.success", {
         messageArgs: {
-          _: "User created. They will soon receive an email to set their password.",
+          _: "User created with a temporary password.",
         },
       });
       redirect("/sales");
@@ -54,9 +60,11 @@ export function SalesCreate() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <SimpleForm onSubmit={onSubmit as SubmitHandler<any>}>
-            <SalesInputs />
-          </SimpleForm>
+          <CanAccess resource="sales" action="create">
+            <SimpleForm onSubmit={onSubmit as SubmitHandler<any>}>
+              <SalesInputs create />
+            </SimpleForm>
+          </CanAccess>
         </CardContent>
       </Card>
     </div>

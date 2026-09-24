@@ -4,7 +4,7 @@ import { TextInput } from "@/components/admin/text-input";
 
 import type { Sale } from "../types";
 
-export function SalesInputs() {
+export function SalesInputs({ create = false }: { create?: boolean }) {
   const { identity } = useGetIdentity();
   const record = useRecordContext<Sale>();
   return (
@@ -16,16 +16,20 @@ export function SalesInputs() {
         validate={[required(), email()]}
         helperText={false}
       />
-      <BooleanInput
-        source="administrator"
-        readOnly={record?.id === identity?.id}
-        helperText={false}
-      />
-      <BooleanInput
-        source="disabled"
-        readOnly={record?.id === identity?.id}
-        helperText={false}
-      />
+      {create ? (
+        <TextInput
+          source="password"
+          type="password"
+          validate={required()}
+          helperText={false}
+        />
+      ) : (
+        <BooleanInput
+          source="disabled"
+          readOnly={record?.id === identity?.id}
+          helperText={false}
+        />
+      )}
     </div>
   );
 }

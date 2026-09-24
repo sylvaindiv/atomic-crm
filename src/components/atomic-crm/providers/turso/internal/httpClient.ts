@@ -11,15 +11,17 @@ import { HttpError, type DataProvider } from "ra-core";
  */
 const API_URL = import.meta.env.VITE_API_URL ?? "/api";
 
-async function apiFetch<T = any>(
-  resource: string,
-  method: string,
-  body: Record<string, unknown>,
+export async function apiFetch<T = any>(
+  path: string,
+  options: RequestInit = {},
 ): Promise<T> {
-  const response = await fetch(`${API_URL}/${resource}/${method}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+  const response = await fetch(`${API_URL}/${path}`, {
+    credentials: "include",
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
   });
 
   const json = await response.json().catch(() => ({}));
@@ -33,18 +35,33 @@ async function apiFetch<T = any>(
   return json as T;
 }
 
+export const apiPost = <T = any>(path: string, body: Record<string, unknown>) =>
+  apiFetch<T>(path, { method: "POST", body: JSON.stringify(body) });
+
+export const apiPatch = <T = any>(
+  path: string,
+  body: Record<string, unknown>,
+) => apiFetch<T>(path, { method: "PATCH", body: JSON.stringify(body) });
+
+const dataRequest = <T = any>(
+  resource: string,
+  method: string,
+  body: Record<string, unknown>,
+) => apiPost<T>(`${resource}/${method}`, body);
+
 export const baseDataProvider: DataProvider = {
   getList: (resource, params) =>
-    apiFetch(resource, "getList", {
+    dataRequest(resource, "getList", {
       filter: params.filter,
       sort: params.sort,
       pagination: params.pagination,
     }),
-  getOne: (resource, params) => apiFetch(resource, "getOne", { id: params.id }),
+  getOne: (resource, params) =>
+    dataRequest(resource, "getOne", { id: params.id }),
   getMany: (resource, params) =>
-    apiFetch(resource, "getMany", { ids: params.ids }),
+    dataRequest(resource, "getMany", { ids: params.ids }),
   getManyReference: (resource, params) =>
-    apiFetch(resource, "getManyReference", {
+    dataRequest(resource, "getManyReference", {
       target: params.target,
       id: params.id,
       filter: params.filter,
@@ -52,12 +69,13 @@ export const baseDataProvider: DataProvider = {
       pagination: params.pagination,
     }),
   create: (resource, params) =>
-    apiFetch(resource, "create", { data: params.data }),
+    dataRequest(resource, "create", { data: params.data }),
   update: (resource, params) =>
-    apiFetch(resource, "update", { id: params.id, data: params.data }),
+    dataRequest(resource, "update", { id: params.id, data: params.data }),
   updateMany: (resource, params) =>
-    apiFetch(resource, "updateMany", { ids: params.ids, data: params.data }),
-  delete: (resource, params) => apiFetch(resource, "delete", { id: params.id }),
+    dataRequest(resource, "updateMany", { ids: params.ids, data: params.data }),
+  delete: (resource, params) =>
+    dataRequest(resource, "delete", { id: params.id }),
   deleteMany: (resource, params) =>
-    apiFetch(resource, "deleteMany", { ids: params.ids }),
+    dataRequest(resource, "deleteMany", { ids: params.ids }),
 };

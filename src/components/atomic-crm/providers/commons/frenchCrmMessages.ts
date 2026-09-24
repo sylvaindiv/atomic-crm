@@ -289,20 +289,20 @@ export const frenchCrmMessages = {
         first_name: "Prénom",
         last_name: "Nom",
         email: "E-mail",
-        administrator: "Admin",
         disabled: "Désactivé",
+        password: "Mot de passe provisoire",
       },
       create: {
         error:
           "Une erreur s'est produite lors de la création de l'utilisateur.",
-        success:
-          "Utilisateur créé. Ils recevront prochainement un email pour définir leur mot de passe.",
+        success: "Utilisateur créé avec un mot de passe provisoire.",
         title: "Créer un nouvel utilisateur",
       },
       edit: {
         error: "Une erreur s'est produite. Veuillez réessayer.",
         record_not_found: "Enregistrement introuvable",
         success: "Utilisateur mis à jour avec succès",
+        password_reset: "Mot de passe provisoire réinitialisé avec succès",
         title: "Modifier %{name}",
       },
       action: {
@@ -536,8 +536,6 @@ export const frenchCrmMessages = {
       password: {
         change: "Changer le mot de passe",
       },
-      password_reset_sent:
-        "Un e-mail de réinitialisation du mot de passe a été envoyé à votre adresse e-mail",
       record_not_found: "Enregistrement introuvable",
       title: "Profil",
       updated: "Votre profil a été mis à jour",

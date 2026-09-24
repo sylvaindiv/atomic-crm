@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/components/admin/use-theme";
-import { ChevronRight, KeyRound } from "lucide-react";
+import { ChevronRight, KeyRound, Users } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import { LogOut, Moon, Smartphone, Sun } from "lucide-react";
 import {
   Form,
   Translate,
+  CanAccess,
   useAuthProvider,
   useDataProvider,
   useGetIdentity,
@@ -45,42 +46,13 @@ import type { SalesFormData } from "../types";
 
 const ChangePasswordButton = () => {
   const translate = useTranslate();
-  const notify = useNotify();
-  const { identity } = useGetIdentity();
-  const dataProvider = useDataProvider<CrmDataProvider>();
-
-  const { mutate: updatePassword } = useMutation({
-    mutationKey: ["updatePassword"],
-    mutationFn: async () => {
-      if (!identity) {
-        throw new Error(
-          translate("crm.profile.record_not_found", {
-            _: "Record not found",
-          }),
-        );
-      }
-      return dataProvider.updatePassword(identity.id);
-    },
-    onSuccess: () => {
-      notify("crm.profile.password_reset_sent", {
-        messageArgs: {
-          _: "A reset password email has been sent to your email address",
-        },
-      });
-    },
-    onError: (e) => {
-      notify(`${e}`, { type: "error" });
-    },
-  });
 
   return (
-    <Button
-      variant="outline"
-      className="w-full text-base h-auto"
-      onClick={() => updatePassword()}
-    >
-      <KeyRound className="size-5 mr-3" />
-      {translate("crm.profile.password.change")}
+    <Button variant="outline" className="w-full text-base h-auto" asChild>
+      <Link to="/change-password">
+        <KeyRound className="size-5 mr-3" />
+        {translate("crm.profile.password.change")}
+      </Link>
     </Button>
   );
 };
@@ -103,6 +75,9 @@ export const SettingsPageMobile = () => {
         <div className="flex flex-col min-h-[calc(100dvh-3.5rem-4.5rem)]">
           <div className="space-y-6">
             <ProfileSection />
+            <CanAccess resource="sales" action="list">
+              <UsersSection />
+            </CanAccess>
             <PreferencesSection />
             <AboutSection />
           </div>
@@ -159,10 +134,7 @@ const ProfileSection = () => {
       );
 
       try {
-        await dataProvider.salesUpdate(identity.id, {
-          ...data,
-          [field]: value,
-        } as SalesFormData);
+        await dataProvider.salesUpdate(identity.id, { [field]: value });
         refetchIdentity();
         refetchUser();
         notify("crm.profile.updated", {
@@ -191,7 +163,7 @@ const ProfileSection = () => {
     async (values: SalesFormData) => {
       if (!data) return;
       try {
-        await dataProvider.salesUpdate(data.id, values);
+        await dataProvider.salesUpdate(data.id, { avatar: values.avatar });
         refetchIdentity();
         refetchUser();
         notify("crm.profile.updated", {
@@ -246,11 +218,43 @@ const ProfileSection = () => {
 
         <ItemSeparator />
 
-        <InlineEditRow
-          label={translate("resources.sales.fields.email")}
-          value={data.email ?? ""}
-          onSave={(v) => saveField("email", v)}
-        />
+        <Item size="sm">
+          <ItemContent>
+            <ItemTitle className="font-normal text-muted-foreground">
+              {translate("resources.sales.fields.email")}
+            </ItemTitle>
+          </ItemContent>
+          <ItemActions>
+            <span className="text-base">{data.email ?? ""}</span>
+          </ItemActions>
+        </Item>
+      </ItemGroup>
+    </div>
+  );
+};
+
+const UsersSection = () => {
+  const translate = useTranslate();
+
+  return (
+    <div>
+      <SectionLabel>
+        {translate("resources.sales.name", { smart_count: 2 })}
+      </SectionLabel>
+      <ItemGroup className="rounded-lg border overflow-hidden">
+        <Item asChild size="sm" className="cursor-pointer">
+          <Link to="/sales">
+            <ItemContent>
+              <ItemTitle className="font-normal">
+                {translate("resources.sales.name", { smart_count: 2 })}
+              </ItemTitle>
+            </ItemContent>
+            <ItemActions>
+              <Users className="size-4 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
+            </ItemActions>
+          </Link>
+        </Item>
       </ItemGroup>
     </div>
   );
