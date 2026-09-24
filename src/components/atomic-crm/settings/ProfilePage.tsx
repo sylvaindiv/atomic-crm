@@ -13,6 +13,7 @@ import {
 } from "ra-core";
 import { useState } from "react";
 import { useFormState } from "react-hook-form";
+import { Link } from "react-router";
 import { RecordField } from "@/components/admin/record-field";
 import { TextInput } from "@/components/admin/text-input";
 import { Button } from "@/components/ui/button";
@@ -49,7 +50,12 @@ export const ProfilePage = () => {
           }),
         );
       }
-      return dataProvider.salesUpdate(identity.id, data);
+      const { first_name, last_name, avatar } = data;
+      return dataProvider.salesUpdate(identity.id, {
+        first_name,
+        last_name,
+        avatar,
+      });
     },
     onSuccess: () => {
       refetchIdentity();
@@ -100,32 +106,6 @@ const ProfileForm = ({
   const { isDirty } = useFormState();
   const dataProvider = useDataProvider<CrmDataProvider>();
 
-  const { mutate: updatePassword } = useMutation({
-    mutationKey: ["updatePassword"],
-    mutationFn: async () => {
-      if (!identity) {
-        throw new Error(
-          translate("crm.profile.record_not_found", {
-            _: "Record not found",
-          }),
-        );
-      }
-      return dataProvider.updatePassword(identity.id);
-    },
-    onSuccess: () => {
-      notify("crm.profile.password_reset_sent", {
-        messageArgs: {
-          _: "A reset password email has been sent to your email address",
-        },
-      });
-    },
-    onError: (e) => {
-      notify(`${e}`, {
-        type: "error",
-      });
-    },
-  });
-
   const { mutate: mutateSale } = useMutation({
     mutationKey: ["signup"],
     mutationFn: async (data: SalesFormData) => {
@@ -136,7 +116,12 @@ const ProfileForm = ({
           }),
         );
       }
-      return dataProvider.salesUpdate(record.id, data);
+      const { first_name, last_name, avatar } = data;
+      return dataProvider.salesUpdate(record.id, {
+        first_name,
+        last_name,
+        avatar,
+      });
     },
     onSuccess: () => {
       refetch();
@@ -156,10 +141,6 @@ const ProfileForm = ({
     },
   });
   if (!identity) return null;
-
-  const handleClickOpenPasswordChange = () => {
-    updatePassword();
-  };
 
   const handleAvatarUpdate = async (values: any) => {
     mutateSale(values);
@@ -186,19 +167,17 @@ const ProfileForm = ({
               <TextRender source="first_name" isEditMode={isEditMode} />
               <TextRender source="last_name" isEditMode={isEditMode} />
             </div>
-            <TextRender source="email" isEditMode={isEditMode} />
+            <TextRender source="email" isEditMode={false} />
             <LanguageSelector />
           </div>
 
           <div className="flex flex-row justify-end gap-2">
             {!isEditMode && (
               <>
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={handleClickOpenPasswordChange}
-                >
-                  {translate("crm.profile.password.change")}
+                <Button variant="outline" type="button" asChild>
+                  <Link to="/change-password">
+                    {translate("crm.profile.password.change")}
+                  </Link>
                 </Button>
               </>
             )}

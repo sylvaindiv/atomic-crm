@@ -1,126 +1,64 @@
-import type { Sale } from "../../types";
-import { getAuthProvider } from "./authProvider";
+import { clearAuthState, getAuthProvider } from "./authProvider";
 
-// `vi.mock` factories are hoisted above the rest of the file, so the mocks
-// they reference must be created via `vi.hoisted` (see
-// https://vitest.dev/api/vi.html#vi-hoisted) — this also matches the
-// project's browser-mode test runner, which needs `vi.hoisted` explicitly
-// (a plain top-level `vi.fn()` is not enough there).
-const mockGetList = vi.hoisted(() => vi.fn());
-const mockCreate = vi.hoisted(() => vi.fn());
+const apiFetch = vi.hoisted(() => vi.fn());
+const apiPost = vi.hoisted(() => vi.fn());
 
-vi.mock("./internal/httpClient", () => ({
-  baseDataProvider: {
-    getList: mockGetList,
-    create: mockCreate,
-  },
-}));
+vi.mock("./internal/httpClient", () => ({ apiFetch, apiPost }));
 
-/** Builds a valid `sales` row fixture, overridable per test. */
-function buildSale(overrides: Partial<Sale> = {}): Sale {
-  return {
-    id: 1,
-    first_name: "Admin",
-    last_name: "User",
-    email: "admin@local",
+const session = {
+  user: {
+    id: 7,
+    first_name: "Jane",
+    last_name: "Doe",
+    avatar: { src: "https://example.com/jane.png" },
     administrator: true,
-    disabled: false,
-    user_id: "user-id-1",
-    ...overrides,
-  };
-}
+  },
+  must_change_password: true,
+};
 
-/** `getIdentity` is optional on `AuthProvider`; this implementation always provides it. */
-async function resolveIdentity() {
-  const identity = await getAuthProvider().getIdentity?.();
-  if (!identity) throw new Error("getIdentity() did not resolve");
-  return identity;
-}
-
-describe("turso authProvider getIdentity", () => {
+describe("turso authProvider", () => {
   beforeEach(() => {
-    mockGetList.mockReset();
-    mockCreate.mockReset();
+    apiFetch.mockReset();
+    apiPost.mockReset();
+    clearAuthState();
+    localStorage.clear();
   });
 
-  it("returns the first sales row, sorted by id ascending, without creating one", async () => {
-    // Arrange
-    const sale = buildSale({
-      id: 7,
-      first_name: "Jane",
-      last_name: "Doe",
-      avatar: { src: "https://example.com/jane.png" } as Sale["avatar"],
-    });
-    mockGetList.mockResolvedValue({ data: [sale], total: 1 });
+  it("uses the server session and redirects a temporary password user", async () => {
+    apiPost.mockResolvedValue(session);
 
-    // Act
-    const identity = await resolveIdentity();
-
-    // Assert
-    expect(identity).toEqual({
+    await expect(
+      getAuthProvider().login({
+        email: "jane@example.com",
+        password: "temporary password",
+      }),
+    ).resolves.toEqual({ redirectTo: "/change-password" });
+    await expect(getAuthProvider().getIdentity?.()).resolves.toEqual({
       id: 7,
       fullName: "Jane Doe",
       avatar: "https://example.com/jane.png",
+      must_change_password: true,
     });
-    expect(mockGetList).toHaveBeenCalledWith("sales", {
-      filter: {},
-      pagination: { page: 1, perPage: 1 },
-      sort: { field: "id", order: "ASC" },
+    expect(apiPost).toHaveBeenCalledWith("auth/login", {
+      email: "jane@example.com",
+      password: "temporary password",
     });
-    expect(mockCreate).not.toHaveBeenCalled();
   });
 
-  it("self-provisions a default sales row when the table is empty", async () => {
-    // Arrange
-    mockGetList.mockResolvedValue({ data: [], total: 0 });
-    mockCreate.mockResolvedValue({ data: buildSale({ id: 1 }) });
+  it("checks the session on the server without provisioning a sales row", async () => {
+    apiFetch.mockResolvedValue({ ...session, must_change_password: false });
 
-    // Act
-    const identity = await resolveIdentity();
+    await expect(getAuthProvider().checkAuth({})).resolves.toBeUndefined();
+    expect(apiFetch).toHaveBeenCalledWith("auth/me");
+  });
 
-    // Assert
-    expect(mockCreate).toHaveBeenCalledWith("sales", {
-      data: expect.objectContaining({
-        first_name: "Admin",
-        last_name: "User",
-        email: "admin@local",
-        administrator: true,
-        disabled: false,
-        user_id: expect.any(String),
+  it("redirects a limited session without logging it out", async () => {
+    await expect(
+      getAuthProvider().checkError({
+        status: 403,
+        body: { code: "PASSWORD_CHANGE_REQUIRED" },
       }),
-    });
-    expect(identity).toEqual({
-      id: 1,
-      fullName: "Admin User",
-      avatar: undefined,
-    });
-  });
-
-  it("re-fetches and returns the existing row instead of throwing when a concurrent caller already created it", async () => {
-    // Arrange: the table looked empty, but by the time our insert runs, a
-    // concurrent caller (another tab / request) has already created the
-    // default row, so the UNIQUE constraint on sales.email rejects ours.
-    const raceWinner = buildSale({
-      id: 2,
-      first_name: "Race",
-      last_name: "Winner",
-    });
-    mockGetList
-      .mockResolvedValueOnce({ data: [], total: 0 })
-      .mockResolvedValueOnce({ data: [raceWinner], total: 1 });
-    mockCreate.mockRejectedValue(
-      new Error("SQLITE_CONSTRAINT: UNIQUE constraint failed: sales.email"),
-    );
-
-    // Act
-    const identity = await resolveIdentity();
-
-    // Assert
-    expect(identity).toEqual({
-      id: 2,
-      fullName: "Race Winner",
-      avatar: undefined,
-    });
-    expect(mockGetList).toHaveBeenCalledTimes(2);
+    ).rejects.toEqual({ redirectTo: "/change-password" });
+    expect(apiPost).not.toHaveBeenCalled();
   });
 });

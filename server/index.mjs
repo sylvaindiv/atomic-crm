@@ -7,22 +7,43 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 
-import { initSchema, loadTableColumns } from "./db.mjs";
+import { db, initSchema, loadTableColumns } from "./db.mjs";
+import { authGuard, authorizeDataRequest, mountAuth } from "./auth.mjs";
 import { HANDLERS } from "./query.mjs";
 import { RESOURCES } from "./resources.mjs";
 
 const app = new Hono();
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
+mountAuth(app, { db });
 
 // Generic data endpoint: POST /api/:resource/:method with a JSON body matching
 // the react-admin DataProvider params for that method.
 app.post("/api/:resource/:method", async (c) => {
   const { resource, method } = c.req.param();
+  const authError = await authGuard(c, db);
+  if (authError) return authError;
   const cfg = RESOURCES[resource];
   if (!cfg) return c.json({ error: `Unknown resource: ${resource}` }, 404);
   const handler = HANDLERS[method];
   if (!handler) return c.json({ error: `Unknown method: ${method}` }, 404);
+
+  if (!["getList", "getOne", "getMany", "getManyReference"].includes(method)) {
+    const origin = c.req.header("origin");
+    const appOrigin = process.env.APP_ORIGIN ?? "http://localhost:5173";
+    if (
+      origin !== appOrigin ||
+      !c.req
+        .header("content-type")
+        ?.toLowerCase()
+        .startsWith("application/json")
+    ) {
+      return c.json({ error: "Invalid request origin" }, 400);
+    }
+  }
+
+  const authorizationError = authorizeDataRequest(c, resource, method);
+  if (authorizationError) return authorizationError;
 
   const body = await c.req.json().catch(() => ({}));
   try {

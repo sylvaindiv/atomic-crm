@@ -286,19 +286,19 @@ export const englishCrmMessages = {
         first_name: "First name",
         last_name: "Last name",
         email: "Email",
-        administrator: "Admin",
         disabled: "Disabled",
+        password: "Temporary password",
       },
       create: {
         error: "An error occurred while creating the user.",
-        success:
-          "User created. They will soon receive an email to set their password.",
+        success: "User created with a temporary password.",
         title: "Create a new user",
       },
       edit: {
         error: "An error occurred. Please try again.",
         record_not_found: "Record not found",
         success: "User updated successfully",
+        password_reset: "Temporary password reset successfully",
         title: "Edit %{name}",
       },
       action: {
@@ -534,8 +534,6 @@ export const englishCrmMessages = {
       password: {
         change: "Change password",
       },
-      password_reset_sent:
-        "A reset password email has been sent to your email address",
       record_not_found: "Record not found",
       title: "Profile",
       updated: "Your profile has been updated",

@@ -90,7 +90,9 @@ const Header = () => {
                   <CanAccess resource="configuration" action="edit">
                     <SettingsMenu />
                   </CanAccess>
-                  <ImportFromJsonMenuItem />
+                  <CanAccess resource="configuration" action="edit">
+                    <ImportFromJsonMenuItem />
+                  </CanAccess>
                   <ChangelogMenuItem />
                 </UserMenu>
               </div>

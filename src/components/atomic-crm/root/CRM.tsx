@@ -4,12 +4,15 @@ import type {
   DashboardComponent,
   LayoutComponent,
 } from "ra-core";
-import { CustomRoutes, localStorageStore, Resource } from "ra-core";
+import {
+  CustomRoutes,
+  localStorageStore,
+  Resource,
+  useGetIdentity,
+} from "ra-core";
 import { useEffect, useMemo } from "react";
-import { Route } from "react-router";
+import { Navigate, Route } from "react-router";
 import { QueryClient } from "@tanstack/react-query";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { Admin } from "@/components/admin/admin";
 
 import companies from "../companies";
@@ -46,6 +49,8 @@ import {
 } from "./defaultConfiguration";
 import { i18nProvider as defaulti18nProvider } from "../providers/commons/i18nProvider";
 import { StartPage } from "../login/StartPage.tsx";
+import { ChangePasswordPage } from "../login/ChangePasswordPage.tsx";
+import { SESSION_EVENT } from "../providers/turso/authProvider";
 import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { MobileTasksList } from "../tasks/MobileTasksList.tsx";
 import { ContactListMobile } from "../contacts/ContactList.tsx";
@@ -118,6 +123,20 @@ export const CRM = ({
   disableTelemetry,
   ...rest
 }: CRMProps) => {
+  const queryClient = useMemo(() => new QueryClient(), []);
+
+  useEffect(() => {
+    localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
+    localStorage.removeItem("app_auth");
+    localStorage.removeItem("app_login_attempts");
+    const clearCache = () => queryClient.clear();
+    window.addEventListener(SESSION_EVENT, clearCache);
+    window.addEventListener("storage", clearCache);
+    return () => {
+      window.removeEventListener(SESSION_EVENT, clearCache);
+      window.removeEventListener("storage", clearCache);
+    };
+  }, [queryClient]);
   useEffect(() => {
     if (
       disableTelemetry ||
@@ -159,6 +178,8 @@ export const CRM = ({
       ...authProvider,
       login: async (params: any) => {
         const result = await authProvider.login(params);
+        queryClient.clear();
+        if ((result as any)?.redirectTo) return result;
         try {
           const config = await dataProvider.getConfiguration();
           if (Object.keys(config).length > 0) {
@@ -187,6 +208,7 @@ export const CRM = ({
         return result;
       },
       logout: async (params: any) => {
+        queryClient.clear();
         try {
           store.removeItem(CONFIGURATION_STORE_KEY);
         } catch {
@@ -195,7 +217,7 @@ export const CRM = ({
         return authProvider.logout(params);
       },
     }),
-    [authProvider, dataProvider, store],
+    [authProvider, dataProvider, queryClient, store],
   );
 
   const ResponsiveAdmin = isMobile ? MobileAdmin : DesktopAdmin;
@@ -206,6 +228,7 @@ export const CRM = ({
       authProvider={wrappedAuthProvider}
       i18nProvider={i18nProvider}
       store={store}
+      queryClient={queryClient}
       loginPage={StartPage}
       requireAuth
       disableTelemetry
@@ -220,12 +243,19 @@ const DesktopAdmin = (
     layout?: LayoutComponent;
   },
 ) => {
+  const ActiveLayout = props.layout ?? Layout;
+  const GuardedLayout = (layoutProps: any) => (
+    <PasswordChangeGuard layout={ActiveLayout} {...layoutProps} />
+  );
   return (
     <Admin
-      layout={props.layout ?? Layout}
+      layout={GuardedLayout}
       dashboard={props.dashboard ?? Dashboard}
       {...props}
     >
+      <CustomRoutes noLayout>
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+      </CustomRoutes>
       <CustomRoutes>
         <Route path={ProfilePage.path} element={<ProfilePage />} />
         <Route path={SettingsPage.path} element={<SettingsPage />} />
@@ -250,51 +280,50 @@ const MobileAdmin = (
     layout?: LayoutComponent;
   },
 ) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        gcTime: 1000 * 60 * 60 * 24, // 24 hours
-        networkMode: "offlineFirst",
-      },
-      mutations: {
-        networkMode: "offlineFirst",
-      },
-    },
-  });
-  const asyncStoragePersister = createAsyncStoragePersister({
-    storage: localStorage,
-  });
-
-  return (
-    <PersistQueryClientProvider
-      client={queryClient}
-      persistOptions={{ persister: asyncStoragePersister }}
-    >
-      <Admin
-        queryClient={queryClient}
-        layout={props.layout ?? MobileLayout}
-        dashboard={props.dashboard ?? MobileDashboard}
-        {...props}
-      >
-        <CustomRoutes>
-          <Route
-            path={SettingsPageMobile.path}
-            element={<SettingsPageMobile />}
-          />
-          <Route path={ChangelogPage.path} element={<ChangelogPage />} />
-          <Route path={MapPage.path} element={<MapPage />} />
-        </CustomRoutes>
-        <Resource
-          name="contacts"
-          list={ContactListMobile}
-          show={ContactShow}
-          recordRepresentation={contacts.recordRepresentation}
-        >
-          <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
-        </Resource>
-        <Resource name="companies" show={CompanyShow} />
-        <Resource name="tasks" list={MobileTasksList} />
-      </Admin>
-    </PersistQueryClientProvider>
+  const ActiveLayout = props.layout ?? MobileLayout;
+  const GuardedLayout = (layoutProps: any) => (
+    <PasswordChangeGuard layout={ActiveLayout} {...layoutProps} />
   );
+  return (
+    <Admin
+      layout={GuardedLayout}
+      dashboard={props.dashboard ?? MobileDashboard}
+      {...props}
+    >
+      <CustomRoutes noLayout>
+        <Route path="/change-password" element={<ChangePasswordPage />} />
+      </CustomRoutes>
+      <CustomRoutes>
+        <Route
+          path={SettingsPageMobile.path}
+          element={<SettingsPageMobile />}
+        />
+        <Route path={ChangelogPage.path} element={<ChangelogPage />} />
+        <Route path={MapPage.path} element={<MapPage />} />
+      </CustomRoutes>
+      <Resource
+        name="contacts"
+        list={ContactListMobile}
+        show={ContactShow}
+        recordRepresentation={contacts.recordRepresentation}
+      >
+        <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
+      </Resource>
+      <Resource name="companies" show={CompanyShow} />
+      <Resource name="tasks" list={MobileTasksList} />
+      <Resource name="sales" {...sales} />
+    </Admin>
+  );
+};
+
+const PasswordChangeGuard = ({ layout: Layout, ...props }: any) => {
+  const { identity, isPending } = useGetIdentity();
+  if (isPending) return null;
+  if (
+    (identity as { must_change_password?: boolean } | undefined)
+      ?.must_change_password
+  ) {
+    return <Navigate to="/change-password" replace />;
+  }
+  return <Layout {...props} />;
 };

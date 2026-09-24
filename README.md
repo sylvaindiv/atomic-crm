@@ -1,6 +1,6 @@
 # Atomic CRM
 
-A full-featured CRM built with React, shadcn-admin-kit, and Supabase.
+A full-featured CRM built with React, shadcn-admin-kit, and Turso/libSQL.
 
 <https://github.com/user-attachments/assets/0d7554b5-49ef-41c6-bcc9-a76214fc5c99>
 
@@ -14,7 +14,7 @@ Atomic CRM is free and open-source. You can test it online at <https://marmelab.
 - ✉️ **Capture Emails**: CC Atomic CRM to automatically save communications as notes.
 - 📊 **Manage Deals**: Visualize and track your sales pipeline in a Kanban board.
 - 🔄 **Import & Export Data**: Easily transfer contacts in and out of the system.
-- 🔐 **Control Access**: Log in with Google, Azure, Keycloak, and Auth0.
+- 🔐 **Control Access**: Owner-managed email and password accounts.
 - 📜 **Track Activity History**: View all interactions in aggregated activity logs.
 - 🔗 **Integrate via API**: Connect seamlessly with other systems using our API.
 - 🛠️ **Customize Everything**: Add custom fields, change the theme, and replace any component to fit your needs.
@@ -25,7 +25,7 @@ To run this project locally, you will need the following tools installed on your
 
 - Make
 - Node 22 LTS
-- Docker (required by Supabase)
+- A Turso database, or a local libSQL file for development
 
 Fork the [`marmelab/atomic-crm`](https://github.com/marmelab/atomic-crm) repository to your user/organization, then clone it locally:
 
@@ -40,7 +40,9 @@ cd atomic-crm
 make install
 ```
 
-This will install the dependencies for the frontend and the backend, including a local Supabase instance.
+Copy `.env.example` to `.env`, then set `TURSO_DATABASE_URL`,
+`TURSO_AUTH_TOKEN` when using Turso, and `APP_ORIGIN` to the exact public HTTPS
+origin. A local database can use `TURSO_DATABASE_URL=file:./db/atomic-crm.local.db`.
 
 Once your app is configured, start the app locally with the following command:
 
@@ -48,16 +50,16 @@ Once your app is configured, start the app locally with the following command:
 make start
 ```
 
-This will start the Vite dev server for the frontend, the local Supabase instance for the API, and a Postgres database (thanks to Docker).
+This starts the Vite dev server and the local API server.
 
-You can then access the app via [http://localhost:5173/](http://localhost:5173/). You will be prompted to create the first user.
+You can then access the app via [http://localhost:5173/](http://localhost:5173/).
+Apply the schema with `npm run db:apply`, then provision the selected owner from
+the terminal with `node --env-file=.env server/manage-auth.mjs prepare --sales-id
+<id> --email <email>`, supplying the password on standard input. It never selects
+an owner automatically. The owner creates, disables, and resets user accounts from
+the CRM. Public signup is unavailable.
 
-If you need debug the backend, you can access the following services:
-
-- Supabase dashboard: [http://localhost:54323/](http://localhost:54323/)
-- REST API: [http://127.0.0.1:54321](http://127.0.0.1:54321)
-- Attachments storage: [http://localhost:54323/project/default/storage/buckets/attachments](http://localhost:54323/project/default/storage/buckets/attachments)
-- Inbucket email testing service: [http://localhost:54324/](http://localhost:54324/)
+The local API listens on [http://localhost:3001/api/health](http://localhost:3001/api/health).
 
 ## Documentation
 
