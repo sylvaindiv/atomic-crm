@@ -27,7 +27,7 @@ export const NoteInputs = ({
   defaultStatus?: string;
   showStatus?: boolean;
   selectReference?: boolean;
-  reference?: "contacts";
+  reference?: "contacts" | "partners";
 }) => {
   const { noteStatuses } = useConfigurationContext();
   const translate = useTranslate();

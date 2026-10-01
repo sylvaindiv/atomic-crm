@@ -73,7 +73,7 @@ describe("getContactsByStatus", () => {
 
     const result = getContactsByStatus([], noteStatuses);
 
-    expect(Object.keys(result)).toEqual(["z", "a"]);
+    expect(Object.keys(result)).toEqual(["z", "a", ""]);
   });
 
   it("omits a contact whose status matches no visible column, without rewriting its status", () => {

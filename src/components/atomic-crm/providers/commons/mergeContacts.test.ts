@@ -49,6 +49,21 @@ const buildDataProvider = (
 };
 
 describe("mergeContacts", () => {
+  it("rejects a merge across referee and partner records before writing", async () => {
+    const update = vi.fn();
+    const provider = buildDataProvider({
+      getOne: getOneFor(
+        buildContact({ id: winnerId, contact_type: "partner" }),
+        buildContact({ id: loserId, contact_type: "referee" }),
+      ),
+      update,
+    });
+
+    await expect(mergeContacts(loserId, winnerId, provider)).rejects.toThrow(
+      "same type",
+    );
+    expect(update).not.toHaveBeenCalled();
+  });
   it("repoints contacts referred by the loser to the winner, before the loser is deleted", async () => {
     // Arrange
     const winner = buildContact({ id: winnerId });

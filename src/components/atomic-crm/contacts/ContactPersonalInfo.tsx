@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { formatPhoneNumber } from "@/lib/utils";
 import { translatePersonalInfoTypeLabel } from "./contactModel";
 import type { Contact } from "../types";
+import { resourceForContact } from "./contactResource";
 
 export const ContactPersonalInfo = () => {
   const record = useRecordContext<Contact>();
@@ -38,7 +39,7 @@ export const ContactPersonalInfo = () => {
           primary={
             <Link
               className="underline hover:no-underline text-sm text-muted-foreground"
-              to={`/contacts/${record.referred_by_id}/show`}
+              to={`/${resourceForContact(record)}/${record.referred_by_id}/show`}
             >
               {record.referred_by_name}
             </Link>

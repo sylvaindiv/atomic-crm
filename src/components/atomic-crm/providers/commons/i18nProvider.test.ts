@@ -33,6 +33,20 @@ describe("i18nProvider", () => {
     );
   });
 
+  it("uses partner labels in both locales", async () => {
+    await i18nProvider.changeLocale("fr");
+    expect(
+      i18nProvider.translate("resources.partners.name", { smart_count: 2 }),
+    ).toBe("Partenaires");
+    expect(i18nProvider.translate("resources.partners.action.new")).toBe(
+      "Nouveau partenaire",
+    );
+    await i18nProvider.changeLocale("en");
+    expect(i18nProvider.translate("resources.partners.action.new")).toBe(
+      "New Partner",
+    );
+  });
+
   it("uses browser french locale when available", () => {
     vi.stubGlobal("navigator", {
       language: "fr-FR",

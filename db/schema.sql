@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS companies (
 -- Contacts --------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS contacts (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    contact_type   TEXT NOT NULL DEFAULT 'referee' CHECK (contact_type IN ('referee', 'partner')),
     first_name     TEXT,
     last_name      TEXT,
     gender         TEXT,
@@ -167,6 +168,7 @@ CREATE TABLE IF NOT EXISTS record_history (
 -- Indexes on foreign keys -----------------------------------------------------
 CREATE INDEX IF NOT EXISTS contact_notes_contact_id_idx ON contact_notes (contact_id);
 CREATE INDEX IF NOT EXISTS contacts_company_id_idx      ON contacts (company_id);
+CREATE INDEX IF NOT EXISTS contacts_type_idx            ON contacts (contact_type);
 CREATE UNIQUE INDEX IF NOT EXISTS uq__sales__email       ON sales (email);
 CREATE INDEX IF NOT EXISTS auth_sessions_sales_id_idx ON auth_sessions (sales_id);
 CREATE INDEX IF NOT EXISTS auth_sessions_expires_at_idx ON auth_sessions (expires_at);
@@ -181,7 +183,7 @@ DROP VIEW IF EXISTS companies_summary;
 CREATE VIEW companies_summary AS
 SELECT
     c.*,
-    (SELECT count(*) FROM contacts co WHERE co.company_id = c.id) AS nb_contacts
+    (SELECT count(*) FROM contacts co WHERE co.company_id = c.id AND co.contact_type = 'referee') AS nb_contacts
 FROM companies c;
 
 -- contacts_summary: adds company_name, referred_by_name, open-task count, and

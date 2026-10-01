@@ -72,12 +72,13 @@ async function getNewContactsAndNotes(
   filter: any,
 ): Promise<Activity[]> {
   const { data: contacts } = await dataProvider.getList<Contact>("contacts", {
-    filter,
+    filter: { ...filter, contact_type: "referee" },
     pagination: { page: 1, perPage: 250 },
     sort: { field: "first_seen", order: "DESC" },
   });
 
   const recentContactNotesFilter = {} as any;
+  recentContactNotesFilter.contact_type = "referee";
   if (filter.sales_id) {
     recentContactNotesFilter.sales_id = filter.sales_id;
   }

@@ -27,6 +27,12 @@ export const mergeContacts = async (
   if (!winnerContact || !loserContact) {
     throw new Error("Could not fetch contacts");
   }
+  if (
+    (winnerContact.contact_type ?? "referee") !==
+    (loserContact.contact_type ?? "referee")
+  ) {
+    throw new Error("Only contacts of the same type can be merged");
+  }
 
   // 1. Reassign all tasks from loser to winner
   const { data: loserTasks } = await dataProvider.getManyReference<Task>(

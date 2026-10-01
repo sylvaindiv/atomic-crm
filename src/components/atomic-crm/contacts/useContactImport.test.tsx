@@ -40,8 +40,14 @@ const buildRow = (
 // A minimal harness: useContactImport is a hook with no UI of its own, so we
 // expose processBatch behind a button click and assert on the (mocked)
 // dataProvider calls it makes.
-const ImportHarness = ({ batch }: { batch: ContactImportSchema[] }) => {
-  const processBatch = useContactImport();
+const ImportHarness = ({
+  batch,
+  contactType = "referee",
+}: {
+  batch: ContactImportSchema[];
+  contactType?: "referee" | "partner";
+}) => {
+  const processBatch = useContactImport(contactType);
   return (
     <button type="button" onClick={() => processBatch(batch)}>
       Run import
@@ -65,14 +71,34 @@ type MockDataProvider = {
 const renderHarness = (
   batch: ContactImportSchema[],
   dataProvider: MockDataProvider,
+  contactType: "referee" | "partner" = "referee",
 ) =>
   render(
     <StoryWrapper dataProvider={dataProvider as any}>
-      <ImportHarness batch={batch} />
+      <ImportHarness batch={batch} contactType={contactType} />
     </StoryWrapper>,
   );
 
 describe("useContactImport", () => {
+  it("forces partner type when importing from Partners", async () => {
+    const createMock = vi.fn(async (_resource: string, params: any) => ({
+      data: { id: 9, ...params.data },
+    }));
+    const getListMock = vi.fn(async () => ({ data: [], total: 0 }));
+    const screen = await renderHarness(
+      [buildRow({ contact_type: "referee" })],
+      { create: createMock, getList: getListMock },
+      "partner",
+    );
+    await screen.getByRole("button", { name: "Run import" }).click();
+    await expect.poll(() => createMock.mock.calls.length).toBe(1);
+    expect(createMock).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({
+        data: expect.objectContaining({ contact_type: "partner" }),
+      }),
+    );
+  });
   it("creates a new company with zipcode/city from the row, preserving leading zeros in the postal code", async () => {
     // Arrange
     const createMock = vi.fn(async (_resource: string, params: any) => ({

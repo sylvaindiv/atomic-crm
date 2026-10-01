@@ -18,6 +18,7 @@ import {
 import { EditSheet } from "../misc/EditSheet";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { NoteInputsMobile } from "./NoteInputsMobile";
+import { useContactResource } from "../contacts/contactResource";
 
 export interface NoteEditSheetProps {
   open: boolean;
@@ -31,15 +32,16 @@ export const NoteEditSheet = ({
   noteId,
 }: NoteEditSheetProps) => {
   const createPath = useCreatePath();
+  const contactResource = useContactResource();
   const translate = useTranslate();
   const getRedirectTo = (record: any) => {
     return createPath({
-      resource: "contacts",
+      resource: contactResource,
       type: "show",
       id: record ? record[foreignKeyMapping["contacts"]] : undefined,
     });
   };
-  const getContactRepresentation = useGetRecordRepresentation("contacts");
+  const getContactRepresentation = useGetRecordRepresentation(contactResource);
 
   return (
     <EditSheet
@@ -48,7 +50,7 @@ export const NoteEditSheet = ({
       title={
         <ReferenceField
           source={foreignKeyMapping["contacts"]}
-          reference="contacts"
+          reference={contactResource}
           render={({ referenceRecord }) => (
             <span className="text-xl font-semibold truncate">
               {referenceRecord

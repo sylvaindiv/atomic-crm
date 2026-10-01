@@ -14,7 +14,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Pencil } from "lucide-react";
-import { Link } from "react-router";
+import { Link, Navigate } from "react-router";
 
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
@@ -32,6 +32,7 @@ import type { Contact } from "../types";
 import { Avatar } from "./Avatar";
 import { ContactAside, ContactCaseInfo } from "./ContactAside";
 import { MobileBackButton } from "../misc/MobileBackButton";
+import { resourceForContact, useContactResource } from "./contactResource";
 
 export const ContactShow = (props: ShowBaseProps = {}) => {
   const isMobile = useIsMobile();
@@ -56,15 +57,25 @@ export const ContactShow = (props: ShowBaseProps = {}) => {
 
 const ContactShowContentMobile = () => {
   const translate = useTranslate();
+  const resource = useContactResource();
   const { defaultTitle, record, isPending } = useShowContext<Contact>();
   const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const { contacts: otherContacts } = useGetContactsFromSameCompany(
     record?.company_id ?? null,
     record?.id ?? 0,
+    record?.contact_type ?? "referee",
   );
   const hasOtherJudges = otherContacts.length > 0;
   if (isPending || !record) return null;
+  if (resourceForContact(record) !== resource) {
+    return (
+      <Navigate
+        to={`/${resourceForContact(record)}/${record.id}/show`}
+        replace
+      />
+    );
+  }
 
   return (
     <>
@@ -81,9 +92,9 @@ const ContactShowContentMobile = () => {
         contactId={record.id}
       />
       <MobileHeader>
-        <MobileBackButton />
+        <MobileBackButton to={`/${resource}`} />
         <div className="flex flex-1 min-w-0">
-          <Link to="/contacts" className="flex-1 min-w-0">
+          <Link to={`/${resource}`} className="flex-1 min-w-0">
             <h1 className="truncate text-xl font-semibold">{defaultTitle}</h1>
           </Link>
         </div>
@@ -145,7 +156,7 @@ const ContactShowContentMobile = () => {
             </TabsTrigger>
             {hasOtherJudges && (
               <TabsTrigger value="other_notes">
-                {translate("resources.contacts.other_judges_notes", {
+                {translate(`resources.${resource}.other_judges_notes`, {
                   smart_count: 1,
                 })}
               </TabsTrigger>
@@ -222,12 +233,22 @@ const ContactShowContentMobile = () => {
 
 export const ContactShowContent = () => {
   const translate = useTranslate();
+  const resource = useContactResource();
   const { record, isPending } = useShowContext<Contact>();
   const { contacts: otherContacts } = useGetContactsFromSameCompany(
     record?.company_id ?? null,
     record?.id ?? 0,
+    record?.contact_type ?? "referee",
   );
   if (isPending || !record) return null;
+  if (resourceForContact(record) !== resource) {
+    return (
+      <Navigate
+        to={`/${resourceForContact(record)}/${record.id}/show`}
+        replace
+      />
+    );
+  }
 
   const scrollToOtherJudgesNotes = () => {
     document

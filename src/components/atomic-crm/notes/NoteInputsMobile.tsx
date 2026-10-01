@@ -18,6 +18,7 @@ import { validateNoteOrAttachmentRequired } from "./noteModel";
 import { NextActionInputs } from "./NextActionInputs";
 import type { ContactNote } from "../types";
 import type { Identifier } from "ra-core";
+import { useContactResource } from "../contacts/contactResource";
 
 export const NoteInputsMobile = ({
   selectContact,
@@ -27,6 +28,7 @@ export const NoteInputsMobile = ({
   contactId?: Identifier;
 }) => {
   const translate = useTranslate();
+  const contactResource = useContactResource();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const { field, fieldState } = useInput({
     source: "text",
@@ -65,7 +67,7 @@ export const NoteInputsMobile = ({
         <div className="px-4 py-4">
           <ReferenceInput
             source={foreignKeyMapping["contacts"]}
-            reference="contacts"
+            reference={contactResource}
           >
             <AutocompleteInput
               label="resources.notes.fields.contact_id"

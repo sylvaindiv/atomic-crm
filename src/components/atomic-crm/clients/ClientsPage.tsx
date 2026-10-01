@@ -21,7 +21,7 @@ export const ClientsPage = () => (
     resource="contacts"
     perPage={25}
     sort={{ field: "last_name", order: "ASC" }}
-    filter={{ status: "client" }}
+    filter={{ status: "client", contact_type: "referee" }}
     disableSyncWithLocation
     storeKey="clients.listParams"
   >

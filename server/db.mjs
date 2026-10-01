@@ -5,6 +5,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { RESOURCES } from "./resources.mjs";
+import { migrateContactType } from "../db/migrate-contact-type.mjs";
 
 const url = process.env.TURSO_DATABASE_URL;
 if (!url) {
@@ -32,9 +33,13 @@ export async function initSchema() {
   const { rows } = await db.execute(
     "SELECT name FROM sqlite_master WHERE type='table' AND name='contacts'",
   );
-  if (rows.length > 0) return;
-
   const schema = readFileSync(join(repoRoot, "db", "schema.sql"), "utf8");
+  if (rows.length > 0) {
+    await migrateContactType(db);
+    // Refresh views/indexes after a migration, including contacts_summary.
+    await db.executeMultiple(schema);
+    return;
+  }
   await db.executeMultiple(schema);
   const seed = readFileSync(join(repoRoot, "db", "seed.sql"), "utf8");
   await db.executeMultiple(seed);

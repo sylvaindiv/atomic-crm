@@ -21,7 +21,7 @@ export const TasksList = () => {
         <AddTask display="icon" selectContact />
       </div>
       <Card className="p-4 mb-2">
-        <TasksListContent />
+        <TasksListContent contactType="referee" />
       </Card>
     </div>
   );

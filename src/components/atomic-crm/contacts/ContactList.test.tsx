@@ -1,4 +1,6 @@
 import { render } from "vitest-browser-react";
+import { page } from "vitest/browser";
+import { buildContact, StoryWrapper } from "@/test/StoryWrapper";
 
 import {
   DesktopEmpty,
@@ -13,6 +15,58 @@ afterEach(() => {
 });
 
 describe("ContactList", () => {
+  it("shows only partners with the shared table on desktop", async () => {
+    page.viewport(1600, 900);
+    const screen = await render(
+      <StoryWrapper
+        initialEntries={["/partners"]}
+        data={{
+          contacts: [
+            buildContact({ id: 1, first_name: "Referee", status: "" }),
+            buildContact({
+              id: 2,
+              first_name: "Partner",
+              contact_type: "partner",
+              status: "",
+            }),
+          ],
+        }}
+      >
+        <div />
+      </StoryWrapper>,
+    );
+    await expect.element(screen.getByText("Partner Lovelace")).toBeVisible();
+    await expect
+      .element(screen.getByText("Referee Lovelace"))
+      .not.toBeInTheDocument();
+    await expect
+      .element(screen.getByRole("button", { name: "New Partner" }))
+      .toBeVisible();
+  });
+
+  it("opens partners on the partner route on mobile", async () => {
+    page.viewport(375, 667);
+    const screen = await render(
+      <StoryWrapper
+        initialEntries={["/partners"]}
+        data={{
+          contacts: [
+            buildContact({
+              id: 2,
+              first_name: "Partner",
+              contact_type: "partner",
+              status: "",
+            }),
+          ],
+        }}
+      >
+        <div />
+      </StoryWrapper>,
+    );
+    await expect
+      .element(screen.getByRole("link", { name: /Partner Lovelace/ }))
+      .toHaveAttribute("href", "/partners/2/show");
+  });
   it("renders an invite to create the first contact when the app is empty", async () => {
     const screen = await render(<DesktopEmpty />);
     await expect

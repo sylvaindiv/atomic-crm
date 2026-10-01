@@ -22,14 +22,16 @@ import { TagForm } from "../tags/TagForm";
 import { useCreateTag } from "../tags/useCreateTag";
 import { useTags } from "../tags/useTags";
 import type { Contact, Tag } from "../types";
+import { useContactResource } from "./contactResource";
 
 type BulkTagDialogMode = "select" | "create";
 
 export function BulkTagButton() {
+  const resource = useContactResource();
   const translate = useTranslate();
   const notify = useNotify();
   const refresh = useRefresh();
-  const [update] = useUpdate<Contact>("contacts", undefined, {
+  const [update] = useUpdate<Contact>(resource, undefined, {
     returnPromise: true,
   });
   const createTag = useCreateTag();
@@ -40,7 +42,7 @@ export function BulkTagButton() {
 
   const { data: selectedContacts = [], isPending: isPendingContacts } =
     useGetMany<Contact>(
-      "contacts",
+      resource,
       { ids: selectedIds },
       { enabled: open && selectedIds.length > 0 },
     );
@@ -70,7 +72,7 @@ export function BulkTagButton() {
       try {
         await Promise.all(
           contactsToUpdate.map((contact) =>
-            update("contacts", {
+            update(resource, {
               id: contact.id,
               data: { tags: [...(contact.tags ?? []), tag.id] },
               previousData: contact,
@@ -80,8 +82,8 @@ export function BulkTagButton() {
 
         notify(
           contactsToUpdate.length > 0
-            ? "resources.contacts.bulk_tag.success"
-            : "resources.contacts.bulk_tag.noop",
+            ? `resources.${resource}.bulk_tag.success`
+            : `resources.${resource}.bulk_tag.noop`,
           {
             messageArgs: { smart_count: contactsToUpdate.length },
             type: "success",
@@ -91,7 +93,7 @@ export function BulkTagButton() {
         onUnselectItems();
         refresh();
       } catch (error) {
-        notify("resources.contacts.bulk_tag.error", {
+        notify(`resources.${resource}.bulk_tag.error`, {
           type: "error",
         });
         console.error("Bulk tag failed:", error);
@@ -99,7 +101,15 @@ export function BulkTagButton() {
         setIsApplying(false);
       }
     },
-    [closeDialog, update, notify, onUnselectItems, refresh, selectedContacts],
+    [
+      closeDialog,
+      update,
+      notify,
+      onUnselectItems,
+      refresh,
+      selectedContacts,
+      resource,
+    ],
   );
 
   const handleCreateTag = async (data: Pick<Tag, "name" | "color">) => {
@@ -123,7 +133,7 @@ export function BulkTagButton() {
         onClick={() => setOpen(true)}
       >
         <TagIcon />
-        {translate("resources.contacts.bulk_tag.action")}
+        {translate(`resources.${resource}.bulk_tag.action`)}
       </Button>
 
       <Dialog
@@ -139,10 +149,10 @@ export function BulkTagButton() {
             <>
               <DialogHeader>
                 <DialogTitle>
-                  {translate("resources.contacts.bulk_tag.title")}
+                  {translate(`resources.${resource}.bulk_tag.title`)}
                 </DialogTitle>
                 <DialogDescription>
-                  {translate("resources.contacts.bulk_tag.description")}
+                  {translate(`resources.${resource}.bulk_tag.description`)}
                 </DialogDescription>
               </DialogHeader>
 
@@ -172,7 +182,7 @@ export function BulkTagButton() {
                   ))
                 ) : (
                   <p className="text-sm text-muted-foreground">
-                    {translate("resources.contacts.bulk_tag.empty")}
+                    {translate(`resources.${resource}.bulk_tag.empty`)}
                   </p>
                 )}
               </div>
@@ -196,12 +206,14 @@ export function BulkTagButton() {
                   {translate("resources.tags.dialog.create_title")}
                 </DialogTitle>
                 <DialogDescription>
-                  {translate("resources.contacts.bulk_tag.create_description")}
+                  {translate(
+                    `resources.${resource}.bulk_tag.create_description`,
+                  )}
                 </DialogDescription>
               </DialogHeader>
 
               <TagForm
-                cancelLabel={translate("resources.contacts.bulk_tag.back")}
+                cancelLabel={translate(`resources.${resource}.bulk_tag.back`)}
                 open={open && mode === "create"}
                 onCancel={() => setMode("select")}
                 onSubmit={handleCreateTag}

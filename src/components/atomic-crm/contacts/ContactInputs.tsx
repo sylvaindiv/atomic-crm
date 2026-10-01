@@ -85,7 +85,7 @@ const ContactPositionInputs = () => {
       </ReferenceInput>
       <ReferenceInput
         source="referred_by_id"
-        reference="contacts"
+        reference={record?.contact_type === "partner" ? "partners" : "contacts"}
         // Only meaningful on edit: a new contact being created has no id yet
         filter={record?.id ? { "id@neq": record.id } : undefined}
       >
@@ -231,7 +231,7 @@ export const ContactStatusSelector = () => {
     if (nextStatus === record?.status) return;
 
     update(
-      "contacts",
+      record.contact_type === "partner" ? "partners" : "contacts",
       {
         id: record.id,
         data: { status: nextStatus },

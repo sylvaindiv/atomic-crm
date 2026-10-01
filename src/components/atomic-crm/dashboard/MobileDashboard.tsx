@@ -54,6 +54,7 @@ export const MobileDashboard = () => {
   const { total: totalContactNotes, isPending: isPendingContactNotes } =
     useGetList<ContactNote>("contact_notes", {
       pagination: { page: 1, perPage: 1 },
+      filter: { contact_type: "referee" },
     });
   const oneSecondHasPassed = useTimeout(1000);
 

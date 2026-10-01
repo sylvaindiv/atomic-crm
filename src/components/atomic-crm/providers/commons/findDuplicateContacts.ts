@@ -79,11 +79,14 @@ export async function findDuplicateContacts(
   contact: Contact,
   dataProvider: DataProvider,
 ): Promise<DuplicateContactCandidate[]> {
-  const { data: contacts } = await dataProvider.getList<Contact>("contacts", {
-    filter: {},
-    pagination: { page: 1, perPage: CANDIDATE_FETCH_LIMIT },
-    sort: { field: "id", order: "ASC" },
-  });
+  const { data: contacts } = await dataProvider.getList<Contact>(
+    contact.contact_type === "partner" ? "partners" : "contacts",
+    {
+      filter: { contact_type: contact.contact_type ?? "referee" },
+      pagination: { page: 1, perPage: CANDIDATE_FETCH_LIMIT },
+      sort: { field: "id", order: "ASC" },
+    },
+  );
 
   const targetName = normalizedFullName(contact);
   const targetNameIsUsable = isUsableName(targetName);
@@ -98,6 +101,10 @@ export async function findDuplicateContacts(
 
   for (const other of contacts) {
     if (other.id === contact.id) continue;
+    if (
+      (other.contact_type ?? "referee") !== (contact.contact_type ?? "referee")
+    )
+      continue;
 
     const matchedBy: DuplicateMatchReason[] = [];
 

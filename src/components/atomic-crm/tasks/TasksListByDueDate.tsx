@@ -22,10 +22,12 @@ import {
 
 export const TasksListByDueDate = ({
   filterByContact,
+  contactType,
   emptyPlaceholder,
   pendingPlaceholder,
 }: {
   filterByContact?: Identifier;
+  contactType?: "referee" | "partner";
   emptyPlaceholder?: React.ReactNode;
   pendingPlaceholder?: React.ReactNode;
 }) => {
@@ -39,6 +41,7 @@ export const TasksListByDueDate = ({
       pagination: { page: 1, perPage: 1000 },
       sort: { field: "due_date", order: "ASC" },
       filter: {
+        ...(contactType ? { contact_type: contactType } : {}),
         ...(filterByContact != null
           ? { contact_id: filterByContact }
           : { sales_id: identity?.id }),

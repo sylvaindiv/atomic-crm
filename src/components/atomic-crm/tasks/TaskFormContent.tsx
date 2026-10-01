@@ -7,6 +7,7 @@ import { DateTimeInput } from "@/components/admin";
 
 import { contactOptionText } from "../misc/ContactOption";
 import { useConfigurationContext } from "../root/ConfigurationContext";
+import { useContactResource } from "../contacts/contactResource";
 
 export const TaskFormContent = ({
   selectContact,
@@ -14,6 +15,7 @@ export const TaskFormContent = ({
   selectContact?: boolean;
 }) => {
   const { taskTypes } = useConfigurationContext();
+  const contactResource = useContactResource();
   return (
     <div className="flex flex-col gap-4">
       <TextInput
@@ -24,7 +26,7 @@ export const TaskFormContent = ({
         helperText={false}
       />
       {selectContact && (
-        <ReferenceInput source="contact_id" reference="contacts_summary">
+        <ReferenceInput source="contact_id" reference={contactResource}>
           <AutocompleteInput
             label="resources.tasks.fields.contact_id"
             optionText={contactOptionText}

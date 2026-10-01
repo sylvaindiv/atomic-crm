@@ -30,6 +30,8 @@ export const MobileNavigation = () => {
     currentPath = "/";
   } else if (matchPath("/contacts/*", location.pathname)) {
     currentPath = "/contacts";
+  } else if (matchPath("/partners/*", location.pathname)) {
+    currentPath = "/partners";
   } else if (matchPath("/clients/*", location.pathname)) {
     currentPath = "/clients";
   } else if (matchPath("/companies/*", location.pathname)) {
@@ -76,6 +78,12 @@ export const MobileNavigation = () => {
             isActive={currentPath === "/contacts"}
           />
           <NavigationButton
+            href="/partners"
+            Icon={Users}
+            label={translate("resources.partners.name", { smart_count: 2 })}
+            isActive={currentPath === "/partners"}
+          />
+          <NavigationButton
             href="/clients"
             Icon={BadgeCheck}
             label={translate("crm.clients.title")}
@@ -110,20 +118,25 @@ const NavigationButton = ({
     asChild
     variant="ghost"
     className={cn(
-      "flex-col gap-1 h-auto py-2 px-1 rounded-md w-14",
+      "flex-col gap-1 h-auto py-2 px-1 rounded-md w-[13.3vw] max-w-14",
       isActive ? null : "text-muted-foreground",
     )}
   >
     <Link to={href}>
       <Icon className="size-6" />
-      <span className="text-[0.6rem] font-medium">{label}</span>
+      <span className="w-full truncate text-center text-[0.6rem] font-medium">
+        {label}
+      </span>
     </Link>
   </Button>
 );
 
 const CreateButton = () => {
   const translate = useTranslate();
-  const contact_id = useMatch("/contacts/:id/*")?.params.id;
+  const refereeMatch = useMatch("/contacts/:id/*");
+  const partnerMatch = useMatch("/partners/:id/*");
+  const contact_id = (refereeMatch ?? partnerMatch)?.params.id;
+  const isPartner = !!useMatch("/partners/*");
   const [contactCreateOpen, setContactCreateOpen] = useState(false);
   const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const [taskCreateOpen, setTaskCreateOpen] = useState(false);
@@ -133,6 +146,7 @@ const CreateButton = () => {
       <ContactCreateSheet
         open={contactCreateOpen}
         onOpenChange={setContactCreateOpen}
+        contactType={isPartner ? "partner" : "referee"}
       />
       <NoteCreateSheet
         open={noteCreateOpen}
@@ -162,7 +176,11 @@ const CreateButton = () => {
               setContactCreateOpen(true);
             }}
           >
-            {translate("resources.contacts.forcedCaseName")}
+            {translate(
+              isPartner
+                ? "resources.partners.forcedCaseName"
+                : "resources.contacts.forcedCaseName",
+            )}
           </DropdownMenuItem>
           <DropdownMenuItem
             className="h-12 px-4 text-base"
