@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import { RESOURCES } from "./resources.mjs";
 import { migrateContactType } from "../db/migrate-contact-type.mjs";
+import { migrateClientChecklist } from "../db/migrate-client-checklist.mjs";
 
 const url = process.env.TURSO_DATABASE_URL;
 if (!url) {
@@ -36,6 +37,7 @@ export async function initSchema() {
   const schema = readFileSync(join(repoRoot, "db", "schema.sql"), "utf8");
   if (rows.length > 0) {
     await migrateContactType(db);
+    await migrateClientChecklist(db);
     // Refresh views/indexes after a migration, including contacts_summary.
     await db.executeMultiple(schema);
     return;

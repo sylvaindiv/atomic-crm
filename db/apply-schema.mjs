@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { migrateContactType } from "./migrate-contact-type.mjs";
+import { migrateClientChecklist } from "./migrate-client-checklist.mjs";
 
 const url = process.env.TURSO_DATABASE_URL;
 if (!url) {
@@ -26,6 +27,7 @@ const print = (s) => process.stdout.write(s + "\n");
 
 const schema = readFileSync(join(here, "schema.sql"), "utf8");
 await migrateContactType(client);
+await migrateClientChecklist(client);
 await client.executeMultiple(schema);
 print(`Schema applied to ${url}`);
 

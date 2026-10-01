@@ -83,7 +83,11 @@ export default defineConfig({
         test: {
           name: "server",
           environment: "node",
-          include: ["server/auth.test.mjs", "server/query.test.mjs"],
+          include: [
+            "server/auth.test.mjs",
+            "server/query.test.mjs",
+            "db/migrate-client-checklist.test.mjs",
+          ],
           testTimeout: 30000,
         },
       },
