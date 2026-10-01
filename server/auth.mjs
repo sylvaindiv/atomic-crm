@@ -16,6 +16,12 @@ const SESSION_MS = 12 * 60 * 60 * 1000;
 const LIMITED_SESSION_MS = 15 * 60 * 1000;
 const TEMPORARY_MS = 7 * 24 * 60 * 60 * 1000;
 
+export const getAppOrigin = () =>
+  process.env.APP_ORIGIN ??
+  (process.env.NODE_ENV === "production"
+    ? new URL(process.env.APP_URL ?? "https://crm.padel-arcade.fr").origin
+    : "http://localhost:5173");
+
 const iso = (date = new Date()) => date.toISOString();
 const tokenHash = (token) => createHash("sha256").update(token).digest("hex");
 const rowObject = (result) =>
@@ -205,10 +211,7 @@ function parseJson(c) {
   return c.req.json().catch(() => null);
 }
 
-export function mountAuth(
-  app,
-  { db, appOrigin = process.env.APP_ORIGIN ?? "http://localhost:5173" },
-) {
+export function mountAuth(app, { db, appOrigin = getAppOrigin() }) {
   app.use("/api/*", async (c, next) => {
     c.header("Cache-Control", "no-store");
     await next();

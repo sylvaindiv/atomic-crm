@@ -6,7 +6,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Home, ListTodo, Plus, Settings, Users } from "lucide-react";
+import {
+  BadgeCheck,
+  Home,
+  ListTodo,
+  Plus,
+  Settings,
+  Users,
+} from "lucide-react";
 import { useTranslate } from "ra-core";
 import { Link, matchPath, useLocation, useMatch } from "react-router";
 import { ContactCreateSheet } from "../contacts/ContactCreateSheet";
@@ -23,6 +30,8 @@ export const MobileNavigation = () => {
     currentPath = "/";
   } else if (matchPath("/contacts/*", location.pathname)) {
     currentPath = "/contacts";
+  } else if (matchPath("/clients/*", location.pathname)) {
+    currentPath = "/clients";
   } else if (matchPath("/companies/*", location.pathname)) {
     currentPath = "/companies";
   } else if (matchPath("/tasks/*", location.pathname)) {
@@ -50,7 +59,7 @@ export const MobileNavigation = () => {
           "calc(var(--spacing)) * 6" + (isPwa && isWebiOS ? " + 15px" : ""),
       }}
     >
-      <div className="flex justify-center">
+      <div className="flex justify-center w-full">
         <>
           <NavigationButton
             href="/"
@@ -65,6 +74,12 @@ export const MobileNavigation = () => {
               smart_count: 2,
             })}
             isActive={currentPath === "/contacts"}
+          />
+          <NavigationButton
+            href="/clients"
+            Icon={BadgeCheck}
+            label={translate("crm.clients.title")}
+            isActive={currentPath === "/clients"}
           />
           <CreateButton />
           <NavigationButton
@@ -95,7 +110,7 @@ const NavigationButton = ({
     asChild
     variant="ghost"
     className={cn(
-      "flex-col gap-1 h-auto py-2 px-1 rounded-md w-16",
+      "flex-col gap-1 h-auto py-2 px-1 rounded-md w-14",
       isActive ? null : "text-muted-foreground",
     )}
   >
@@ -134,7 +149,7 @@ const CreateButton = () => {
           <Button
             variant="default"
             size="icon"
-            className="h-16 w-16 rounded-full -mt-3"
+            className="h-14 w-14 rounded-full -mt-3"
             aria-label={translate("ra.action.create")}
           >
             <Plus className="size-10" />

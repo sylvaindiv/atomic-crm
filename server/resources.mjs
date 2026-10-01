@@ -22,13 +22,13 @@ export const RESOURCES = {
   },
   contacts: {
     table: "contacts",
-    json: ["avatar", "email_jsonb", "phone_jsonb", "tags"],
+    json: ["avatar", "email_jsonb", "phone_jsonb", "tags", "client_checklist"],
     bool: ["has_newsletter"],
   },
   contacts_summary: {
     table: "contacts_summary",
     readonly: true,
-    json: ["avatar", "email_jsonb", "phone_jsonb", "tags"],
+    json: ["avatar", "email_jsonb", "phone_jsonb", "tags", "client_checklist"],
     bool: ["has_newsletter"],
   },
   contact_notes: {

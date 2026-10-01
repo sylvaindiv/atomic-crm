@@ -51,7 +51,13 @@ export const ContactCaseInfo = () => {
   );
 };
 
-export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
+export const ContactAside = ({
+  link = "edit",
+  showTasks = true,
+}: {
+  link?: "edit" | "show";
+  showTasks?: boolean;
+}) => {
   const record = useRecordContext<Contact>();
   const translate = useTranslate();
 
@@ -91,19 +97,21 @@ export const ContactAside = ({ link = "edit" }: { link?: "edit" | "show" }) => {
         <TagsListEdit />
       </AsideSection>
 
-      <AsideSection
-        title={translate("resources.tasks.name", { smart_count: 2 })}
-      >
-        <ReferenceManyField
-          target="contact_id"
-          reference="tasks"
-          sort={{ field: "due_date", order: "ASC" }}
-          perPage={1000}
+      {showTasks && (
+        <AsideSection
+          title={translate("resources.tasks.name", { smart_count: 2 })}
         >
-          <TasksIterator />
-        </ReferenceManyField>
-        <AddTask />
-      </AsideSection>
+          <ReferenceManyField
+            target="contact_id"
+            reference="tasks"
+            sort={{ field: "due_date", order: "ASC" }}
+            perPage={1000}
+          >
+            <TasksIterator />
+          </ReferenceManyField>
+          <AddTask />
+        </AsideSection>
+      )}
 
       {link !== "edit" && (
         <>

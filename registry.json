@@ -156,6 +156,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/settings/ClientChecklistSettings.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/sales/useGetSalesName.ts",
           "type": "registry:component"
         },
@@ -405,6 +409,10 @@
         },
         {
           "path": "src/components/atomic-crm/notes/Note.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/notes/NextActionInputs.tsx",
           "type": "registry:component"
         },
         {
@@ -696,6 +704,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/contacts/ContactFollowUp.tsx",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/contacts/ContactEmpty.tsx",
           "type": "registry:component"
         },
@@ -861,6 +873,10 @@
         },
         {
           "path": "src/components/atomic-crm/companies/table/CompanyTable.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/clients/ClientsPage.tsx",
           "type": "registry:component"
         },
         {

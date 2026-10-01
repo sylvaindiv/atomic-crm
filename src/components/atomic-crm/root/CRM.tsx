@@ -39,6 +39,7 @@ import {
 } from "./ConfigurationContext";
 import type { CrmDataProvider } from "../providers/types";
 import {
+  defaultClientChecklist,
   defaultCompanySectors,
   defaultCurrency,
   defaultDarkModeLogo,
@@ -57,6 +58,8 @@ import { ContactListMobile } from "../contacts/ContactList.tsx";
 import { ContactShow } from "../contacts/ContactShow.tsx";
 import { CompanyShow } from "../companies/CompanyShow.tsx";
 import { NoteShowPage } from "../notes/NoteShowPage.tsx";
+import { ClientsPage } from "../clients/ClientsPage.tsx";
+import { ClientChecklistSettingsPage } from "../settings/ClientChecklistSettings.tsx";
 
 const defaultStore = localStorageStore(undefined, "CRM");
 
@@ -108,6 +111,7 @@ export type CRMProps = {
  * export default App;
  */
 export const CRM = ({
+  clientChecklist = defaultClientChecklist,
   companySectors = defaultCompanySectors,
   currency = defaultCurrency,
   darkModeLogo = defaultDarkModeLogo,
@@ -156,6 +160,7 @@ export const CRM = ({
   useEffect(() => {
     if (!store.getItem(CONFIGURATION_STORE_KEY)) {
       store.setItem(CONFIGURATION_STORE_KEY, {
+        clientChecklist,
         companySectors,
         currency,
         noteStatuses,
@@ -259,6 +264,7 @@ const DesktopAdmin = (
       <CustomRoutes>
         <Route path={ProfilePage.path} element={<ProfilePage />} />
         <Route path={SettingsPage.path} element={<SettingsPage />} />
+        <Route path="/clients" element={<ClientsPage />} />
         <Route path={ImportPage.path} element={<ImportPage />} />
         <Route path={ChangelogPage.path} element={<ChangelogPage />} />
         <Route path={MapPage.path} element={<MapPage />} />
@@ -294,6 +300,11 @@ const MobileAdmin = (
         <Route path="/change-password" element={<ChangePasswordPage />} />
       </CustomRoutes>
       <CustomRoutes>
+        <Route path="/clients" element={<ClientsPage />} />
+        <Route
+          path={ClientChecklistSettingsPage.path}
+          element={<ClientChecklistSettingsPage />}
+        />
         <Route
           path={SettingsPageMobile.path}
           element={<SettingsPageMobile />}

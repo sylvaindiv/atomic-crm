@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS contacts (
     -- contact row. See adr/ADR-33662640-TASK-001-fold-deals-into-contacts.md
     amount         INTEGER,
     description    TEXT,
+    client_checklist TEXT NOT NULL DEFAULT '[]', -- JSON array of completed checklist item ids
     "index"        INTEGER
 );
 

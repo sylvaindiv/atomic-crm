@@ -2,15 +2,11 @@ import {
   CreateBase,
   Form,
   useGetIdentity,
-  useListContext,
   useNotify,
   useRecordContext,
-  useResourceContext,
   useTranslate,
-  useUpdate,
-  type Identifier,
-  type RaRecord,
 } from "ra-core";
+import { useQueryClient } from "@tanstack/react-query";
 import { useFormContext } from "react-hook-form";
 import { SaveButton } from "@/components/admin/form";
 import { cn } from "@/lib/utils";
@@ -18,6 +14,7 @@ import { cn } from "@/lib/utils";
 import { NoteInputs } from "./NoteInputs";
 import { getCurrentDate } from "./utils";
 import { foreignKeyMapping } from "./foreignKeyMapping";
+import { NextActionInputs } from "./NextActionInputs";
 
 export const NoteCreate = ({
   reference,
@@ -28,7 +25,6 @@ export const NoteCreate = ({
   showStatus?: boolean;
   className?: string;
 }) => {
-  const resource = useResourceContext();
   const record = useRecordContext();
   const { identity } = useGetIdentity();
 
@@ -38,7 +34,7 @@ export const NoteCreate = ({
 
   return (
     <CreateBase
-      resource={resource}
+      resource="contact_notes"
       redirect={false}
       transform={(data: any) => ({
         ...data,
@@ -50,34 +46,22 @@ export const NoteCreate = ({
       <Form>
         <div className={cn("space-y-3", className)}>
           <NoteInputs defaultStatus={defaultStatus} showStatus={showStatus} />
-          <NoteCreateButton
-            defaultStatus={defaultStatus}
-            record={record}
-            reference={reference}
-          />
+          <NextActionInputs defaultContactId={record.id} />
+          <NoteCreateButton defaultStatus={defaultStatus} />
         </div>
       </Form>
     </CreateBase>
   );
 };
 
-const NoteCreateButton = ({
-  defaultStatus,
-  reference,
-  record,
-}: {
-  defaultStatus?: string;
-  reference: "contacts";
-  record: RaRecord<Identifier>;
-}) => {
-  const [update] = useUpdate();
+const NoteCreateButton = ({ defaultStatus }: { defaultStatus?: string }) => {
   const notify = useNotify();
   const translate = useTranslate();
   const { identity } = useGetIdentity();
   const { reset } = useFormContext();
-  const { refetch } = useListContext();
+  const queryClient = useQueryClient();
 
-  if (!record || !identity) return null;
+  if (!identity) return null;
 
   const resetValues: {
     date: string;
@@ -94,15 +78,9 @@ const NoteCreateButton = ({
     resetValues.status = data.status ?? defaultStatus;
 
     reset(resetValues, { keepValues: false });
-    refetch();
-    update(reference, {
-      id: (record && record.id) as unknown as Identifier,
-      data: {
-        last_seen: new Date().toISOString(),
-        status: data.status,
-      },
-      previousData: record,
-    });
+    queryClient.invalidateQueries({ queryKey: ["contact_notes", "getList"] });
+    queryClient.invalidateQueries({ queryKey: ["tasks", "getList"] });
+    queryClient.invalidateQueries({ queryKey: ["contacts"] });
     notify("resources.notes.added", {
       messageArgs: {
         _: "Note added",

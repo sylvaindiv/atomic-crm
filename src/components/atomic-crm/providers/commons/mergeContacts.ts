@@ -137,6 +137,10 @@ export const mergeContacts = async (
         winnerContact.tags || [],
         loserContact.tags || [],
       ),
+      client_checklist: mergeArraysUnique(
+        winnerContact.client_checklist || [],
+        loserContact.client_checklist || [],
+      ),
     },
     previousData: winnerContact,
   });

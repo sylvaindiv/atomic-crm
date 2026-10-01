@@ -12,6 +12,7 @@ import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 import { TextInput } from "@/components/admin/text-input";
 
 import ImageEditorField from "../misc/ImageEditorField";
+import { ClientChecklistFields } from "./ClientChecklistSettings";
 import {
   useConfigurationContext,
   useConfigurationUpdater,
@@ -32,11 +33,24 @@ const SECTIONS = [
   },
   { id: "notes", label: "resources.notes.name", fallback: "Notes" },
   { id: "tasks", label: "resources.tasks.name", fallback: "Tasks" },
+  {
+    id: "clients",
+    label: "crm.clients.title",
+    fallback: "Clients",
+  },
 ];
 
 /** Ensure every item in a { value, label } array has a value (slug from label). */
 const ensureValues = (items: { value?: string; label: string }[] | undefined) =>
   items?.map((item) => ({ ...item, value: item.value || toSlug(item.label) }));
+
+const ensureChecklistIds = (
+  items: { value?: string; label: string }[] | undefined,
+) =>
+  items?.map((item) => ({
+    ...item,
+    value: item.value || crypto.randomUUID(),
+  })) ?? [];
 
 export const transformFormValues = (data: Record<string, any>) => ({
   config: {
@@ -47,6 +61,7 @@ export const transformFormValues = (data: Record<string, any>) => ({
     companySectors: ensureValues(data.companySectors),
     taskTypes: ensureValues(data.taskTypes),
     noteStatuses: ensureValues(data.noteStatuses),
+    clientChecklist: ensureChecklistIds(data.clientChecklist),
   } as ConfigurationContextValue,
 });
 
@@ -92,6 +107,7 @@ const SettingsForm = () => {
       companySectors: config.companySectors,
       taskTypes: config.taskTypes,
       noteStatuses: config.noteStatuses,
+      clientChecklist: config.clientChecklist,
     }),
     [config],
   );
@@ -238,6 +254,16 @@ const SettingsFormFields = () => {
                 <TextInput source="label" label={false} />
               </SimpleFormIterator>
             </ArrayInput>
+          </CardContent>
+        </Card>
+
+        {/* Clients */}
+        <Card id="clients">
+          <CardContent className="space-y-4">
+            <h2 className="text-xl font-semibold text-muted-foreground">
+              {translate("crm.clients.title", { _: "Clients" })}
+            </h2>
+            <ClientChecklistFields />
           </CardContent>
         </Card>
       </div>

@@ -15,12 +15,16 @@ import { contactOptionText } from "../misc/ContactOption";
 import { AttachmentField } from "./AttachmentField";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { validateNoteOrAttachmentRequired } from "./noteModel";
+import { NextActionInputs } from "./NextActionInputs";
 import type { ContactNote } from "../types";
+import type { Identifier } from "ra-core";
 
 export const NoteInputsMobile = ({
   selectContact,
+  contactId,
 }: {
   selectContact?: boolean;
+  contactId?: Identifier;
 }) => {
   const translate = useTranslate();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -73,6 +77,9 @@ export const NoteInputsMobile = ({
           </ReferenceInput>
         </div>
       )}
+      <div className="px-4">
+        <NextActionInputs defaultContactId={contactId} />
+      </div>
       <div className="px-4">
         <AttachmentPreviewsMobile />
         <AttachButton />

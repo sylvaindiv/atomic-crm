@@ -279,6 +279,11 @@ export const englishCrmMessages = {
       validation: {
         note_or_attachment_required: "A note or an attachment is required",
       },
+      next_action: {
+        title: "Dated next action",
+        create: "Create a task",
+        existing: "Choose an open task",
+      },
     },
     sales: {
       name: "User |||| Users",
@@ -402,6 +407,29 @@ export const englishCrmMessages = {
       loading: "Loading...",
       me: "Me",
       task_count: "%{smart_count} task |||| %{smart_count} tasks",
+    },
+    clients: {
+      title: "Clients",
+      empty: "No clients found",
+      checklist: {
+        progress: "%{completed} / %{total} completed",
+        progress_label: "Client checklist progress",
+        completed: "Complete",
+        settings_title: "Client onboarding checklist",
+        empty: "No steps defined",
+        name: "Step name",
+        save: "Save checklist",
+        saved: "Checklist saved",
+        save_error: "Unable to save the checklist",
+      },
+    },
+    follow_up: {
+      title: "Follow-up",
+      open_tasks: "Next actions",
+      no_open_tasks: "No open actions",
+      history: "History",
+      empty_history: "No notes or completed tasks",
+      load_more: "Load more",
     },
     changelog: {
       title: "Changelog",
