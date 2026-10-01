@@ -343,6 +343,7 @@ const exporter: Exporter<Contact> = async (
     };
     delete exportedContact.email_fts;
     delete exportedContact.phone_fts;
+    delete exportedContact.client_checklist;
     return exportedContact;
   });
   return jsonExport(contacts, {}, (_err: any, csv: string) => {

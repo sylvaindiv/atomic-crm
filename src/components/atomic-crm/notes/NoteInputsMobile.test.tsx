@@ -82,6 +82,6 @@ describe("NoteInputsMobile", () => {
     await screen.getByPlaceholder("Add a note").fill("Call summary");
     await screen.getByRole("button", { name: "Save" }).click();
 
-    await expect.element(screen.getByText("Required")).toBeVisible();
+    await expect.element(screen.getByText("Required").first()).toBeVisible();
   });
 });

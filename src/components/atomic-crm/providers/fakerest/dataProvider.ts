@@ -23,6 +23,7 @@ import { getCompanyAvatar } from "../commons/getCompanyAvatar";
 import { getContactAvatar } from "../commons/getContactAvatar";
 import { mergeCompanies } from "../commons/mergeCompanies";
 import { mergeContacts } from "../commons/mergeContacts";
+import { isValidDueDate, validateNextAction } from "../../notes/noteModel";
 import type { CrmDataProvider } from "../types";
 import {
   authProvider as defaultAuthProvider,
@@ -137,6 +138,39 @@ const preserveAttachmentMimeType = <
     type: attachment.type ?? attachment.rawFile?.type,
   })),
 });
+
+const validateChecklistWrite = (resource: string, data: any) => {
+  if (resource === "contacts" && "client_checklist" in (data ?? {})) {
+    const ids = data.client_checklist;
+    if (
+      !Array.isArray(ids) ||
+      ids.some((id: unknown) => typeof id !== "string" || !id.trim()) ||
+      new Set(ids).size !== ids.length
+    ) {
+      throw new Error("client_checklist must be a unique array of IDs");
+    }
+  }
+  if (
+    resource === "configuration" &&
+    data?.config?.clientChecklist !== undefined
+  ) {
+    const items = data.config.clientChecklist;
+    if (
+      !Array.isArray(items) ||
+      items.some(
+        (item: any) =>
+          !item ||
+          typeof item.value !== "string" ||
+          !item.value.trim() ||
+          typeof item.label !== "string" ||
+          !item.label.trim(),
+      ) ||
+      new Set(items.map((item: any) => item.value)).size !== items.length
+    ) {
+      throw new Error("clientChecklist must contain unique IDs and labels");
+    }
+  }
+};
 
 export const createDataProvider = ({
   db = generateData(),
@@ -297,7 +331,7 @@ export const createDataProvider = ({
     },
   };
 
-  const dataProvider = withLifecycleCallbacks(
+  const lifecycleDataProvider = withLifecycleCallbacks(
     withSupabaseFilterAdapter(dataProviderWithCustomMethod),
     [
       {
@@ -541,6 +575,148 @@ export const createDataProvider = ({
       } satisfies ResourceCallbacks<ContactNote>,
     ],
   ) as CrmDataProvider;
+
+  const create = lifecycleDataProvider.create.bind(lifecycleDataProvider);
+  const update = lifecycleDataProvider.update.bind(lifecycleDataProvider);
+  const dataProvider: CrmDataProvider = {
+    ...lifecycleDataProvider,
+    async create(resource, params) {
+      validateChecklistWrite(resource, params.data);
+      if (
+        !params.data ||
+        !Object.prototype.hasOwnProperty.call(params.data, "next_action")
+      ) {
+        return create(resource, params);
+      }
+      if (resource !== "contact_notes") {
+        throw new Error(
+          "next_action is only supported when creating a contact note",
+        );
+      }
+
+      const { next_action, ...noteData } = params.data as typeof params.data & {
+        next_action: unknown;
+      };
+      if (!validateNextAction(next_action)) {
+        throw new Error("next_action is invalid");
+      }
+      if (
+        noteData.contact_id == null ||
+        (!(typeof noteData.text === "string" && noteData.text.trim()) &&
+          !(
+            Array.isArray(noteData.attachments) &&
+            noteData.attachments.length > 0
+          ))
+      ) {
+        throw new Error("A note requires a contact and text or an attachment");
+      }
+
+      const { data: contact } = await lifecycleDataProvider.getOne<Contact>(
+        "contacts",
+        { id: noteData.contact_id },
+      );
+      if (next_action.mode === "existing") {
+        const { data: task } = await lifecycleDataProvider.getOne<Task>(
+          "tasks",
+          { id: next_action.task_id },
+        );
+        if (
+          String(task.contact_id) !== String(contact.id) ||
+          task.done_date != null ||
+          typeof task.text !== "string" ||
+          !task.text.trim() ||
+          typeof task.due_date !== "string" ||
+          !isValidDueDate(task.due_date)
+        ) {
+          throw new Error(
+            "Selected task is not an open valid task for this contact",
+          );
+        }
+      }
+
+      const listParams = {
+        filter: {},
+        pagination: { page: 1, perPage: 10_000 },
+        sort: { field: "id", order: "ASC" as const },
+      };
+      const [{ data: notesBefore }, { data: tasksBefore }] = await Promise.all([
+        lifecycleDataProvider.getList<ContactNote>("contact_notes", listParams),
+        lifecycleDataProvider.getList<Task>("tasks", listParams),
+      ]);
+      const originalNoteIds = new Set(notesBefore.map((note) => note.id));
+      const originalTaskIds = new Set(tasksBefore.map((task) => task.id));
+      try {
+        const result = await create("contact_notes", {
+          ...params,
+          data: noteData,
+        });
+        if (next_action.mode === "create") {
+          await create("tasks", {
+            data: {
+              contact_id: contact.id,
+              type: "none",
+              text: next_action.text.trim(),
+              due_date: next_action.due_date,
+              done_date: null,
+              sales_id: noteData.sales_id ?? null,
+            },
+          });
+        }
+
+        await dataProvider.update("contacts", {
+          id: contact.id,
+          data: {
+            last_seen: new Date().toISOString(),
+            ...(noteData.status !== undefined
+              ? { status: noteData.status }
+              : {}),
+          },
+          previousData: contact,
+        });
+        return result;
+      } catch (error) {
+        const [{ data: notesAfter }, { data: tasksAfter }] = await Promise.all([
+          lifecycleDataProvider.getList<ContactNote>(
+            "contact_notes",
+            listParams,
+          ),
+          lifecycleDataProvider.getList<Task>("tasks", listParams),
+        ]);
+        await Promise.allSettled([
+          ...tasksAfter
+            .filter((task) => !originalTaskIds.has(task.id))
+            .map((task) =>
+              baseDataProvider.delete("tasks", {
+                id: task.id,
+                previousData: task,
+              }),
+            ),
+          ...notesAfter
+            .filter((note) => !originalNoteIds.has(note.id))
+            .map((note) =>
+              baseDataProvider.delete("contact_notes", {
+                id: note.id,
+                previousData: note,
+              }),
+            ),
+        ]);
+        try {
+          await baseDataProvider.update("contacts", {
+            id: contact.id,
+            data: contact,
+            previousData: contact,
+          });
+        } catch {
+          // Preserve the original write error if compensation also fails.
+        }
+        throw error;
+      }
+    },
+    async update(resource, params) {
+      validateChecklistWrite(resource, params.data);
+      return update(resource, params);
+    },
+  };
 
   return dataProvider;
 };

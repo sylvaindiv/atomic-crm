@@ -75,8 +75,19 @@ export const defaultTaskTypes = [
   { value: "call", label: "Call" },
 ];
 
+export const defaultClientChecklist = [
+  { value: "first-tournament", label: "Premier tournoi créé ensemble" },
+  { value: "stripe-connected", label: "Compte Stripe connecté" },
+  { value: "mouja-installed", label: "Extension Mouja installée" },
+  {
+    value: "advantage-system-configured",
+    label: "Explication et paramétrage du système d’avantage",
+  },
+];
+
 export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
+  clientChecklist: defaultClientChecklist,
   currency: defaultCurrency,
   noteStatuses: defaultNoteStatuses,
   taskTypes: defaultTaskTypes,

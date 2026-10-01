@@ -108,6 +108,7 @@ export type Contact = {
   amount?: number | null;
   description?: string;
   index?: number;
+  client_checklist?: string[];
   // Computed column (contacts_summary view): the contact's earliest open
   // task due_date. Read by the Kanban (TASK-004).
   next_action_due_date?: string | null;

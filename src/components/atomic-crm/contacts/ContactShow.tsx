@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  InfiniteListBase,
   RecordRepresentation,
   ShowBase,
   useShowContext,
@@ -20,7 +19,6 @@ import { Link } from "react-router";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
 import { CompanyAvatar } from "../companies/CompanyAvatar";
-import { NoteCreate, NotesIterator, NotesIteratorMobile } from "../notes";
 import { NoteCreateSheet } from "../notes/NoteCreateSheet";
 import { OtherJudgesNotes } from "../notes/OtherJudgesNotes";
 import { useGetContactsFromSameCompany } from "./useGetContactsFromSameCompany";
@@ -29,7 +27,7 @@ import { ContactEditSheet } from "./ContactEditSheet";
 import { ContactStatusSelector } from "./ContactInputs";
 import { ContactPersonalInfo } from "./ContactPersonalInfo";
 import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
-import { ContactTasksList } from "./ContactTasksList";
+import { ContactFollowUp } from "./ContactFollowUp";
 import type { Contact } from "../types";
 import { Avatar } from "./Avatar";
 import { ContactAside, ContactCaseInfo } from "./ContactAside";
@@ -67,8 +65,6 @@ const ContactShowContentMobile = () => {
   );
   const hasOtherJudges = otherContacts.length > 0;
   if (isPending || !record) return null;
-
-  const taskCount = record.nb_tasks ?? 0;
 
   return (
     <>
@@ -140,12 +136,12 @@ const ContactShowContentMobile = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="notes" className="w-full">
+        <Tabs defaultValue="follow_up" className="w-full">
           <TabsList
-            className={`grid w-full h-10 ${hasOtherJudges ? "grid-cols-4" : "grid-cols-3"}`}
+            className={`grid w-full h-10 ${hasOtherJudges ? "grid-cols-3" : "grid-cols-2"}`}
           >
-            <TabsTrigger value="notes">
-              {translate("resources.notes.name", { smart_count: 2 })}
+            <TabsTrigger value="follow_up">
+              {translate("crm.follow_up.title")}
             </TabsTrigger>
             {hasOtherJudges && (
               <TabsTrigger value="other_notes">
@@ -154,47 +150,17 @@ const ContactShowContentMobile = () => {
                 })}
               </TabsTrigger>
             )}
-            <TabsTrigger value="tasks">
-              {translate("crm.common.task_count", {
-                smart_count: taskCount ?? 0,
-              })}
-            </TabsTrigger>
             <TabsTrigger value="details">
               {translate("crm.common.details")}
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="notes" className="mt-2">
-            <InfiniteListBase
-              resource="contact_notes"
-              filter={{ contact_id: record.id }}
-              sort={{ field: "date", order: "DESC" }}
-              perPage={25}
-              disableSyncWithLocation
-              storeKey={false}
-              empty={
-                <div className="flex flex-col items-center justify-center py-8 text-center">
-                  <p className="text-muted-foreground mb-4">
-                    {translate("resources.notes.empty")}
-                  </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setNoteCreateOpen(true)}
-                  >
-                    {translate("resources.notes.action.add")}
-                  </Button>
-                </div>
-              }
-              loading={false}
-              error={false}
-              queryOptions={{
-                onError: () => {
-                  /** override to hide notification as error case is handled by NotesIteratorMobile */
-                },
-              }}
-            >
-              <NotesIteratorMobile contactId={record.id} showStatus />
-            </InfiniteListBase>
+          <TabsContent value="follow_up" className="mt-2">
+            <ContactFollowUp
+              contact={record}
+              mobile
+              onCreateNote={() => setNoteCreateOpen(true)}
+            />
           </TabsContent>
 
           {hasOtherJudges && (
@@ -202,10 +168,6 @@ const ContactShowContentMobile = () => {
               <OtherJudgesNotes contact={record} />
             </TabsContent>
           )}
-
-          <TabsContent value="tasks" className="mt-4">
-            <ContactTasksList />
-          </TabsContent>
 
           <TabsContent value="details" className="mt-4">
             <div className="space-y-6">
@@ -322,25 +284,13 @@ export const ContactShowContent = () => {
                 </ReferenceField>
               </div>
             </div>
-            <InfiniteListBase
-              resource="contact_notes"
-              filter={{ contact_id: record.id }}
-              sort={{ field: "date", order: "DESC" }}
-              perPage={25}
-              disableSyncWithLocation
-              storeKey={false}
-              empty={
-                <NoteCreate reference="contacts" showStatus className="mt-4" />
-              }
-            >
-              <NotesIterator reference="contacts" showStatus />
-            </InfiniteListBase>
+            <ContactFollowUp contact={record} />
           </CardContent>
         </Card>
 
         <OtherJudgesNotes contact={record} />
       </div>
-      <ContactAside />
+      <ContactAside showTasks={false} />
     </div>
   );
 };

@@ -189,4 +189,66 @@ describe("mergeContacts", () => {
       }),
     );
   });
+
+  it("unions client checklist progress without duplicating ids", async () => {
+    const winner = buildContact({
+      id: winnerId,
+      client_checklist: ["first-tournament", "stripe-connected"],
+    });
+    const loser = buildContact({
+      id: loserId,
+      client_checklist: ["stripe-connected", "mouja-installed"],
+    });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    const dataProvider = buildDataProvider({
+      getOne: vi.fn(getOneFor(winner, loser)),
+      update,
+    });
+
+    await mergeContacts(loserId, winnerId, dataProvider);
+
+    expect(update).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({
+        id: winnerId,
+        data: expect.objectContaining({
+          client_checklist: [
+            "first-tournament",
+            "stripe-connected",
+            "mouja-installed",
+          ],
+        }),
+      }),
+    );
+  });
+
+  it("merges checklist progress when old contacts have no checklist field", async () => {
+    const winner = buildContact({ id: winnerId });
+    const loser = buildContact({
+      id: loserId,
+      client_checklist: ["mouja-installed"],
+    });
+    delete (winner as Partial<typeof winner>).client_checklist;
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    const dataProvider = buildDataProvider({
+      getOne: vi.fn(getOneFor(winner, loser)),
+      update,
+    });
+
+    await mergeContacts(loserId, winnerId, dataProvider);
+
+    expect(update).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({
+        id: winnerId,
+        data: expect.objectContaining({
+          client_checklist: ["mouja-installed"],
+        }),
+      }),
+    );
+  });
 });

@@ -74,16 +74,9 @@ export const Task = ({
   };
 
   useEffect(() => {
-    // We do not want to invalidate the query when a tack is checked or unchecked
-    if (
-      isUpdatePending ||
-      !isSuccess ||
-      variables?.data?.done_date != undefined
-    ) {
-      return;
-    }
-
+    if (isUpdatePending || !isSuccess) return;
     queryClient.invalidateQueries({ queryKey: ["tasks", "getList"] });
+    queryClient.invalidateQueries({ queryKey: ["contacts"] });
   }, [queryClient, isUpdatePending, isSuccess, variables]);
 
   const labelId = `checkbox-list-label-${task.id}`;
@@ -91,10 +84,7 @@ export const Task = ({
   return (
     <>
       <div className="flex items-start justify-between">
-        <div
-          className="flex items-start gap-2 flex-1"
-          onClick={isMobile ? handleCheck() : undefined}
-        >
+        <div className="flex items-start gap-2 flex-1">
           <Checkbox
             id={labelId}
             checked={!!task.done_date}
@@ -102,8 +92,11 @@ export const Task = ({
             disabled={isUpdatePending}
             className="mt-1"
           />
-          <div className={`flex-grow ${task.done_date ? "line-through" : ""}`}>
-            <div className="text-sm">
+          <div className="flex-grow">
+            <label
+              htmlFor={labelId}
+              className={`text-sm cursor-pointer ${task.done_date ? "line-through" : ""}`}
+            >
               {task.type && task.type !== "none" && (
                 <>
                   <span className="font-semibold text-sm">
@@ -120,7 +113,7 @@ export const Task = ({
                 </>
               )}
               {task.text}
-            </div>
+            </label>
             <div className="text-sm text-muted-foreground">
               {translate("resources.tasks.fields.due_short")}
               &nbsp;

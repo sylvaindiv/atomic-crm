@@ -58,4 +58,31 @@ describe("transformFormValues", () => {
 
     expect(result.config).not.toHaveProperty("dealCategories");
   });
+
+  it("preserves checklist IDs across label changes and creates IDs for new items", () => {
+    const result = transformFormValues({
+      clientChecklist: [
+        { value: "stable-id", label: "Renamed step" },
+        { label: "New step" },
+      ],
+    });
+
+    expect(result.config.clientChecklist?.[0]).toEqual({
+      value: "stable-id",
+      label: "Renamed step",
+    });
+    expect(result.config.clientChecklist?.[1].value).toMatch(
+      /^[0-9a-f-]{36}$/i,
+    );
+  });
+
+  it("preserves an explicitly empty checklist and the other configuration", () => {
+    const result = transformFormValues({
+      title: "CRM test",
+      clientChecklist: [],
+    });
+
+    expect(result.config.clientChecklist).toEqual([]);
+    expect(result.config.title).toBe("CRM test");
+  });
 });

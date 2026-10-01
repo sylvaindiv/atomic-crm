@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "@/components/admin/use-theme";
-import { ChevronRight, KeyRound, Users } from "lucide-react";
+import { ChevronRight, KeyRound, ListChecks, Users } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,6 +40,7 @@ import { MobileContent } from "../layout/MobileContent";
 import MobileHeader from "../layout/MobileHeader";
 import { ChangelogPage } from "../misc/ChangelogPage";
 import { MapPage } from "../map/MapPage";
+import { ClientChecklistSettingsPage } from "./ClientChecklistSettings";
 import ImageEditorField from "../misc/ImageEditorField";
 import type { CrmDataProvider } from "../providers/types";
 import type { SalesFormData } from "../types";
@@ -78,6 +79,9 @@ export const SettingsPageMobile = () => {
             <CanAccess resource="sales" action="list">
               <UsersSection />
             </CanAccess>
+            <CanAccess resource="configuration" action="edit">
+              <ClientChecklistSection />
+            </CanAccess>
             <PreferencesSection />
             <AboutSection />
           </div>
@@ -96,6 +100,35 @@ export const SettingsPageMobile = () => {
         </div>
       </MobileContent>
     </>
+  );
+};
+
+const ClientChecklistSection = () => {
+  const translate = useTranslate();
+
+  return (
+    <div>
+      <SectionLabel>
+        {translate("crm.clients.title", { _: "Clients" })}
+      </SectionLabel>
+      <ItemGroup className="rounded-lg border overflow-hidden">
+        <Item asChild size="sm" className="cursor-pointer">
+          <Link to={ClientChecklistSettingsPage.path}>
+            <ItemContent>
+              <ItemTitle className="font-normal">
+                {translate("crm.clients.checklist.settings_title", {
+                  _: "Client checklist",
+                })}
+              </ItemTitle>
+            </ItemContent>
+            <ItemActions>
+              <ListChecks className="size-4 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
+            </ItemActions>
+          </Link>
+        </Item>
+      </ItemGroup>
+    </div>
   );
 };
 

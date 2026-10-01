@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createClient } from "@libsql/client";
 import { Hono } from "hono";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   authGuard,
@@ -55,11 +55,34 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  vi.unstubAllEnvs();
   db.close();
   await rm(directory, { recursive: true, force: true });
 });
 
 describe("auth API", () => {
+  it("accepts the production app origin without APP_ORIGIN and rejects localhost", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("APP_ORIGIN", undefined);
+    vi.stubEnv("APP_URL", undefined);
+    app = new Hono();
+    mountAuth(app, { db });
+
+    expect(
+      (await request("/api/auth/logout", { method: "POST", body: "{}" }))
+        .status,
+    ).toBe(400);
+    const production = await app.request("/api/auth/logout", {
+      method: "POST",
+      headers: {
+        origin: "https://crm.padel-arcade.fr",
+        "content-type": "application/json",
+      },
+      body: "{}",
+    });
+    expect(production.status).toBe(200);
+  });
+
   it("refuses anonymous CRM access and accepts a completed owner session", async () => {
     expect(
       (await request("/api/sales/getList", { method: "POST", body: "{}" }))

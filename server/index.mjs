@@ -8,7 +8,12 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 
 import { db, initSchema, loadTableColumns } from "./db.mjs";
-import { authGuard, authorizeDataRequest, mountAuth } from "./auth.mjs";
+import {
+  getAppOrigin,
+  authGuard,
+  authorizeDataRequest,
+  mountAuth,
+} from "./auth.mjs";
 import { HANDLERS } from "./query.mjs";
 import { RESOURCES } from "./resources.mjs";
 
@@ -30,7 +35,7 @@ app.post("/api/:resource/:method", async (c) => {
 
   if (!["getList", "getOne", "getMany", "getManyReference"].includes(method)) {
     const origin = c.req.header("origin");
-    const appOrigin = process.env.APP_ORIGIN ?? "http://localhost:5173";
+    const appOrigin = getAppOrigin();
     if (
       origin !== appOrigin ||
       !c.req

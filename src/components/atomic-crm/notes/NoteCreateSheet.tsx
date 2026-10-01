@@ -1,14 +1,13 @@
 import {
   type Identifier,
-  useDataProvider,
   useGetIdentity,
   useGetOne,
   useGetRecordRepresentation,
   useNotify,
   useRedirect,
   useTranslate,
-  useUpdate,
 } from "ra-core";
+import { useQueryClient } from "@tanstack/react-query";
 import { CreateSheet } from "../misc/CreateSheet";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { NoteInputsMobile } from "./NoteInputsMobile";
@@ -33,8 +32,7 @@ export const NoteCreateSheet = ({
     { id: contact_id! },
     { enabled: !selectContact },
   );
-  const [update] = useUpdate();
-  const dataProvider = useDataProvider();
+  const queryClient = useQueryClient();
   const notify = useNotify();
   const redirect = useRedirect();
   const translate = useTranslate();
@@ -46,15 +44,9 @@ export const NoteCreateSheet = ({
   const handleSuccess = async (data: any) => {
     const referenceRecordId = data[foreignKeyMapping["contacts"]];
     if (!referenceRecordId) return;
-    const { data: contact } = await dataProvider.getOne("contacts", {
-      id: referenceRecordId,
-    });
-    if (!contact) return;
-    update("contacts", {
-      id: referenceRecordId as unknown as Identifier,
-      data: { last_seen: new Date().toISOString(), status: data.status },
-      previousData: contact,
-    });
+    queryClient.invalidateQueries({ queryKey: ["contact_notes", "getList"] });
+    queryClient.invalidateQueries({ queryKey: ["tasks", "getList"] });
+    queryClient.invalidateQueries({ queryKey: ["contacts"] });
     notify("resources.notes.added", {
       messageArgs: {
         _: "Note added",
@@ -97,7 +89,7 @@ export const NoteCreateSheet = ({
           : undefined
       }
     >
-      <NoteInputsMobile selectContact={selectContact} />
+      <NoteInputsMobile selectContact={selectContact} contactId={contact_id} />
     </CreateSheet>
   );
 };

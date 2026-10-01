@@ -282,6 +282,11 @@ export const frenchCrmMessages = {
       validation: {
         note_or_attachment_required: "Une note ou une pièce jointe est requise",
       },
+      next_action: {
+        title: "Prochaine action datée",
+        create: "Créer une tâche",
+        existing: "Choisir une tâche ouverte",
+      },
     },
     sales: {
       name: "Utilisateur |||| Utilisateurs",
@@ -407,6 +412,29 @@ export const frenchCrmMessages = {
       copy: "Copier",
       loading: "Chargement...",
       me: "Moi",
+    },
+    clients: {
+      title: "Clients",
+      empty: "Aucun client trouvé",
+      checklist: {
+        progress: "%{completed} / %{total} étapes terminées",
+        progress_label: "Progression de la checklist client",
+        completed: "Terminé",
+        settings_title: "Checklist d'accueil des clients",
+        empty: "Aucune étape définie",
+        name: "Nom de l'étape",
+        save: "Enregistrer la checklist",
+        saved: "Checklist enregistrée",
+        save_error: "Impossible d'enregistrer la checklist",
+      },
+    },
+    follow_up: {
+      title: "Suivi",
+      open_tasks: "Prochaines actions",
+      no_open_tasks: "Aucune action ouverte",
+      history: "Historique",
+      empty_history: "Aucune note ou tâche terminée",
+      load_more: "Charger plus",
     },
     changelog: {
       title: "Notes de version",
