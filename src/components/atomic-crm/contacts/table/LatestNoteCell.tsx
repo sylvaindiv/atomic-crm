@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 import type { Contact } from "../../types";
 import { NoteCreate, NotesIterator } from "../../notes";
+import { resourceForContact } from "../contactResource";
 
 export const LatestNoteCell = () => {
   const record = useRecordContext<Contact>();
@@ -38,10 +39,17 @@ export const LatestNoteCell = () => {
               disableSyncWithLocation
               storeKey={false}
               empty={
-                <NoteCreate reference="contacts" showStatus className="mt-4" />
+                <NoteCreate
+                  reference={resourceForContact(record)}
+                  showStatus
+                  className="mt-4"
+                />
               }
             >
-              <NotesIterator reference="contacts" showStatus />
+              <NotesIterator
+                reference={resourceForContact(record)}
+                showStatus
+              />
             </InfiniteListBase>
           )}
         </DialogContent>

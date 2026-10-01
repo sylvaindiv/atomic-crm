@@ -17,12 +17,14 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import { ResponsiveFilters } from "../misc/ResponsiveFilters";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ActiveFilterButton } from "../misc/ActiveFilterButton";
+import { useContactResource } from "./contactResource";
 
 export const ContactListFilter = () => {
   const { noteStatuses } = useConfigurationContext();
   const isMobile = useIsMobile();
   const translate = useTranslate();
-  const [viewMode] = useStore<string>("contacts.viewMode", "table");
+  const resource = useContactResource();
+  const [viewMode] = useStore<string>(`${resource}.viewMode`, "table");
   const isKanban = viewMode === "kanban";
   const { data } = useGetList("tags", {
     pagination: { page: 1, perPage: 10 },
@@ -36,7 +38,7 @@ export const ContactListFilter = () => {
   return (
     <ResponsiveFilters
       searchInput={{
-        placeholder: translate("resources.contacts.filters.search"),
+        placeholder: translate(`resources.${resource}.filters.search`),
       }}
     >
       <FilterCategory

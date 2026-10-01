@@ -12,14 +12,20 @@ import { Markdown } from "../misc/Markdown";
 import { RelativeDate } from "../misc/RelativeDate";
 import { NoteAttachments } from "./NoteAttachments";
 import type { Contact, ContactNote } from "../types";
+import { resourceForContact } from "../contacts/contactResource";
 
 const MAX_NOTES_PER_JUDGE = 3;
 
 export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
   const translate = useTranslate();
+  const resource = resourceForContact(contact);
 
   const { contacts, isPending: isContactsPending } =
-    useGetContactsFromSameCompany(contact.company_id, contact.id);
+    useGetContactsFromSameCompany(
+      contact.company_id,
+      contact.id,
+      contact.contact_type,
+    );
 
   const contactIds = useMemo(() => contacts.map((c) => c.id), [contacts]);
 
@@ -49,14 +55,14 @@ export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
       <Card id="other-judges-notes" className="mt-6">
         <CardHeader>
           <CardTitle className="text-lg">
-            {translate("resources.contacts.other_judges_notes", {
+            {translate(`resources.${resource}.other_judges_notes`, {
               smart_count: contacts.length,
             })}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            {translate("resources.contacts.other_judges_notes_empty")}
+            {translate(`resources.${resource}.other_judges_notes_empty`)}
           </p>
         </CardContent>
       </Card>
@@ -67,7 +73,7 @@ export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
     <Card id="other-judges-notes" className="mt-6">
       <CardHeader>
         <CardTitle className="text-lg">
-          {translate("resources.contacts.other_judges_notes", {
+          {translate(`resources.${resource}.other_judges_notes`, {
             smart_count: contacts.length,
           })}
         </CardTitle>
@@ -89,7 +95,7 @@ export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Link
-                    to={`/contacts/${contactInfo.id}/show`}
+                    to={`/${resourceForContact(contactInfo)}/${contactInfo.id}/show`}
                     className="font-medium text-sm text-foreground hover:underline"
                   >
                     {contactInfo.first_name} {contactInfo.last_name}
@@ -97,11 +103,11 @@ export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
                   {contactInfo.status && <Status status={contactInfo.status} />}
                 </div>
                 <Link
-                  to={`/contacts/${contactInfo.id}/show`}
+                  to={`/${resourceForContact(contactInfo)}/${contactInfo.id}/show`}
                   className="text-sm text-muted-foreground hover:underline"
                 >
                   {translate(
-                    "resources.contacts.other_judges_notes_view_profile",
+                    `resources.${resource}.other_judges_notes_view_profile`,
                   )}
                 </Link>
               </div>
@@ -122,7 +128,7 @@ export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
               </div>
               {trimmedNotes.length < contactNotes.length && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  {translate("resources.contacts.other_judges_notes_more", {
+                  {translate(`resources.${resource}.other_judges_notes_more`, {
                     smart_count: contactNotes.length - trimmedNotes.length,
                   })}
                 </p>

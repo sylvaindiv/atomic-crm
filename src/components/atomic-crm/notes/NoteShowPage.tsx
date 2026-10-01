@@ -21,15 +21,17 @@ import type { ContactNote } from "../types";
 import { NoteAttachments } from "./NoteAttachments";
 import { NoteEditSheet } from "./NoteEditSheet";
 import { useGetSalesName } from "../sales/useGetSalesName";
+import { useContactResource } from "../contacts/contactResource";
 
 export const NoteShowPage = () => {
   const translate = useTranslate();
+  const resource = useContactResource();
   const { id: contactId, noteId } = useParams<{
     id: string;
     noteId: string;
   }>();
   const [editOpen, setEditOpen] = useState(false);
-  const getContactRepresentation = useGetRecordRepresentation("contacts");
+  const getContactRepresentation = useGetRecordRepresentation(resource);
 
   const { data: note, isPending } = useGetOne<ContactNote>("contact_notes", {
     id: noteId!,
@@ -50,15 +52,18 @@ export const NoteShowPage = () => {
         noteId={note.id}
       />
       <MobileHeader>
-        <MobileBackButton to={`/contacts/${contactId}/show`} />
+        <MobileBackButton to={`/${resource}/${contactId}/show`} />
         <div className="flex flex-1 min-w-0">
-          <Link to={`/contacts/${contactId}/show`} className="flex-1 min-w-0">
+          <Link
+            to={`/${resource}/${contactId}/show`}
+            className="flex-1 min-w-0"
+          >
             <h1 className="truncate text-xl font-semibold">
               <ReferenceField
                 record={note}
                 resource="contact_notes"
                 source="contact_id"
-                reference="contacts"
+                reference={resource}
                 link={false}
                 render={({ referenceRecord }) =>
                   referenceRecord
@@ -68,7 +73,7 @@ export const NoteShowPage = () => {
                     : null
                 }
               >
-                <RecordRepresentation resource="contacts" />
+                <RecordRepresentation resource={resource} />
               </ReferenceField>
             </h1>
           </Link>

@@ -26,6 +26,7 @@ export const MapPage = () => {
     "contacts",
     {
       pagination: { page: 1, perPage: 2000 },
+      filter: { contact_type: "referee" },
       sort: { field: "id", order: "ASC" },
     },
   );

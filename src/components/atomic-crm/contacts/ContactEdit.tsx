@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { Navigate } from "react-router";
 import { EditBase, Form, useEditContext, type MutationMode } from "ra-core";
 
 import type { Contact } from "../types";
@@ -10,6 +11,7 @@ import {
   defaultEmailJsonb,
   defaultPhoneJsonb,
 } from "./contactModel";
+import { resourceForContact, useContactResource } from "./contactResource";
 
 export const ContactEdit = ({
   mutationMode,
@@ -39,7 +41,13 @@ const normalizeContactArrayFields = (record: Contact) => ({
 
 const ContactEditContent = () => {
   const { isPending, record } = useEditContext<Contact>();
+  const resource = useContactResource();
   if (isPending || !record) return null;
+  if (resourceForContact(record) !== resource) {
+    return (
+      <Navigate to={`/${resourceForContact(record)}/${record.id}`} replace />
+    );
+  }
   return (
     <div className="mt-2 flex gap-8">
       <Form

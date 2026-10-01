@@ -149,7 +149,22 @@ function assertRequiredColumns(cfg, data, { requireAllPresent }) {
 }
 
 async function listWith(cfg, { filter, sort, pagination }, extra = []) {
-  const where = buildWhere(filter, cfg, extra);
+  let effectiveFilter = filter;
+  if (
+    (cfg.table === "tasks" || cfg.table === "contact_notes") &&
+    filter?.contact_type
+  ) {
+    const { contact_type, ...rest } = filter;
+    effectiveFilter = rest;
+    extra = [
+      ...extra,
+      {
+        sql: `EXISTS (SELECT 1 FROM contacts owner WHERE owner.id = ${quoteId(cfg.table)}."contact_id" AND owner.contact_type = ?)`,
+        args: [contact_type],
+      },
+    ];
+  }
+  const where = buildWhere(effectiveFilter, cfg, extra);
   const table = quoteId(cfg.table);
 
   const totalRes = await db.execute({

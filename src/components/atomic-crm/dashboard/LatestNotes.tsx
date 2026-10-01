@@ -14,7 +14,7 @@ export const LatestNotes = () => {
     {
       pagination: { page: 1, perPage: 5 },
       sort: { field: "date", order: "DESC" },
-      filter: { sales_id: identity?.id },
+      filter: { sales_id: identity?.id, contact_type: "referee" },
     },
     { enabled: Number.isInteger(identity?.id) },
   );

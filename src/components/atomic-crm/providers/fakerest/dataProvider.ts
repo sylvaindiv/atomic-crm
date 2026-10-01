@@ -178,6 +178,9 @@ export const createDataProvider = ({
   authProvider,
   silent = false,
 }: CreateFakeRestDataProviderOptions = {}): CrmDataProvider => {
+  db.contacts.forEach((contact) => {
+    contact.contact_type ??= "referee";
+  });
   const baseDataProvider = fakeRestDataProvider(db, !silent, latency);
   let taskUpdateType = TASK_DONE_NOT_CHANGED;
   const getIdentity = async () =>
@@ -203,10 +206,23 @@ export const createDataProvider = ({
   const dataProviderWithCustomMethod: CrmDataProvider = {
     ...baseDataProvider,
     async getList(resource: string, params: any) {
+      if (
+        (resource === "tasks" || resource === "contact_notes") &&
+        params.filter?.contact_type
+      ) {
+        const { contact_type, ...filter } = params.filter;
+        const ids = db.contacts
+          .filter((contact) => contact.contact_type === contact_type)
+          .map((contact) => contact.id);
+        return baseDataProvider.getList(resource, {
+          ...params,
+          filter: { ...filter, contact_id_eq_any: ids },
+        });
+      }
       if (resource === "activity_log") {
         const { filter = {}, pagination } = params;
         const all = await getActivityLog(
-          withSupabaseFilterAdapter(baseDataProvider),
+          withSupabaseFilterAdapter(dataProviderWithCustomMethod),
           filter.company_id,
           filter.sales_id,
         );
@@ -441,7 +457,10 @@ export const createDataProvider = ({
           return fetchAndUpdateCompanyData(newParams, dataProvider);
         },
         afterCreate: async (result) => {
-          if (result.data.company_id != null) {
+          if (
+            result.data.company_id != null &&
+            result.data.contact_type !== "partner"
+          ) {
             await updateCompany(result.data.company_id, (company) => ({
               nb_contacts: (company.nb_contacts ?? 0) + 1,
             }));
@@ -454,7 +473,10 @@ export const createDataProvider = ({
           return fetchAndUpdateCompanyData(newParams, dataProvider);
         },
         afterDelete: async (result) => {
-          if (result.data.company_id != null) {
+          if (
+            result.data.company_id != null &&
+            result.data.contact_type !== "partner"
+          ) {
             await updateCompany(result.data.company_id, (company) => ({
               nb_contacts: (company.nb_contacts ?? 1) - 1,
             }));

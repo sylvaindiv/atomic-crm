@@ -21,6 +21,7 @@ import { TagChip } from "../tags/TagChip";
 import { TagCreateModal } from "../tags/TagCreateModal";
 import { useTags } from "../tags/useTags";
 import type { Contact, Tag } from "../types";
+import { resourceForContact } from "./contactResource";
 
 export const TagsListEdit = () => {
   const record = useRecordContext<Contact>();
@@ -47,7 +48,7 @@ export const TagsListEdit = () => {
       throw new Error("No contact record found");
     }
     const tags = [...(record.tags ?? []), id];
-    update("contacts", {
+    update(resourceForContact(record), {
       id: record.id,
       data: { tags },
       previousData: record,
@@ -59,7 +60,7 @@ export const TagsListEdit = () => {
       throw new Error("No contact record found");
     }
     const tags = record.tags.filter((tagId) => tagId !== id);
-    await update("contacts", {
+    await update(resourceForContact(record), {
       id: record.id,
       data: { tags },
       previousData: record,
@@ -81,7 +82,7 @@ export const TagsListEdit = () => {
       }
 
       await update(
-        "contacts",
+        resourceForContact(record),
         {
           id: record.id,
           data: { tags: [...record.tags, tag.id] },

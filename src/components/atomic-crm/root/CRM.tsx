@@ -60,6 +60,7 @@ import { CompanyShow } from "../companies/CompanyShow.tsx";
 import { NoteShowPage } from "../notes/NoteShowPage.tsx";
 import { ClientsPage } from "../clients/ClientsPage.tsx";
 import { ClientChecklistSettingsPage } from "../settings/ClientChecklistSettings.tsx";
+import { withContactTypes } from "../providers/commons/withContactTypes";
 
 const defaultStore = localStorageStore(undefined, "CRM");
 
@@ -128,6 +129,10 @@ export const CRM = ({
   ...rest
 }: CRMProps) => {
   const queryClient = useMemo(() => new QueryClient(), []);
+  const typedDataProvider = useMemo(
+    () => withContactTypes(dataProvider),
+    [dataProvider],
+  );
 
   useEffect(() => {
     localStorage.removeItem("REACT_QUERY_OFFLINE_CACHE");
@@ -229,7 +234,7 @@ export const CRM = ({
 
   return (
     <ResponsiveAdmin
-      dataProvider={dataProvider}
+      dataProvider={typedDataProvider}
       authProvider={wrappedAuthProvider}
       i18nProvider={i18nProvider}
       store={store}
@@ -271,6 +276,7 @@ const DesktopAdmin = (
         <Route path={LogsPage.path} element={<LogsPage />} />
       </CustomRoutes>
       <Resource name="contacts" {...contacts} />
+      <Resource name="partners" {...contacts} />
       <Resource name="companies" {...companies} />
       <Resource name="contact_notes" />
       <Resource name="tasks" />
@@ -314,6 +320,14 @@ const MobileAdmin = (
       </CustomRoutes>
       <Resource
         name="contacts"
+        list={ContactListMobile}
+        show={ContactShow}
+        recordRepresentation={contacts.recordRepresentation}
+      >
+        <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
+      </Resource>
+      <Resource
+        name="partners"
         list={ContactListMobile}
         show={ContactShow}
         recordRepresentation={contacts.recordRepresentation}

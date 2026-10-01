@@ -16,6 +16,7 @@ import {
   defaultEmailJsonb,
   defaultPhoneJsonb,
 } from "./contactModel";
+import { useContactResource } from "./contactResource";
 
 export interface ContactEditSheetProps {
   open: boolean;
@@ -28,9 +29,10 @@ export const ContactEditSheet = ({
   onOpenChange,
   contactId,
 }: ContactEditSheetProps) => {
+  const resource = useContactResource();
   return (
     <EditSheet
-      resource="contacts"
+      resource={resource}
       id={contactId}
       open={open}
       onOpenChange={onOpenChange}
@@ -53,9 +55,10 @@ const ContactEditMenuButton = ({
 }) => {
   const translate = useTranslate();
   const record = useRecordContext();
+  const resource = useContactResource();
   const { handleDelete } = useDeleteController({
     record,
-    resource: "contacts",
+    resource,
     redirect: "list",
     mutationMode: "undoable",
   });

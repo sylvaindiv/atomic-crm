@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 
 import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
+import { resourceForContact } from "../contactResource";
 import { ContactKanbanColumn } from "./ContactKanbanColumn";
 import type { ContactsByStatus } from "./contactStages";
 import {
@@ -175,7 +176,7 @@ const statusFilter = (status: string) =>
 // `status` and/or `index` in the update payload -- never any other contact
 // field -- and issues one update per moved card (never a full-column
 // rewrite where avoidable).
-const updateContactStatus = async (
+export const updateContactStatus = async (
   source: Contact,
   destination: {
     status: string;
@@ -183,12 +184,13 @@ const updateContactStatus = async (
   },
   dataProvider: DataProvider,
 ) => {
+  const resource = resourceForContact(source);
   if (source.status === destination.status) {
     // moving contact inside the same column
     // Fetch all the contacts in this status (because the list may be
     // filtered, but we need to update even non-filtered contacts)
     const { data: columnContacts } = await dataProvider.getList<Contact>(
-      "contacts",
+      resource,
       {
         sort: { field: "index", order: "ASC" },
         pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
@@ -212,14 +214,14 @@ const updateContactStatus = async (
               (contact.index ?? 0) < sourceIndex,
           )
           .map((contact) =>
-            dataProvider.update("contacts", {
+            dataProvider.update(resource, {
               id: contact.id,
               data: { index: (contact.index ?? 0) + 1 },
               previousData: contact,
             }),
           ),
         // for the contact that was moved, update its index
-        dataProvider.update("contacts", {
+        dataProvider.update(resource, {
           id: source.id,
           data: { index: destinationIndex },
           previousData: source,
@@ -239,14 +241,14 @@ const updateContactStatus = async (
               (contact.index ?? 0) > sourceIndex,
           )
           .map((contact) =>
-            dataProvider.update("contacts", {
+            dataProvider.update(resource, {
               id: contact.id,
               data: { index: (contact.index ?? 0) - 1 },
               previousData: contact,
             }),
           ),
         // for the contact that was moved, update its index
-        dataProvider.update("contacts", {
+        dataProvider.update(resource, {
           id: source.id,
           data: { index: destinationIndex },
           previousData: source,
@@ -259,12 +261,12 @@ const updateContactStatus = async (
     // filtered, but we need to update even non-filtered contacts)
     const [{ data: sourceContacts }, { data: destinationContacts }] =
       await Promise.all([
-        dataProvider.getList<Contact>("contacts", {
+        dataProvider.getList<Contact>(resource, {
           sort: { field: "index", order: "ASC" },
           pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
           filter: statusFilter(source.status),
         }),
-        dataProvider.getList<Contact>("contacts", {
+        dataProvider.getList<Contact>(resource, {
           sort: { field: "index", order: "ASC" },
           pagination: { page: 1, perPage: KANBAN_PAGE_SIZE },
           filter: statusFilter(destination.status),
@@ -279,7 +281,7 @@ const updateContactStatus = async (
       ...sourceContacts
         .filter((contact) => (contact.index ?? 0) > sourceIndex)
         .map((contact) =>
-          dataProvider.update("contacts", {
+          dataProvider.update(resource, {
             id: contact.id,
             data: { index: (contact.index ?? 0) - 1 },
             previousData: contact,
@@ -289,14 +291,14 @@ const updateContactStatus = async (
       ...destinationContacts
         .filter((contact) => (contact.index ?? 0) >= destinationIndex)
         .map((contact) =>
-          dataProvider.update("contacts", {
+          dataProvider.update(resource, {
             id: contact.id,
             data: { index: (contact.index ?? 0) + 1 },
             previousData: contact,
           }),
         ),
       // change the dragged contact to take the destination index and column
-      dataProvider.update("contacts", {
+      dataProvider.update(resource, {
         id: source.id,
         data: {
           index: destinationIndex,

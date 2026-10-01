@@ -5,6 +5,7 @@ import type { Company, Contact, ContactNote, Tag } from "../types";
 import { contactFullName } from "./contactModel";
 
 export type ContactImportSchema = {
+  contact_type?: string;
   first_name: string;
   last_name: string;
   gender: string;
@@ -43,7 +44,9 @@ type CompanyImportInfo = {
   city?: string;
 };
 
-export function useContactImport() {
+export function useContactImport(
+  contactType: Contact["contact_type"] = "referee",
+) {
   const today = new Date().toISOString();
   const user = useGetIdentity();
   const dataProvider = useDataProvider();
@@ -133,7 +136,7 @@ export function useContactImport() {
 
       if (unresolvedNames.length > 0) {
         const { data: contacts } = await dataProvider.getList<Contact>(
-          "contacts",
+          contactType === "partner" ? "partners" : "contacts",
           {
             filter: {},
             pagination: { page: 1, perPage: 1000 },
@@ -154,7 +157,7 @@ export function useContactImport() {
         return acc;
       }, new Map<string, Contact>());
     },
-    [contactsByNameCache, dataProvider],
+    [contactsByNameCache, dataProvider, contactType],
   );
 
   const processBatch = useCallback(
@@ -223,9 +226,10 @@ export function useContactImport() {
             const referrer = referrers.get(known_via?.trim().toLowerCase());
 
             const { data: createdContact } = await dataProvider.create<Contact>(
-              "contacts",
+              contactType === "partner" ? "partners" : "contacts",
               {
                 data: {
+                  contact_type: contactType,
                   first_name,
                   last_name,
                   gender,
@@ -280,6 +284,7 @@ export function useContactImport() {
       getContactsByName,
       user?.identity?.id,
       today,
+      contactType,
     ],
   );
 

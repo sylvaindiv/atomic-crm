@@ -8,6 +8,7 @@ import {
   defaultEmailJsonb,
   defaultPhoneJsonb,
 } from "./contactModel";
+import { useContactResource } from "./contactResource";
 
 export const ContactCreate = ({
   mutationMode,
@@ -15,6 +16,7 @@ export const ContactCreate = ({
   mutationMode?: MutationMode;
 }) => {
   const { identity } = useGetIdentity();
+  const resource = useContactResource();
 
   return (
     <CreateBase
@@ -27,6 +29,7 @@ export const ContactCreate = ({
           <Form
             defaultValues={{
               sales_id: identity?.id,
+              contact_type: resource === "partners" ? "partner" : "referee",
               email_jsonb: defaultEmailJsonb,
               phone_jsonb: defaultPhoneJsonb,
             }}

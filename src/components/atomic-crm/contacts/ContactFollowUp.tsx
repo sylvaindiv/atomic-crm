@@ -14,6 +14,7 @@ import { NoteCreate } from "../notes/NoteCreate";
 import { Task } from "../tasks/Task";
 import { AddTask } from "../tasks/AddTask";
 import { TaskCreateSheet } from "../tasks/TaskCreateSheet";
+import { resourceForContact } from "./contactResource";
 
 const PAGE_SIZE = 25;
 
@@ -127,7 +128,7 @@ export const ContactFollowUp = ({
           </Button>
         ) : (
           <RecordContextProvider value={contact}>
-            <NoteCreate reference="contacts" showStatus />
+            <NoteCreate reference={resourceForContact(contact)} showStatus />
           </RecordContextProvider>
         )}
       </section>

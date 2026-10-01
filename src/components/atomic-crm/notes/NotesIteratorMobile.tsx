@@ -6,6 +6,7 @@ import {
   useTranslate,
 } from "ra-core";
 import { Link } from "react-router";
+import { useContactResource } from "../contacts/contactResource";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -99,6 +100,7 @@ export const NoteMobile = ({
   showStatus?: boolean;
 }) => {
   const translate = useTranslate();
+  const resource = useContactResource();
   const { identity } = useGetIdentity();
   const isCurrentUser = note.sales_id === identity?.id;
   const salesName = useGetSalesName(note.sales_id, {
@@ -107,7 +109,7 @@ export const NoteMobile = ({
 
   return (
     <Link
-      to={`/contacts/${contactId}/notes/${note.id}`}
+      to={`/${resource}/${contactId}/notes/${note.id}`}
       className="block active:bg-accent/50 -mx-2 px-2 py-2 rounded-md"
     >
       <div className="flex items-center space-x-2 w-full">

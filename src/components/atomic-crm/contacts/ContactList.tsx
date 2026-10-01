@@ -48,17 +48,17 @@ import { MobileContent } from "../layout/MobileContent";
 import { ContactKanban } from "./kanban/ContactKanban";
 import { KANBAN_PAGE_SIZE } from "./kanban/contactStages";
 import { ContactTable } from "./table/ContactTable";
+import { useContactResource } from "./contactResource";
 
 type ContactViewMode = "table" | "kanban";
 
-const VIEW_MODE_STORE_KEY = "contacts.viewMode";
-
 export const ContactList = () => {
+  const resource = useContactResource();
   const { identity } = useGetIdentity();
   const [searchParams] = useSearchParams();
   const showId = searchParams.get("show");
   const [createOpen, setCreateOpen] = useState(false);
-  const [viewMode] = useStore<ContactViewMode>(VIEW_MODE_STORE_KEY, "table");
+  const [viewMode] = useStore<ContactViewMode>(`${resource}.viewMode`, "table");
   const isKanban = viewMode === "kanban";
 
   if (!identity) return null;
@@ -78,7 +78,11 @@ export const ContactList = () => {
           ? { field: "index", order: "ASC" }
           : { field: "last_seen", order: "DESC" }
       }
-      storeKey={isKanban ? "contacts.kanban.listParams.v2" : undefined}
+      storeKey={
+        isKanban
+          ? `${resource}.kanban.listParams.v2`
+          : `${resource}.table.listParams`
+      }
       filterDefaultValues={isKanban ? undefined : { "status@isblank": true }}
       // Table and Kanban share one route/URL, only toggling a store flag.
       // Without this, ra-core prefers a non-empty URL query over the
@@ -99,10 +103,18 @@ const ContactListLayoutDesktop = ({
 }: {
   viewMode: ContactViewMode;
 }) => {
+  const resource = useContactResource();
   const { data, isPending, filterValues } = useListContext();
-  const [filterPanelOpen] = useStore<boolean>("contacts.filterPanelOpen", true);
+  const [filterPanelOpen] = useStore<boolean>(
+    `${resource}.filterPanelOpen`,
+    true,
+  );
 
-  const hasFilters = filterValues && Object.keys(filterValues).length > 0;
+  const hasFilters =
+    !!filterValues &&
+    Object.keys(filterValues).some(
+      (key) => key !== "status@isblank" || filterValues[key] !== true,
+    );
 
   if (isPending) return null;
 
@@ -140,12 +152,13 @@ const ContactBulkActionButtons = () => (
 
 const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
   const translate = useTranslate();
+  const resource = useContactResource();
   const [filterPanelOpen, setFilterPanelOpen] = useStore<boolean>(
-    "contacts.filterPanelOpen",
+    `${resource}.filterPanelOpen`,
     true,
   );
   const [viewMode, setViewMode] = useStore<ContactViewMode>(
-    VIEW_MODE_STORE_KEY,
+    `${resource}.viewMode`,
     "table",
   );
 
@@ -195,18 +208,20 @@ const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
       <ContactImportButton />
       <ExportButton exporter={exporter} />
       <Button onClick={onCreate}>
-        {translate("resources.contacts.action.new")}
+        {translate(`resources.${resource}.action.new`)}
       </Button>
     </TopToolbar>
   );
 };
 
 export const ContactListMobile = () => {
+  const resource = useContactResource();
   const { identity } = useGetIdentity();
   if (!identity) return null;
 
   return (
     <InfiniteListBase
+      storeKey={`${resource}.mobile.listParams`}
       perPage={25}
       sort={{ field: "last_seen", order: "DESC" }}
       exporter={exporter}
@@ -225,7 +240,11 @@ export const ContactListMobile = () => {
 const ContactListLayoutMobile = () => {
   const { isPending, data, error, filterValues } = useListContext();
 
-  const hasFilters = filterValues && Object.keys(filterValues).length > 0;
+  const hasFilters =
+    !!filterValues &&
+    Object.keys(filterValues).some(
+      (key) => key !== "status@isblank" || filterValues[key] !== true,
+    );
 
   if (!isPending && !data?.length && !hasFilters) return <ContactEmpty />;
 
@@ -347,6 +366,9 @@ const exporter: Exporter<Contact> = async (
     return exportedContact;
   });
   return jsonExport(contacts, {}, (_err: any, csv: string) => {
-    downloadCSV(csv, "contacts");
+    downloadCSV(
+      csv,
+      records[0]?.contact_type === "partner" ? "partners" : "contacts",
+    );
   });
 };

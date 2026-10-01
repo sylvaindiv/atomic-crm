@@ -5,12 +5,45 @@ import frenchMessages from "ra-language-french";
 import { englishCrmMessages } from "./englishCrmMessages";
 import { frenchCrmMessages } from "./frenchCrmMessages";
 
-const englishCatalog = mergeTranslations(englishMessages, englishCrmMessages);
+const partnerCopy = (contacts: object, locale: "en" | "fr") => {
+  let text = JSON.stringify(contacts);
+  if (locale === "fr") {
+    text = text
+      .replaceAll("Juges-arbitres", "Partenaires")
+      .replaceAll("juges-arbitres", "partenaires")
+      .replaceAll("Juge-arbitre", "Partenaire")
+      .replaceAll("juge-arbitre", "partenaire");
+  } else {
+    text = text
+      .replaceAll("Judges-Referees", "Partners")
+      .replaceAll("Judges-referees", "Partners")
+      .replaceAll("Judge-Referee", "Partner")
+      .replaceAll("Judge-referee", "Partner")
+      .replaceAll("judges-referees", "partners")
+      .replaceAll("judge-referee", "partner")
+      .replaceAll("Referees", "Partners")
+      .replaceAll("Referee", "Partner")
+      .replaceAll("referees", "partners")
+      .replaceAll("referee", "partner");
+  }
+  return JSON.parse(text);
+};
+
+const englishCatalog = mergeTranslations(englishMessages, englishCrmMessages, {
+  resources: {
+    partners: partnerCopy(englishCrmMessages.resources.contacts, "en"),
+  },
+});
 
 const frenchCatalog = mergeTranslations(
   englishCatalog,
   frenchMessages,
   frenchCrmMessages,
+  {
+    resources: {
+      partners: partnerCopy(frenchCrmMessages.resources.contacts, "fr"),
+    },
+  },
 );
 
 export const getInitialLocale = (): "en" | "fr" => {

@@ -3,6 +3,7 @@ import { useRecordContext, useTranslate } from "ra-core";
 import type { Contact } from "../../types";
 import { contactFullName } from "../contactModel";
 import { EditableReferenceCell } from "./EditableReferenceCell";
+import { resourceForContact } from "../contactResource";
 
 /**
  * Table-cell wrapper around `EditableReferenceCell` for the contact's
@@ -20,7 +21,7 @@ export const EditableReferredByCell = () => {
   return (
     <EditableReferenceCell<Contact>
       source="referred_by_id"
-      reference="contacts"
+      reference={resourceForContact(record)}
       label={translate("resources.contacts.fields.referred_by_id")}
       displayValue={record.referred_by_name}
       optionText={contactFullName}

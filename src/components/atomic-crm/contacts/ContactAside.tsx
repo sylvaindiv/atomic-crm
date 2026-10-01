@@ -15,6 +15,7 @@ import { ContactBackgroundInfo } from "./ContactBackgroundInfo";
 import { AsideSection } from "../misc/AsideSection";
 import type { Contact } from "../types";
 import { ContactMergeButton } from "./ContactMergeButton";
+import { resourceForContact } from "./contactResource";
 
 /**
  * Shows budget (`amount`) and case description, stored directly on the
@@ -67,9 +68,13 @@ export const ContactAside = ({
     <div className="hidden sm:block w-92 min-w-92 text-sm">
       <div className="mb-4 -ml-1">
         {link === "edit" ? (
-          <EditButton label="resources.contacts.action.edit" />
+          <EditButton
+            label={`resources.${resourceForContact(record)}.action.edit`}
+          />
         ) : (
-          <ShowButton label="resources.contacts.action.show" />
+          <ShowButton
+            label={`resources.${resourceForContact(record)}.action.show`}
+          />
         )}
       </div>
 

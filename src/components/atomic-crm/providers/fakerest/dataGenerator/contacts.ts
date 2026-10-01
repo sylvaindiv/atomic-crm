@@ -90,6 +90,7 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
 
     const contact = {
       id,
+      contact_type: "referee" as const,
       first_name,
       last_name,
       gender,

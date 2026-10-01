@@ -23,7 +23,7 @@ test("merging two clubs that only differ by case reassigns contacts to the winne
     name: "Padel Club Paris",
     salesId: sales.id,
   });
-  const winner = await createCompany({
+  await createCompany({
     name: "PADEL CLUB PARIS",
     salesId: sales.id,
   });
@@ -69,7 +69,9 @@ test("merging two clubs that only differ by case reassigns contacts to the winne
   await expect(
     page.getByRole("heading", { name: "PADEL CLUB PARIS" }),
   ).toBeVisible();
-  await expect(page.getByText("1 judge-referee", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("1 judge-referee", { exact: true }),
+  ).toBeVisible();
 
   // The loser club no longer appears in the clubs list.
   await page.getByRole("link", { name: "Clubs" }).click();

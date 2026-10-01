@@ -8,6 +8,7 @@ import {
   useUpdate,
 } from "ra-core";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { ReferenceField } from "@/components/admin/reference-field";
 import { DateField } from "@/components/admin/date-field";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,7 @@ import type { Contact, Task as TData } from "../types";
 import { TaskEdit } from "./TaskEdit";
 import { TaskEditSheet } from "./TaskEditSheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { resourceForContact } from "../contacts/contactResource";
 
 export const Task = ({
   task,
@@ -77,6 +79,7 @@ export const Task = ({
     if (isUpdatePending || !isSuccess) return;
     queryClient.invalidateQueries({ queryKey: ["tasks", "getList"] });
     queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    queryClient.invalidateQueries({ queryKey: ["partners"] });
   }, [queryClient, isUpdatePending, isSuccess, variables]);
 
   const labelId = `checkbox-list-label-${task.id}`;
@@ -123,17 +126,19 @@ export const Task = ({
                   source="contact_id"
                   reference="contacts"
                   record={task}
-                  link="show"
+                  link={false}
                   className="inline text-sm text-muted-foreground"
                   render={({ referenceRecord }) => {
                     if (!referenceRecord) return null;
                     return (
-                      <>
+                      <Link
+                        to={`/${resourceForContact(referenceRecord as Contact)}/${referenceRecord.id}/show`}
+                      >
                         {" "}
                         {translate("resources.tasks.regarding_contact", {
                           name: getContactRepresentation(referenceRecord),
                         })}
-                      </>
+                      </Link>
                     );
                   }}
                 />

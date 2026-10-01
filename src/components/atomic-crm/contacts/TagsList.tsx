@@ -3,6 +3,7 @@ import { ReferenceArrayField } from "@/components/admin/reference-array-field";
 import { SingleFieldList } from "@/components/admin/single-field-list";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useContactResource } from "./contactResource";
 
 const ColoredBadge = (props: any) => {
   const record = useRecordContext();
@@ -19,15 +20,18 @@ const ColoredBadge = (props: any) => {
   );
 };
 
-export const TagsList = () => (
-  <ReferenceArrayField
-    className="inline-block"
-    resource="contacts"
-    source="tags"
-    reference="tags"
-  >
-    <SingleFieldList>
-      <ColoredBadge source="name" />
-    </SingleFieldList>
-  </ReferenceArrayField>
-);
+export const TagsList = () => {
+  const resource = useContactResource();
+  return (
+    <ReferenceArrayField
+      className="inline-block"
+      resource={resource}
+      source="tags"
+      reference="tags"
+    >
+      <SingleFieldList>
+        <ColoredBadge source="name" />
+      </SingleFieldList>
+    </ReferenceArrayField>
+  );
+};

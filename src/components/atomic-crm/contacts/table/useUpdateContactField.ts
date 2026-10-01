@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useNotify, useRecordContext, useUpdate } from "ra-core";
 
 import type { Contact } from "../../types";
+import { resourceForContact } from "../contactResource";
 
 /**
  * Commits a single-column optimistic update to the current contact record.
@@ -27,7 +28,7 @@ export const useUpdateContactField = <K extends keyof Contact>(field: K) => {
       if (!record || value === record[field]) return;
 
       update(
-        "contacts",
+        resourceForContact(record),
         {
           id: record.id,
           // `field` is exactly `K` here, so this literal has exactly one key of type K.

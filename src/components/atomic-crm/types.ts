@@ -79,6 +79,7 @@ export type PhoneNumberAndType = {
 };
 
 export type Contact = {
+  contact_type: "referee" | "partner";
   first_name: string;
   last_name: string;
   title: string;

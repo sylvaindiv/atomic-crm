@@ -15,9 +15,12 @@ import { RotateCcw } from "lucide-react";
 import { Status } from "../misc/Status";
 import type { Contact } from "../types";
 import { Avatar } from "./Avatar";
+import { resourceForContact } from "./contactResource";
+import { useContactResource } from "./contactResource";
 
 export const ContactListContentMobile = () => {
   const translate = useTranslate();
+  const resource = useContactResource();
   const {
     data: contacts,
     error,
@@ -54,7 +57,7 @@ export const ContactListContentMobile = () => {
     return (
       <div className="p-4">
         <div className="text-center text-muted-foreground mb-4">
-          {translate("resources.contacts.list.error_loading")}
+          {translate(`resources.${resource}.list.error_loading`)}
         </div>
         <div className="text-center mt-2">
           <Button
@@ -80,7 +83,7 @@ export const ContactListContentMobile = () => {
       {contacts.length === 0 && (
         <div className="p-4">
           <div className="text-muted-foreground">
-            {translate("resources.contacts.empty.title")}
+            {translate(`resources.${resource}.empty.title`)}
           </div>
         </div>
       )}
@@ -92,7 +95,7 @@ const ContactItemContentMobile = ({ contact }: { contact: Contact }) => {
   const translate = useTranslate();
   return (
     <Link
-      to={`/contacts/${contact.id}/show`}
+      to={`/${resourceForContact(contact)}/${contact.id}/show`}
       className="flex flex-row gap-4 items-center py-2 hover:bg-muted transition-colors"
     >
       <Avatar />

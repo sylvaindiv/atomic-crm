@@ -21,7 +21,7 @@ export const NoteCreate = ({
   showStatus,
   className,
 }: {
-  reference: "contacts";
+  reference: "contacts" | "partners";
   showStatus?: boolean;
   className?: string;
 }) => {

@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/tooltip";
 
 import { TaskFormContent } from "./TaskFormContent";
+import { resourceForContact } from "../contacts/contactResource";
+import type { Contact } from "../types";
 
 export const AddTask = ({
   selectContact,
@@ -55,7 +57,7 @@ export const AddTask = ({
     });
     if (!contact.data) return;
 
-    await update("contacts", {
+    await update(resourceForContact(contact.data as Contact), {
       id: contact.data.id,
       data: { last_seen: new Date().toISOString() },
       previousData: contact.data,

@@ -13,7 +13,7 @@ export const MobileTasksList = () => {
         </h1>
       </MobileHeader>
       <MobileContent>
-        <TasksListContent />
+        <TasksListContent contactType="referee" />
       </MobileContent>
     </>
   );
