@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const ClientsPage = () => (
   <InfiniteListBase
@@ -34,37 +35,50 @@ ClientsPage.path = "/clients";
 const ClientsList = () => {
   const { data = [], isPending } = useListContext<Contact>();
   const translate = useTranslate();
+  const isMobile = useIsMobile();
+
+  const content = (
+    <>
+      {isPending ? null : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {data.map((contact) => (
+            <RecordContextProvider key={contact.id} value={contact}>
+              <ClientCard contact={contact} />
+            </RecordContextProvider>
+          ))}
+        </div>
+      )}
+      {!isPending && data.length === 0 && (
+        <p className="text-muted-foreground">
+          {translate("crm.clients.empty", { _: "No clients yet" })}
+        </p>
+      )}
+      <div className="flex justify-center">
+        <InfinitePagination />
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <>
+        <MobileHeader>
+          <h1 className="text-xl font-semibold">
+            {translate("crm.clients.title", { _: "Clients" })}
+          </h1>
+        </MobileHeader>
+        <MobileContent>{content}</MobileContent>
+      </>
+    );
+  }
 
   return (
-    <>
-      <MobileHeader>
-        <h1 className="text-xl font-semibold">
-          {translate("crm.clients.title", { _: "Clients" })}
-        </h1>
-      </MobileHeader>
-      <MobileContent>
-        <h1 className="hidden md:block text-2xl font-semibold mb-4">
-          {translate("crm.clients.title", { _: "Clients" })}
-        </h1>
-        {isPending ? null : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.map((contact) => (
-              <RecordContextProvider key={contact.id} value={contact}>
-                <ClientCard contact={contact} />
-              </RecordContextProvider>
-            ))}
-          </div>
-        )}
-        {!isPending && data.length === 0 && (
-          <p className="text-muted-foreground">
-            {translate("crm.clients.empty", { _: "No clients yet" })}
-          </p>
-        )}
-        <div className="flex justify-center">
-          <InfinitePagination />
-        </div>
-      </MobileContent>
-    </>
+    <div className="mx-auto my-4 px-4">
+      <h1 className="text-2xl font-semibold mb-4">
+        {translate("crm.clients.title", { _: "Clients" })}
+      </h1>
+      {content}
+    </div>
   );
 };
 
