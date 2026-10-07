@@ -1,75 +1,121 @@
-import { useRecordContext, useTranslate } from "ra-core";
+import { useRecordContext } from "ra-core";
 import { DataTable } from "@/components/admin/data-table";
 import { ReferenceField } from "@/components/admin/reference-field";
-
-import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Company } from "../../types";
 import { CompanyAvatar } from "../CompanyAvatar";
-import { getTranslatedCompanySizeLabel } from "../getTranslatedCompanySizeLabel";
-import { sizes } from "../sizes";
+import { httpUrl, linkDomain, socialLinks } from "../companyLinks";
 
-/**
- * Read-only table for the Clubs list, modeled on
- * `contacts/table/ContactTable.tsx` for visual/structural consistency (same
- * `<Card>` wrapper -- applied by the caller, `CompanyList.tsx` -- spacing and
- * column density: see the wrapping `<div>` below, copied from
- * `ContactTable`).
- *
- * Deliberately narrower than `ContactTable`: every cell is read-only, there
- * is no columns picker (the column set is short and fixed), and no
- * bulk-actions toolbar (`bulkActionButtons={false}` also drops the
- * selection checkbox column entirely, unlike `ContactTable`'s
- * `bulkActionsToolbar={false}` which keeps checkboxes for a toolbar
- * rendered by its caller). `rowClick="show"` navigates the whole row to the
- * Club's Show page.
- */
 export const CompanyTable = () => {
   return (
-    <div className="text-xs [&_td]:px-1.5 [&_td]:py-0.5 [&_th]:px-1.5 [&_th]:h-7">
-      <DataTable rowClick="show" bulkActionButtons={false}>
-        <DataTable.Col label={false}>
-          <CompanyAvatar width={20} height={20} />
+    <div className="overflow-x-auto text-xs [&_td]:px-1.5 [&_td]:py-0.5 [&_th]:px-1.5 [&_th]:h-7">
+      <DataTable
+        rowClick="show"
+        bulkActionButtons={false}
+        className="min-w-[1050px]"
+      >
+        <DataTable.Col source="name">
+          <NameCell />
         </DataTable.Col>
-        <DataTable.Col source="name" />
-        <DataTable.Col source="sector">
-          <CompanySectorCell />
+        <DataTable.Col source="zipcode">
+          <ValueCell field="zipcode" />
         </DataTable.Col>
-        <DataTable.Col source="size">
-          <CompanySizeCell />
+        <DataTable.Col source="city">
+          <ValueCell field="city" />
         </DataTable.Col>
-        <DataTable.Col source="city" />
+        <DataTable.Col source="nb_contacts">
+          <ValueCell field="nb_contacts" />
+        </DataTable.Col>
         <DataTable.Col source="sales_id">
-          <ReferenceField source="sales_id" reference="sales" link={false} />
+          <ReferenceField
+            source="sales_id"
+            reference="sales"
+            link={false}
+            empty="—"
+          />
         </DataTable.Col>
-        <DataTable.NumberCol source="nb_contacts" />
+        <DataTable.Col source="website">
+          <LinkCell field="website" />
+        </DataTable.Col>
+        <DataTable.Col source="phone_number">
+          <LinkCell field="phone_number" />
+        </DataTable.Col>
+        <DataTable.Col source="email">
+          <LinkCell field="email" />
+        </DataTable.Col>
+        <DataTable.Col source="social_links">
+          <SocialCell />
+        </DataTable.Col>
       </DataTable>
     </div>
   );
 };
 
-/**
- * The stored `sector` is a raw value (e.g. `"padel_club"`); resolve it
- * against the configured `companySectors` list for its display label, the
- * same lookup `CompanyListFilter` used.
- */
-const CompanySectorCell = () => {
+const NameCell = () => {
   const record = useRecordContext<Company>();
-  const { companySectors } = useConfigurationContext();
-  if (!record) return null;
-  const sector = companySectors.find((s) => s.value === record.sector);
-  return <>{sector?.label ?? record.sector}</>;
+  return (
+    <div className="flex items-center gap-2 whitespace-nowrap">
+      <CompanyAvatar width={20} height={20} />
+      {record?.name || "—"}
+    </div>
+  );
 };
 
-/**
- * The stored `size` is a raw employee-count bucket (e.g. `50`); resolve it
- * to its translated label via the same `getTranslatedCompanySizeLabel` +
- * `sizes` helpers `CompanyListFilter` already uses for the size filter.
- */
-const CompanySizeCell = () => {
+const ValueCell = ({
+  field,
+}: {
+  field: "zipcode" | "city" | "nb_contacts";
+}) => {
   const record = useRecordContext<Company>();
-  const translate = useTranslate();
-  if (!record?.size) return null;
-  const size = sizes.find((s) => s.id === record.size);
-  if (!size) return null;
-  return <>{getTranslatedCompanySizeLabel(size, translate)}</>;
+  return <>{record?.[field] || (record?.[field] === 0 ? 0 : "—")}</>;
+};
+
+const LinkCell = ({
+  field,
+}: {
+  field: "website" | "phone_number" | "email";
+}) => {
+  const record = useRecordContext<Company>();
+  const value = record?.[field];
+  const href =
+    field === "website"
+      ? httpUrl(value)
+      : field === "phone_number"
+        ? value && `tel:${value}`
+        : value && `mailto:${value}`;
+  if (!value) return <>—</>;
+  if (!href) return <>{value}</>;
+  return (
+    <a
+      href={href}
+      onClick={(event) => event.stopPropagation()}
+      className="underline hover:no-underline"
+      {...(field === "website"
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : {})}
+    >
+      {value}
+    </a>
+  );
+};
+
+const SocialCell = () => {
+  const record = useRecordContext<Company>();
+  const links = record ? socialLinks(record) : [];
+  if (!links.length) return <>—</>;
+  return (
+    <div className="flex flex-wrap gap-x-2 gap-y-1">
+      {links.map((link) => (
+        <a
+          key={link}
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(event) => event.stopPropagation()}
+          className="underline hover:no-underline"
+        >
+          {linkDomain(link)}
+        </a>
+      ))}
+    </div>
+  );
 };

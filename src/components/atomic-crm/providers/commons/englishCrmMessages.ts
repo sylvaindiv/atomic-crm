@@ -6,6 +6,8 @@ export const englishCrmMessages = {
       fields: {
         name: "Club name",
         website: "Website",
+        email: "Email",
+        social_links: "Social media",
         linkedin_url: "LinkedIn URL",
         phone_number: "Phone number",
         created_at: "Created at",

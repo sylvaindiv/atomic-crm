@@ -7,9 +7,11 @@ export const frenchCrmMessages = {
       forcedCaseName: "Club",
       fields: {
         name: "Nom du club",
-        website: "Site web",
+        website: "Site internet",
+        email: "Email",
+        social_links: "Réseaux sociaux",
         linkedin_url: "LinkedIn",
-        phone_number: "Numéro de téléphone",
+        phone_number: "Téléphone",
         created_at: "Date de création",
         nb_contacts: "Nombre de juges-arbitres",
         revenue: "Chiffre d'affaires",

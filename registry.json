@@ -456,6 +456,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/misc/columnPreferenceWrites.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/misc/Status.tsx",
           "type": "registry:component"
         },
@@ -501,6 +505,10 @@
         },
         {
           "path": "src/components/atomic-crm/misc/ContactOption.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/misc/ColumnPreferencesProvider.tsx",
           "type": "registry:component"
         },
         {
@@ -836,15 +844,15 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/companies/companyLinks.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/companies/CompanyShow.tsx",
           "type": "registry:component"
         },
         {
           "path": "src/components/atomic-crm/companies/CompanyMergeButton.tsx",
-          "type": "registry:component"
-        },
-        {
-          "path": "src/components/atomic-crm/companies/CompanyListFilter.tsx",
           "type": "registry:component"
         },
         {

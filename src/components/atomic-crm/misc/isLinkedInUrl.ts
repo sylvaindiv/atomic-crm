@@ -4,7 +4,9 @@ export const isLinkedinUrl = (url: string) => {
   if (!url) return;
   try {
     // Parse the URL to ensure it is valid
-    const parsedUrl = new URL(url);
+    const parsedUrl = new URL(
+      /^https?:\/\//i.test(url) ? url : `https://${url}`,
+    );
     if (!parsedUrl.href.match(LINKEDIN_URL_REGEX)) {
       return {
         message: "crm.validation.invalid_linkedin_url",

@@ -70,6 +70,31 @@ const buildDataProvider = (
 };
 
 describe("mergeCompanies", () => {
+  it("keeps the target email and unites social links without duplicates", async () => {
+    const winner = buildCompany({
+      id: winnerId,
+      email: "target@example.org",
+      linkedin_url: "linkedin.com/company/target",
+      social_links: ["https://example.org/a"],
+    });
+    const loser = buildCompany({
+      id: loserId,
+      email: "source@example.org",
+      social_links: ["example.org/a", "https://example.org/b"],
+    });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    await mergeCompanies(
+      loserId,
+      winnerId,
+      buildDataProvider({ getOne: vi.fn(getOneFor(winner, loser)), update }),
+    );
+    expect(update.mock.calls[0][1].data).toMatchObject({
+      email: "target@example.org",
+      social_links: ["https://example.org/a", "https://example.org/b"],
+    });
+  });
   it("reassigns every contact whose company_id is the loser to the winner", async () => {
     // Arrange
     const winner = buildCompany({ id: winnerId });

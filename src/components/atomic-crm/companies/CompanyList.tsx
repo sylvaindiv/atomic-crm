@@ -1,29 +1,46 @@
-import { useGetIdentity, useListContext, useTranslate } from "ra-core";
+import {
+  FilterLiveForm,
+  useGetIdentity,
+  useListContext,
+  useTranslate,
+} from "ra-core";
 import { CreateButton } from "@/components/admin/create-button";
 import { ExportButton } from "@/components/admin/export-button";
+import { ColumnsButton } from "@/components/admin/columns-button";
 import { List } from "@/components/admin/list";
 import { ListPagination } from "@/components/admin/list-pagination";
 import { SortButton } from "@/components/admin/sort-button";
+import { SearchInput } from "@/components/admin/search-input";
 import { Card } from "@/components/ui/card";
 
 import { TopToolbar } from "../layout/TopToolbar";
+import { ColumnPreferencesProvider } from "../misc/ColumnPreferencesProvider";
 import { CompanyEmpty } from "./CompanyEmpty";
-import { CompanyListFilter } from "./CompanyListFilter";
 import { CompanyTable } from "./table/CompanyTable";
 
 export const CompanyList = () => {
   const { identity } = useGetIdentity();
   if (!identity) return null;
   return (
-    <List
-      title={false}
-      perPage={25}
-      sort={{ field: "name", order: "ASC" }}
-      actions={<CompanyListActions />}
-      pagination={<ListPagination />}
+    <ColumnPreferencesProvider
+      key={identity.id}
+      userId={identity.id}
+      resource="companies"
     >
-      <CompanyListLayout />
-    </List>
+      <div className="pb-20 sm:pb-0">
+        <List
+          title={false}
+          perPage={25}
+          sort={{ field: "name", order: "ASC" }}
+          disableSyncWithLocation
+          storeKey="companies-search"
+          actions={false}
+          pagination={<ListPagination />}
+        >
+          <CompanyListLayout />
+        </List>
+      </div>
+    </ColumnPreferencesProvider>
   );
 };
 
@@ -31,17 +48,17 @@ const CompanyListLayout = () => {
   const { data, isPending, filterValues } = useListContext();
   const hasFilters = filterValues && Object.keys(filterValues).length > 0;
 
-  if (isPending) return null;
-  if (!data?.length && !hasFilters) return <CompanyEmpty />;
-
   return (
-    <div className="w-full flex flex-row gap-8">
-      <CompanyListFilter />
-      <div className="flex flex-col flex-1 gap-4">
-        <Card className="py-0">
-          <CompanyTable />
-        </Card>
-      </div>
+    <div className="flex min-w-0 flex-col gap-4">
+      <CompanyListActions />
+      {!isPending &&
+        (!data?.length && !hasFilters ? (
+          <CompanyEmpty />
+        ) : (
+          <Card className="py-0">
+            <CompanyTable />
+          </Card>
+        ))}
     </div>
   );
 };
@@ -49,14 +66,22 @@ const CompanyListLayout = () => {
 const CompanyListActions = () => {
   const translate = useTranslate();
   return (
-    <TopToolbar>
-      <SortButton fields={["name", "created_at", "nb_contacts"]} />
-      <ExportButton />
-      <CreateButton
-        label={translate("resources.companies.action.new", {
-          _: "New Club",
-        })}
-      />
-    </TopToolbar>
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="w-52 max-w-full">
+        <FilterLiveForm>
+          <SearchInput source="q" />
+        </FilterLiveForm>
+      </div>
+      <TopToolbar className="ml-auto min-w-0 max-w-full overflow-x-auto">
+        <SortButton fields={["name", "created_at", "nb_contacts"]} />
+        <ColumnsButton />
+        <ExportButton />
+        <CreateButton
+          label={translate("resources.companies.action.new", {
+            _: "New Club",
+          })}
+        />
+      </TopToolbar>
+    </div>
   );
 };

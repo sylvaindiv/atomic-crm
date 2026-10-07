@@ -1,6 +1,7 @@
 import type { Identifier, DataProvider } from "ra-core";
 
 import type { Company, Contact } from "../../types";
+import { httpUrl, socialLinks } from "../../companies/companyLinks";
 
 /**
  * Merge one company (loser) into another company (winner).
@@ -55,6 +56,14 @@ export const mergeCompanies = async (
       size: winnerCompany.size || loserCompany.size,
       linkedin_url: winnerCompany.linkedin_url || loserCompany.linkedin_url,
       website: winnerCompany.website || loserCompany.website,
+      email: winnerCompany.email || loserCompany.email,
+      social_links: Array.from(
+        new Set([...socialLinks(winnerCompany), ...socialLinks(loserCompany)]),
+      ).filter(
+        (link) =>
+          link !==
+          httpUrl(winnerCompany.linkedin_url || loserCompany.linkedin_url),
+      ),
       phone_number: winnerCompany.phone_number || loserCompany.phone_number,
       address: winnerCompany.address || loserCompany.address,
       zipcode: winnerCompany.zipcode || loserCompany.zipcode,

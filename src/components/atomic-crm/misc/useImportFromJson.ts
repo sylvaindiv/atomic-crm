@@ -13,6 +13,7 @@ import type { RAFile, Tag } from "../types";
 import { colors } from "../tags/colors";
 import { useConfigurationContext } from "../root/ConfigurationContext";
 import { contactGender } from "../contacts/contactModel";
+import { httpUrl, normalizeCompanyLinks } from "../companies/companyLinks";
 
 export type ImportFromJsonStats = {
   sales: number;
@@ -225,6 +226,19 @@ export const useImportFromJson = (): [
         return;
       }
       try {
+        if (
+          dataToImport.email &&
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dataToImport.email.trim())
+        ) {
+          throw new Error("Invalid club email");
+        }
+        for (const link of [
+          dataToImport.website,
+          dataToImport.linkedin_url,
+          ...(dataToImport.social_links ?? []),
+        ]) {
+          if (link && !httpUrl(link)) throw new Error("Invalid club URL");
+        }
         // Validate sector against configuration
         const sector = dataToImport.sector?.trim();
         if (sector && !companySectors.some((s) => s.value === sector)) {
@@ -247,7 +261,7 @@ export const useImportFromJson = (): [
         }
 
         const { data } = await dataProvider.create("companies", {
-          data: {
+          data: normalizeCompanyLinks({
             name: dataToImport.name.trim(),
             description: dataToImport.description?.trim(),
             city: dataToImport.city?.trim(),
@@ -261,6 +275,10 @@ export const useImportFromJson = (): [
               : undefined,
             linkedin_url: dataToImport.linkedin_url?.trim(),
             website: dataToImport.website?.trim(),
+            email: dataToImport.email?.trim(),
+            social_links: Array.isArray(dataToImport.social_links)
+              ? dataToImport.social_links
+              : undefined,
             phone_number: dataToImport.phone_number?.trim(),
             revenue: dataToImport.revenue?.trim(),
             tax_identifier: dataToImport.tax_identifier?.trim(),
@@ -271,7 +289,7 @@ export const useImportFromJson = (): [
               ? idsMaps.sales[dataToImport.sales_id]
               : currentSale.id,
             created_at: dataToImport.created_at,
-          },
+          }),
         });
 
         idsMaps.companies[dataToImport.id] = data.id;
@@ -725,6 +743,8 @@ type CompanyImport = {
   size?: number;
   linkedin_url?: string;
   website?: string;
+  email?: string;
+  social_links?: string[];
   phone_number?: string;
   revenue?: string;
   tax_identifier?: string;

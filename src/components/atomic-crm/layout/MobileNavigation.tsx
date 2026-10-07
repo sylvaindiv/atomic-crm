@@ -8,6 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import {
   BadgeCheck,
+  Building2,
   Home,
   ListTodo,
   Plus,
@@ -89,6 +90,12 @@ export const MobileNavigation = () => {
             label={translate("crm.clients.title")}
             isActive={currentPath === "/clients"}
           />
+          <NavigationButton
+            href="/companies"
+            Icon={Building2}
+            label={translate("resources.companies.name", { smart_count: 2 })}
+            isActive={currentPath === "/companies"}
+          />
           <CreateButton />
           <NavigationButton
             href="/tasks"
@@ -118,7 +125,7 @@ const NavigationButton = ({
     asChild
     variant="ghost"
     className={cn(
-      "flex-col gap-1 h-auto py-2 px-1 rounded-md w-[13.3vw] max-w-14",
+      "flex-col gap-1 h-auto py-2 px-1 rounded-md w-[11.5vw] max-w-14",
       isActive ? null : "text-muted-foreground",
     )}
   >

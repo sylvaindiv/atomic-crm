@@ -33,6 +33,8 @@ export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
         .toLowerCase()
         .replace(regex, "_")}`,
       website: internet.url(),
+      email: internet.email(),
+      social_links: [],
       phone_number: phone.phoneNumber(),
       address: address.streetAddress(),
       zipcode: address.zipCode(),

@@ -63,6 +63,10 @@ import {
 } from "@/components/admin/columns-button";
 import { NumberField } from "@/components/admin/number-field";
 import {
+  orderedColumnIds,
+  useColumnPreferences,
+} from "./column-preferences-context";
+import {
   BulkActionsToolbar,
   BulkActionsToolbarChildren,
 } from "@/components/admin/bulk-actions-toolbar";
@@ -117,10 +121,21 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
   const hasBulkActions = !!bulkActionsToolbar || bulkActionButtons !== false;
   const resourceFromContext = useResourceContext(props);
   const storeKey = props.storeKey || `${resourceFromContext}.datatable`;
+  const preferences = useColumnPreferences();
   const [columnRanks] = useStore<number[]>(`${storeKey}_columnRanks`);
-  const columns = columnRanks
-    ? reorderChildren(children, columnRanks)
-    : children;
+  const childColumns = Children.toArray(children);
+  const ids = childColumns.map((child, index) =>
+    isValidElement<{ source?: string }>(child)
+      ? (child.props.source ?? `column_${index}`)
+      : `column_${index}`,
+  );
+  const columns = preferences
+    ? orderedColumnIds(ids, preferences.settings.order).map(
+        (id) => childColumns[ids.indexOf(id)],
+      )
+    : columnRanks
+      ? reorderChildren(children, columnRanks)
+      : children;
 
   const [columnWidths, setColumnWidths] = useStore<Record<string, number>>(
     `${storeKey}_columnWidths`,
@@ -128,9 +143,14 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
   );
   const setWidth = useCallback(
     (source: string, width: number) => {
-      setColumnWidths((prev) => ({ ...prev, [source]: width }));
+      if (preferences)
+        preferences.update((prev) => ({
+          ...prev,
+          widths: { ...prev.widths, [source]: width },
+        }));
+      else setColumnWidths((prev) => ({ ...prev, [source]: width }));
     },
-    [setColumnWidths],
+    [setColumnWidths, preferences],
   );
 
   return (
@@ -141,7 +161,11 @@ export function DataTable<RecordType extends RaRecord = RaRecord>(
       {...rest}
     >
       <DataTableResizeContext.Provider
-        value={{ resizable: resizableColumns, widths: columnWidths, setWidth }}
+        value={{
+          resizable: resizableColumns,
+          widths: preferences?.settings.widths ?? columnWidths,
+          setWidth,
+        }}
       >
         <div className={cn("rounded-md border", className)}>
           <Table className={resizableColumns ? "table-fixed" : undefined}>
@@ -398,13 +422,16 @@ function DataTableHeadCell<
   const translateLabel = useTranslateLabel();
   const { storeKey, defaultHiddenColumns } = useDataTableStoreContext();
   const [hiddenColumns] = useStore<string[]>(storeKey, defaultHiddenColumns);
+  const preferences = useColumnPreferences();
 
   const resize = useContext(DataTableResizeContext);
   const [dragWidth, setDragWidth] = useState<number | null>(null);
   const startXRef = useRef(0);
   const startWidthRef = useRef(0);
 
-  const isColumnHidden = hiddenColumns.includes(source!);
+  const isColumnHidden = (
+    preferences?.settings.hidden ?? hiddenColumns
+  ).includes(source!);
   if (isColumnHidden) return null;
 
   const isResizing = dragWidth !== null;
@@ -548,8 +575,11 @@ function DataTableCell<
 
   const { storeKey, defaultHiddenColumns } = useDataTableStoreContext();
   const [hiddenColumns] = useStore<string[]>(storeKey, defaultHiddenColumns);
+  const preferences = useColumnPreferences();
   const record = useRecordContext<RecordType>();
-  const isColumnHidden = hiddenColumns.includes(source!);
+  const isColumnHidden = (
+    preferences?.settings.hidden ?? hiddenColumns
+  ).includes(source!);
   if (isColumnHidden) return null;
   if (!render && !field && !children && !source) {
     throw new Error(
