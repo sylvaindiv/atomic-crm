@@ -43,6 +43,7 @@ import { NeedsActionInput } from "./NeedsActionInput";
 import { ContactShowSheet } from "./ContactShowSheet";
 import { TopToolbar } from "../layout/TopToolbar";
 import { InfinitePagination } from "../misc/InfinitePagination";
+import { ColumnPreferencesProvider } from "../misc/ColumnPreferencesProvider";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
 import { ContactKanban } from "./kanban/ContactKanban";
@@ -64,37 +65,42 @@ export const ContactList = () => {
   if (!identity) return null;
 
   return (
-    <List
-      title={false}
-      actions={<ContactListActions onCreate={() => setCreateOpen(true)} />}
-      // The Kanban is grouped into columns, not paged, so it must fetch
-      // the full contact set (KANBAN_PAGE_SIZE) instead of the table's
-      // regular page size; it also gets its own store slot for list
-      // params (perPage/sort/filters).
-      perPage={isKanban ? KANBAN_PAGE_SIZE : 25}
-      pagination={isKanban ? null : undefined}
-      sort={
-        isKanban
-          ? { field: "index", order: "ASC" }
-          : { field: "last_seen", order: "DESC" }
-      }
-      storeKey={
-        isKanban
-          ? `${resource}.kanban.listParams.v2`
-          : `${resource}.table.listParams`
-      }
-      filterDefaultValues={isKanban ? undefined : { "status@isblank": true }}
-      // Table and Kanban share one route/URL, only toggling a store flag.
-      // Without this, ra-core prefers a non-empty URL query over the
-      // per-view perPage/storeKey above, so the table's "rows per page"
-      // (or a stale filter) leaks into the Kanban and caps/filters it.
-      disableSyncWithLocation={isKanban}
-      exporter={exporter}
+    <ColumnPreferencesProvider
+      key={`${identity.id}:${resource}`}
+      userId={identity.id}
+      resource={resource}
     >
-      <ContactListLayoutDesktop viewMode={viewMode} />
-      <ContactShowSheet open={!!showId} id={showId ?? undefined} />
-      <ContactCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
-    </List>
+      <List
+        title={false}
+        actions={<ContactListActions onCreate={() => setCreateOpen(true)} />}
+        // The Kanban is grouped into columns, not paged, so it must fetch
+        // the full contact set (KANBAN_PAGE_SIZE) instead of the table's
+        // regular page size; it also gets its own store slot for list
+        // params (perPage/sort/filters).
+        perPage={isKanban ? KANBAN_PAGE_SIZE : 25}
+        pagination={isKanban ? null : undefined}
+        sort={
+          isKanban
+            ? { field: "index", order: "ASC" }
+            : { field: "last_seen", order: "DESC" }
+        }
+        storeKey={
+          isKanban
+            ? `${resource}.kanban.listParams.v2`
+            : `${resource}.table.listParams.v2`
+        }
+        // Table and Kanban share one route/URL, only toggling a store flag.
+        // Without this, ra-core prefers a non-empty URL query over the
+        // per-view perPage/storeKey above, so the table's "rows per page"
+        // (or a stale filter) leaks into the Kanban and caps/filters it.
+        disableSyncWithLocation={isKanban}
+        exporter={exporter}
+      >
+        <ContactListLayoutDesktop viewMode={viewMode} />
+        <ContactShowSheet open={!!showId} id={showId ?? undefined} />
+        <ContactCreateSheet open={createOpen} onOpenChange={setCreateOpen} />
+      </List>
+    </ColumnPreferencesProvider>
   );
 };
 
@@ -110,11 +116,7 @@ const ContactListLayoutDesktop = ({
     true,
   );
 
-  const hasFilters =
-    !!filterValues &&
-    Object.keys(filterValues).some(
-      (key) => key !== "status@isblank" || filterValues[key] !== true,
-    );
+  const hasFilters = !!filterValues && Object.keys(filterValues).length > 0;
 
   if (isPending) return null;
 
@@ -221,11 +223,10 @@ export const ContactListMobile = () => {
 
   return (
     <InfiniteListBase
-      storeKey={`${resource}.mobile.listParams`}
+      storeKey={`${resource}.mobile.listParams.v2`}
       perPage={25}
       sort={{ field: "last_seen", order: "DESC" }}
       exporter={exporter}
-      filterDefaultValues={{ "status@isblank": true }}
       queryOptions={{
         onError: () => {
           /* Disable error notification as ContactListLayoutMobile handles it */
@@ -240,11 +241,7 @@ export const ContactListMobile = () => {
 const ContactListLayoutMobile = () => {
   const { isPending, data, error, filterValues } = useListContext();
 
-  const hasFilters =
-    !!filterValues &&
-    Object.keys(filterValues).some(
-      (key) => key !== "status@isblank" || filterValues[key] !== true,
-    );
+  const hasFilters = !!filterValues && Object.keys(filterValues).length > 0;
 
   if (!isPending && !data?.length && !hasFilters) return <ContactEmpty />;
 

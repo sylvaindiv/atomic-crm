@@ -18,7 +18,14 @@ import { getActivityLog } from "../commons/activity";
 import { mergeCompanies as mergeCompaniesCommon } from "../commons/mergeCompanies";
 import { mergeContacts as mergeContactsCommon } from "../commons/mergeContacts";
 import { getIsInitialized, setAuthSession } from "./authProvider";
-import { apiPatch, apiPost, baseDataProvider } from "./internal/httpClient";
+import {
+  apiFetch,
+  apiPatch,
+  apiPost,
+  baseDataProvider,
+} from "./internal/httpClient";
+import type { ColumnSettings } from "@/components/admin/column-preferences-context";
+import type { ColumnResource } from "../../misc/ColumnPreferencesProvider";
 
 // --- Attachment / image handling -------------------------------------------
 // Supabase Storage is replaced by base64-in-database storage: uploaded files
@@ -68,6 +75,23 @@ const processCompanyLogo = async (params: any) => {
 const getDataProviderWithCustomMethods = () => {
   return {
     ...baseDataProvider,
+    async getColumnPreferences(
+      resource: ColumnResource,
+    ): Promise<ColumnSettings | null> {
+      const { settings } = await apiFetch<{ settings: ColumnSettings | null }>(
+        `preferences/columns/${resource}`,
+      );
+      return settings;
+    },
+    async saveColumnPreferences(
+      resource: ColumnResource,
+      settings: ColumnSettings,
+    ): Promise<void> {
+      await apiFetch(`preferences/columns/${resource}`, {
+        method: "PUT",
+        body: JSON.stringify(settings),
+      });
+    },
     async getList(resource: string, params: GetListParams) {
       if (resource === "companies") {
         return baseDataProvider.getList("companies_summary", params);

@@ -25,6 +25,8 @@ import { mergeCompanies } from "../commons/mergeCompanies";
 import { mergeContacts } from "../commons/mergeContacts";
 import { isValidDueDate, validateNextAction } from "../../notes/noteModel";
 import type { CrmDataProvider } from "../types";
+import type { ColumnSettings } from "@/components/admin/column-preferences-context";
+import type { ColumnResource } from "../../misc/ColumnPreferencesProvider";
 import {
   authProvider as defaultAuthProvider,
   USER_STORAGE_KEY,
@@ -205,6 +207,25 @@ export const createDataProvider = ({
 
   const dataProviderWithCustomMethod: CrmDataProvider = {
     ...baseDataProvider,
+    async getColumnPreferences(
+      resource: ColumnResource,
+    ): Promise<ColumnSettings | null> {
+      const user = await getIdentity();
+      const saved = localStorage.getItem(
+        `column-preferences:${user?.id}:${resource}`,
+      );
+      return saved ? (JSON.parse(saved) as ColumnSettings) : null;
+    },
+    async saveColumnPreferences(
+      resource: ColumnResource,
+      settings: ColumnSettings,
+    ): Promise<void> {
+      const user = await getIdentity();
+      localStorage.setItem(
+        `column-preferences:${user?.id}:${resource}`,
+        JSON.stringify(settings),
+      );
+    },
     async getList(resource: string, params: any) {
       if (
         (resource === "tasks" || resource === "contact_notes") &&

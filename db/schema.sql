@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS companies (
     size           INTEGER,
     linkedin_url   TEXT,
     website        TEXT COLLATE NOCASE,
+    email          TEXT COLLATE NOCASE,
+    social_links   TEXT,          -- JSON array of URLs
     phone_number   TEXT,
     address        TEXT,
     zipcode        TEXT,
@@ -113,6 +115,13 @@ CREATE TABLE IF NOT EXISTS auth_sessions (
     credential_version  INTEGER NOT NULL,
     expires_at          TEXT NOT NULL,
     created_at          TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+);
+
+CREATE TABLE IF NOT EXISTS column_preferences (
+    sales_id INTEGER NOT NULL REFERENCES sales(id) ON DELETE CASCADE,
+    resource TEXT NOT NULL CHECK (resource IN ('companies', 'contacts', 'partners')),
+    settings TEXT NOT NULL,
+    PRIMARY KEY (sales_id, resource)
 );
 
 CREATE TABLE IF NOT EXISTS auth_login_attempts (

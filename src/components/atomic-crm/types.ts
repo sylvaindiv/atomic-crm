@@ -53,6 +53,8 @@ export type Company = {
   size: 1 | 10 | 50 | 250 | 500;
   linkedin_url: string;
   website: string;
+  email?: string;
+  social_links?: string[];
   phone_number: string;
   address: string;
   zipcode: string;

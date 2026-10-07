@@ -11,13 +11,13 @@
 export const RESOURCES = {
   companies: {
     table: "companies",
-    json: ["logo", "context_links"],
+    json: ["logo", "context_links", "social_links"],
     bool: [],
   },
   companies_summary: {
     table: "companies_summary",
     readonly: true,
-    json: ["logo", "context_links"],
+    json: ["logo", "context_links", "social_links"],
     bool: [],
   },
   contacts: {

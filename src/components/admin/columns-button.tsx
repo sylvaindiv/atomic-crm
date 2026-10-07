@@ -2,6 +2,9 @@ import {
   useState,
   useEffect,
   Children,
+  createContext,
+  isValidElement,
+  useContext,
   type ComponentProps,
   type ReactNode,
 } from "react";
@@ -38,6 +41,12 @@ import {
 } from "@/components/ui/tooltip";
 import { Popover, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import {
+  orderedColumnIds,
+  useColumnPreferences,
+} from "./column-preferences-context";
+
+const ColumnIdsContext = createContext<string[]>([]);
 
 /**
  * Renders a button that lets users show / hide columns in a DataTable
@@ -143,6 +152,7 @@ export interface ColumnsButtonProps extends ComponentProps<typeof Button> {
  * @see ColumnsButton
  */
 export const ColumnsSelector = ({ children }: ColumnsSelectorProps) => {
+  const preferences = useColumnPreferences();
   const translate = useTranslate();
   const { storeKey, defaultHiddenColumns } = useDataTableStoreContext();
   const [columnRanks, setColumnRanks] = useStore<number[] | undefined>(
@@ -184,59 +194,100 @@ export const ColumnsSelector = ({ children }: ColumnsSelectorProps) => {
   if (!container) return null;
 
   const childrenArray = Children.toArray(children);
-  const paddedColumnRanks = padRanks(columnRanks ?? [], childrenArray.length);
+  const ids = childrenArray.map((child, index) =>
+    isValidElement<{ source?: string }>(child)
+      ? (child.props.source ?? `column_${index}`)
+      : `column_${index}`,
+  );
+  const paddedColumnRanks = preferences
+    ? orderedColumnIds(ids, preferences.settings.order).map((id) =>
+        ids.indexOf(id),
+      )
+    : padRanks(columnRanks ?? [], childrenArray.length);
   const shouldDisplaySearchInput = childrenArray.length > 5;
 
   return createPortal(
     <div>
-      {shouldDisplaySearchInput && (
-        <div className="relative p-1">
-          <Input
-            value={columnFilter}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setColumnFilter(e.target.value);
-            }}
-            placeholder={translate("ra.action.search_columns", {
-              _: "Search columns",
-            })}
-            className="pr-8"
-          />
-          <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          {columnFilter && (
-            <button
-              onClick={() => setColumnFilter("")}
-              className="absolute right-8 top-2 h-4 w-4 text-muted-foreground"
-              aria-label="Clear"
-            >
-              ×
-            </button>
+      {preferences && !preferences.ready && (
+        <div className="p-2 text-sm">
+          {preferences.error
+            ? "Impossible de charger les colonnes."
+            : "Chargement des colonnes…"}
+          {preferences.error && (
+            <Button size="sm" variant="outline" onClick={preferences.retry}>
+              Réessayer
+            </Button>
           )}
         </div>
       )}
-      <ul className="max-h-[50vh] p-1 overflow-auto">
-        {paddedColumnRanks.map((position, index) => (
-          <DataTableColumnRankContext.Provider value={position} key={index}>
-            <DataTableColumnFilterContext.Provider
-              value={columnFilter}
-              key={index}
+      {preferences?.saveError && (
+        <div className="p-2 text-sm">
+          Sauvegarde échouée.{" "}
+          <Button size="sm" variant="outline" onClick={preferences.retry}>
+            Réessayer
+          </Button>
+        </div>
+      )}
+      {(!preferences || preferences.ready) && (
+        <>
+          {shouldDisplaySearchInput && (
+            <div className="relative p-1">
+              <Input
+                value={columnFilter}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setColumnFilter(e.target.value);
+                }}
+                placeholder={translate("ra.action.search_columns", {
+                  _: "Search columns",
+                })}
+                className="pr-8"
+              />
+              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              {columnFilter && (
+                <button
+                  onClick={() => setColumnFilter("")}
+                  className="absolute right-8 top-2 h-4 w-4 text-muted-foreground"
+                  aria-label="Clear"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          )}
+          <ColumnIdsContext.Provider value={ids}>
+            <ul className="max-h-[50vh] p-1 overflow-auto">
+              {paddedColumnRanks.map((position, index) => (
+                <DataTableColumnRankContext.Provider
+                  value={position}
+                  key={index}
+                >
+                  <DataTableColumnFilterContext.Provider
+                    value={columnFilter}
+                    key={index}
+                  >
+                    {childrenArray[position]}
+                  </DataTableColumnFilterContext.Provider>
+                </DataTableColumnRankContext.Provider>
+              ))}
+            </ul>
+          </ColumnIdsContext.Provider>
+          <div className="text-center py-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                if (preferences) preferences.reset();
+                else {
+                  setColumnRanks(undefined);
+                  setHiddenColumns(defaultHiddenColumns);
+                }
+              }}
             >
-              {childrenArray[position]}
-            </DataTableColumnFilterContext.Provider>
-          </DataTableColumnRankContext.Provider>
-        ))}
-      </ul>
-      <div className="text-center py-1">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            setColumnRanks(undefined);
-            setHiddenColumns(defaultHiddenColumns);
-          }}
-        >
-          Reset
-        </Button>
-      </div>
+              {translate("ra.action.reset", { _: "Réinitialiser" })}
+            </Button>
+          </div>
+        </>
+      )}
     </div>,
     container,
   );
@@ -253,6 +304,8 @@ export const ColumnsSelectorItem = <
   label,
 }: ColumnsSelectorItemProps<RecordType>) => {
   const resource = useResourceContext();
+  const preferences = useColumnPreferences();
+  const allIds = useContext(ColumnIdsContext);
   const { storeKey, defaultHiddenColumns } = useDataTableStoreContext();
   const [hiddenColumns, setHiddenColumns] = useStore<string[]>(
     storeKey,
@@ -270,13 +323,29 @@ export const ColumnsSelectorItem = <
     resource,
     source,
   }) as string;
-  const isColumnHidden = hiddenColumns.includes(source!);
+  const isColumnHidden = (
+    preferences?.settings.hidden ?? hiddenColumns
+  ).includes(source!);
   const isColumnFiltered = fieldLabelMatchesFilter(fieldLabel, columnFilter);
 
   const handleMove = (
     index1: number | string,
     index2: number | string | null,
   ) => {
+    if (preferences) {
+      const from = Number(index1);
+      const to = index2 === null ? -1 : Number(index2);
+      if (!Number.isInteger(to) || !allIds[from] || !allIds[to]) return;
+      preferences.update((current) => {
+        const order = orderedColumnIds(allIds, current.order);
+        const fromPos = order.indexOf(allIds[from]);
+        const toPos = order.indexOf(allIds[to]);
+        if (fromPos < 0 || toPos < 0) return current;
+        order.splice(toPos, 0, ...order.splice(fromPos, 1));
+        return { ...current, order };
+      });
+      return;
+    }
     const colRanks = !columnRanks
       ? padRanks([], Math.max(Number(index1), Number(index2 || 0)) + 1)
       : Math.max(Number(index1), Number(index2 || 0)) > columnRanks.length - 1
@@ -317,11 +386,18 @@ export const ColumnsSelectorItem = <
       index={String(columnRank)}
       selected={!isColumnHidden}
       onToggle={() =>
-        isColumnHidden
-          ? setHiddenColumns(
-              hiddenColumns.filter((column) => column !== source!),
-            )
-          : setHiddenColumns([...hiddenColumns, source!])
+        preferences
+          ? preferences.update((current) => ({
+              ...current,
+              hidden: isColumnHidden
+                ? current.hidden.filter((column) => column !== source!)
+                : [...current.hidden, source!],
+            }))
+          : isColumnHidden
+            ? setHiddenColumns(
+                hiddenColumns.filter((column) => column !== source!),
+              )
+            : setHiddenColumns([...hiddenColumns, source!])
       }
       onMove={handleMove}
     />

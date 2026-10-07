@@ -87,6 +87,7 @@ export default defineConfig({
             "server/auth.test.mjs",
             "server/query.test.mjs",
             "db/migrate-client-checklist.test.mjs",
+            "db/migrate-company-contact.test.mjs",
           ],
           testTimeout: 30000,
         },

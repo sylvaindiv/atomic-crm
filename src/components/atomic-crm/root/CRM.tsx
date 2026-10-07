@@ -38,6 +38,7 @@ import {
   type ConfigurationContextValue,
 } from "./ConfigurationContext";
 import type { CrmDataProvider } from "../providers/types";
+import { waitForColumnPreferences } from "../misc/columnPreferenceWrites";
 import {
   defaultClientChecklist,
   defaultCompanySectors,
@@ -56,7 +57,6 @@ import { useIsMobile } from "@/hooks/use-mobile.ts";
 import { MobileTasksList } from "../tasks/MobileTasksList.tsx";
 import { ContactListMobile } from "../contacts/ContactList.tsx";
 import { ContactShow } from "../contacts/ContactShow.tsx";
-import { CompanyShow } from "../companies/CompanyShow.tsx";
 import { NoteShowPage } from "../notes/NoteShowPage.tsx";
 import { ClientsPage } from "../clients/ClientsPage.tsx";
 import { ClientChecklistSettingsPage } from "../settings/ClientChecklistSettings.tsx";
@@ -218,6 +218,7 @@ export const CRM = ({
         return result;
       },
       logout: async (params: any) => {
+        await waitForColumnPreferences();
         queryClient.clear();
         try {
           store.removeItem(CONFIGURATION_STORE_KEY);
@@ -334,7 +335,7 @@ const MobileAdmin = (
       >
         <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
       </Resource>
-      <Resource name="companies" show={CompanyShow} />
+      <Resource name="companies" {...companies} />
       <Resource name="tasks" list={MobileTasksList} />
       <Resource name="sales" {...sales} />
     </Admin>

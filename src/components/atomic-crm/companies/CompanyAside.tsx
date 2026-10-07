@@ -1,4 +1,4 @@
-import { Globe, Linkedin, Phone } from "lucide-react";
+import { Globe, Mail, Phone, Share2 } from "lucide-react";
 import {
   useGetIdentity,
   useLocaleState,
@@ -9,7 +9,6 @@ import { EditButton } from "@/components/admin/edit-button";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { ShowButton } from "@/components/admin/show-button";
 import { TextField } from "@/components/admin/text-field";
-import { UrlField } from "@/components/admin/url-field";
 import { SelectField } from "@/components/admin/select-field";
 
 import { formatPhoneNumber } from "@/lib/utils";
@@ -21,6 +20,7 @@ import { getTranslatedCompanySizeLabel } from "./getTranslatedCompanySizeLabel";
 import { sizes } from "./sizes";
 import { useGetSalesName } from "../sales/useGetSalesName";
 import { CompanyMergeButton } from "./CompanyMergeButton";
+import { httpUrl, linkDomain, socialLinks } from "./companyLinks";
 
 interface CompanyAsideProps {
   link?: string;
@@ -68,7 +68,12 @@ export const CompanyAside = ({ link = "edit" }: CompanyAsideProps) => {
 
 export const CompanyInfo = ({ record }: { record: Company }) => {
   const translate = useTranslate();
-  if (!record.website && !record.linkedin_url && !record.phone_number) {
+  if (
+    !record.website &&
+    !record.email &&
+    !record.phone_number &&
+    !socialLinks(record).length
+  ) {
     return null;
   }
 
@@ -76,41 +81,57 @@ export const CompanyInfo = ({ record }: { record: Company }) => {
     <AsideSection
       title={translate("resources.companies.field_categories.contact")}
     >
-      {record.website && (
+      {record.website && httpUrl(record.website) && (
         <div className="flex flex-row items-center gap-1 min-h-[24px]">
           <Globe className="w-4 h-4" />
-          <UrlField
-            source="website"
-            target="_blank"
-            rel="noopener"
-            content={record.website
-              .replace("http://", "")
-              .replace("https://", "")}
-          />
-        </div>
-      )}
-      {record.linkedin_url && (
-        <div className="flex flex-row items-center gap-1 min-h-[24px]">
-          <Linkedin className="w-4 h-4" />
           <a
-            className="underline hover:no-underline"
-            href={record.linkedin_url}
+            href={httpUrl(record.website)!}
             target="_blank"
             rel="noopener noreferrer"
-            title={record.linkedin_url}
+            className="underline hover:no-underline"
           >
-            LinkedIn
+            {record.website.replace(/^https?:\/\//, "")}
+          </a>
+        </div>
+      )}
+      {record.email && (
+        <div className="flex flex-row items-center gap-1 min-h-[24px]">
+          <Mail className="w-4 h-4" />
+          <a
+            className="underline hover:no-underline"
+            href={`mailto:${record.email}`}
+          >
+            {record.email}
           </a>
         </div>
       )}
       {record.phone_number && (
         <div className="flex flex-row items-center gap-1 min-h-[24px]">
           <Phone className="w-4 h-4" />
-          <span className="text-sm">
+          <a
+            href={`tel:${record.phone_number}`}
+            className="text-sm underline hover:no-underline"
+          >
             {formatPhoneNumber(record.phone_number)}
-          </span>
+          </a>
         </div>
       )}
+      {socialLinks(record).map((link) => (
+        <div
+          key={link}
+          className="flex flex-row items-center gap-1 min-h-[24px]"
+        >
+          <Share2 className="w-4 h-4" />
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline hover:no-underline"
+          >
+            {linkDomain(link)}
+          </a>
+        </div>
+      ))}
     </AsideSection>
   );
 };
@@ -201,11 +222,6 @@ export const AdditionalInfo = ({ record }: { record: Company }) => {
   ) {
     return null;
   }
-  const getBaseURL = (url: string) => {
-    const urlObject = new URL(url.startsWith("http") ? url : `https://${url}`);
-    return urlObject.hostname;
-  };
-
   return (
     <AsideSection
       title={translate("resources.companies.field_categories.additional_info")}
@@ -216,16 +232,16 @@ export const AdditionalInfo = ({ record }: { record: Company }) => {
       {record.context_links && (
         <div className="flex flex-col">
           {record.context_links.map((link, index) =>
-            link ? (
+            link && httpUrl(link) ? (
               <a
                 key={index}
                 className="text-sm underline hover:no-underline mb-1"
-                href={link.startsWith("http") ? link : `https://${link}`}
+                href={httpUrl(link)!}
                 target="_blank"
                 rel="noopener noreferrer"
                 title={link}
               >
-                {getBaseURL(link)}
+                {linkDomain(httpUrl(link)!)}
               </a>
             ) : null,
           )}

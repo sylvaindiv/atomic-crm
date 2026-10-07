@@ -16,11 +16,13 @@ import {
 } from "./auth.mjs";
 import { HANDLERS } from "./query.mjs";
 import { RESOURCES } from "./resources.mjs";
+import { mountColumnPreferences } from "./preferences.mjs";
 
 const app = new Hono();
 
 app.get("/api/health", (c) => c.json({ status: "ok" }));
 mountAuth(app, { db });
+mountColumnPreferences(app, db);
 
 // Generic data endpoint: POST /api/:resource/:method with a JSON body matching
 // the react-admin DataProvider params for that method.

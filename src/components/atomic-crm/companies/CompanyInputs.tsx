@@ -1,4 +1,4 @@
-import { required, useRecordContext, useTranslate } from "ra-core";
+import { email, required, useRecordContext, useTranslate } from "ra-core";
 import { ReferenceInput } from "@/components/admin/reference-input";
 import { TextInput } from "@/components/admin/text-input";
 import { SelectInput } from "@/components/admin/select-input";
@@ -13,19 +13,7 @@ import { useConfigurationContext } from "../root/ConfigurationContext";
 import type { Company, Sale } from "../types";
 import { getTranslatedCompanySizeLabel } from "./getTranslatedCompanySizeLabel";
 import { sizes } from "./sizes";
-
-const isUrl = (url: string) => {
-  if (!url) return;
-  const UrlRegex = new RegExp(
-    /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i,
-  );
-  if (!UrlRegex.test(url)) {
-    return {
-      message: "crm.validation.invalid_url",
-      args: { _: "Must be a valid URL" },
-    };
-  }
-};
+import { validateHttpUrl } from "./companyLinks";
 
 export const CompanyInputs = () => {
   const isMobile = useIsMobile();
@@ -83,13 +71,28 @@ const CompanyContactInputs = () => {
           _: "Club info",
         })}
       </h6>
-      <TextInput source="website" helperText={false} validate={isUrl} />
+      <TextInput
+        source="website"
+        helperText={false}
+        validate={validateHttpUrl}
+      />
+      <TextInput source="email" helperText={false} validate={email()} />
       <TextInput
         source="linkedin_url"
         helperText={false}
         validate={isLinkedinUrl}
       />
       <TextInput source="phone_number" helperText={false} />
+      <ArrayInput source="social_links" helperText={false}>
+        <SimpleFormIterator disableReordering fullWidth getItemLabel={false}>
+          <TextInput
+            source=""
+            label={false}
+            helperText={false}
+            validate={validateHttpUrl}
+          />
+        </SimpleFormIterator>
+      </ArrayInput>
     </div>
   );
 };
@@ -156,7 +159,7 @@ const CompanyAdditionalInformationInputs = () => {
             source=""
             label={false}
             helperText={false}
-            validate={isUrl}
+            validate={validateHttpUrl}
           />
         </SimpleFormIterator>
       </ArrayInput>
