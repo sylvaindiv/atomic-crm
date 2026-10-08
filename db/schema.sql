@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS companies (
     id             INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at     TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     name           TEXT NOT NULL,
+    tenup_id       TEXT,
     sector         TEXT,
     size           INTEGER,
     linkedin_url   TEXT,
@@ -55,7 +56,9 @@ CREATE TABLE IF NOT EXISTS contacts (
     has_newsletter INTEGER,       -- boolean
     status         TEXT,
     tags           TEXT,          -- JSON array of tag ids
-    company_id     INTEGER REFERENCES companies(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    company_id     INTEGER REFERENCES companies(id) ON UPDATE CASCADE ON DELETE SET NULL,
+    company_ids    TEXT NOT NULL DEFAULT '[]',
+    tenup_id       TEXT,
     -- See adr/ADR-c7993f35-TASK-001-referred-by-self-fk.md
     referred_by_id INTEGER REFERENCES contacts(id) ON UPDATE CASCADE ON DELETE SET NULL,
     sales_id       INTEGER REFERENCES sales(id),
@@ -186,13 +189,25 @@ CREATE INDEX IF NOT EXISTS auth_login_attempts_address_idx ON auth_login_attempt
 CREATE INDEX IF NOT EXISTS record_history_table_record_idx ON record_history (table_name, record_id);
 CREATE INDEX IF NOT EXISTS record_history_created_at_idx   ON record_history (created_at);
 
+CREATE UNIQUE INDEX IF NOT EXISTS companies_tenup_id_idx ON companies (tenup_id);
+CREATE UNIQUE INDEX IF NOT EXISTS contacts_tenup_id_idx ON contacts (tenup_id);
+
+-- Detach secondary and primary memberships even for direct SQL deletions.
+CREATE TRIGGER IF NOT EXISTS companies_detach_contacts BEFORE DELETE ON companies
+BEGIN
+  UPDATE contacts SET
+    company_ids = (SELECT json_group_array(value) FROM json_each(contacts.company_ids) WHERE value != OLD.id),
+    company_id = (SELECT value FROM json_each(contacts.company_ids) WHERE value != OLD.id LIMIT 1)
+  WHERE id IN (SELECT co.id FROM contacts co, json_each(co.company_ids) j WHERE j.value = OLD.id);
+END;
+
 -- Views -----------------------------------------------------------------------
 -- companies_summary: adds aggregate contact count.
 DROP VIEW IF EXISTS companies_summary;
 CREATE VIEW companies_summary AS
 SELECT
     c.*,
-    (SELECT count(*) FROM contacts co WHERE co.company_id = c.id AND co.contact_type = 'referee') AS nb_contacts
+    (SELECT count(*) FROM contacts co WHERE EXISTS (SELECT 1 FROM json_each(co.company_ids) WHERE value = c.id) AND co.contact_type = 'referee') AS nb_contacts
 FROM companies c;
 
 -- contacts_summary: adds company_name, referred_by_name, open-task count, and
@@ -207,7 +222,7 @@ SELECT
     (SELECT group_concat(json_extract(je.value, '$.number'), ' ')
        FROM json_each(CASE WHEN json_valid(co.phone_jsonb) THEN co.phone_jsonb ELSE '[]' END) je
     ) AS phone_fts,
-    (SELECT cmp.name FROM companies cmp WHERE cmp.id = co.company_id) AS company_name,
+    (SELECT group_concat(cmp.name, ', ') FROM json_each(co.company_ids) j JOIN companies cmp ON cmp.id = j.value) AS company_name,
     (SELECT trim(coalesce(r.first_name, '') || ' ' || coalesce(r.last_name, ''))
        FROM contacts r WHERE r.id = co.referred_by_id
     ) AS referred_by_name,

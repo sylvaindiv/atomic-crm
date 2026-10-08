@@ -3,6 +3,7 @@ import { LIST_REGEX_BASE, parseList } from "./listParser";
 export const CONTAINS_FILTER_REGEX = new RegExp(`^\\{${LIST_REGEX_BASE}\\}$`);
 
 export function transformContainsFilter(value: any) {
+  if (Array.isArray(value)) return value;
   if (value === "{}") {
     return [];
   }

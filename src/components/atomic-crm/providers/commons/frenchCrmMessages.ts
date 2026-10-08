@@ -431,6 +431,7 @@ export const frenchCrmMessages = {
       },
     },
     follow_up: {
+      other_notes: "Autres notes",
       title: "Suivi",
       open_tasks: "Prochaines actions",
       no_open_tasks: "Aucune action ouverte",

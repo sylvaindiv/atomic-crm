@@ -1,3 +1,13 @@
+import { useState } from "react";
+import { Form, useUpdate } from "ra-core";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { ContactClubsInput } from "../ContactClubs";
+import { contactClubIds } from "../contactModel";
 import {
   useCreate,
   useGetIdentity,
@@ -19,6 +29,8 @@ import { EditableReferenceCell } from "./EditableReferenceCell";
  */
 export const EditableCompanyCell = () => {
   const record = useRecordContext<Contact>();
+  const [open, setOpen] = useState(false);
+  const [update, { isPending }] = useUpdate<Contact>();
   const [create] = useCreate<Company>();
   const { identity } = useGetIdentity();
   const notify = useNotify();
@@ -53,6 +65,54 @@ export const EditableCompanyCell = () => {
   };
 
   if (!record) return null;
+
+  if (record.contact_type !== "partner")
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            className="h-8 w-full max-w-64 min-w-0 justify-start text-left"
+            title={record.company_name}
+            aria-label="Modifier les clubs"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span className="truncate">{record.company_name || "—"}</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-80"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <Form
+            defaultValues={{ company_ids: contactClubIds(record) }}
+            onSubmit={async (values: {
+              company_ids?: Contact["company_ids"];
+            }) => {
+              try {
+                await update(
+                  "contacts",
+                  {
+                    id: record.id,
+                    data: { company_ids: values.company_ids },
+                    previousData: record,
+                  },
+                  { returnPromise: true, mutationMode: "pessimistic" },
+                );
+                setOpen(false);
+              } catch {
+                notify("ra.notification.http_error", { type: "error" });
+              }
+            }}
+          >
+            <ContactClubsInput />
+            <Button type="submit" disabled={isPending}>
+              Enregistrer
+            </Button>
+          </Form>
+        </PopoverContent>
+      </Popover>
+    );
 
   return (
     <EditableReferenceCell<Company>

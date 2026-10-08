@@ -96,6 +96,8 @@ export const generateContacts = (db: Db, size = 500): Required<Contact>[] => {
       gender,
       title: title.charAt(0).toUpperCase() + title.substr(1),
       company_id: company.id,
+      company_ids: [company.id],
+      tenup_id: null,
       company_name: company.name,
       referred_by_id,
       referred_by_name,

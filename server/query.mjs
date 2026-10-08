@@ -1,3 +1,4 @@
+import { prepareContactClubs, assertTenupId } from "./contact-clubs.mjs";
 // CRUD + list query builders over libSQL, matching the react-admin DataProvider
 // method surface. Rows are (de)serialized per the resource's json/bool columns.
 import { db, requiredColumns, tableColumns } from "./db.mjs";
@@ -186,6 +187,12 @@ export function getList(cfg, params) {
 }
 
 export function getManyReference(cfg, params) {
+  if (params.target === "company_id" && cfg.table.startsWith("contacts")) {
+    return listWith(cfg, {
+      ...params,
+      filter: { ...params.filter, "company_ids@cs": [coerceId(params.id)] },
+    });
+  }
   const extra = [
     { sql: `${quoteId(params.target)} = ?`, args: [coerceId(params.id)] },
   ];
@@ -348,15 +355,29 @@ async function createWithNextAction(cfg, data) {
 }
 
 export async function create(cfg, { data }, executor = db) {
-  assertWritable(cfg);
-  assertChecklistWrite(cfg, data);
-  assertRequiredColumns(cfg, data, { requireAllPresent: true });
   if (
     executor === db &&
     Object.prototype.hasOwnProperty.call(data ?? {}, "next_action")
   ) {
     return createWithNextAction(cfg, data);
   }
+  if (executor === db && cfg.table === "contacts") {
+    const tx = await db.transaction("write");
+    try {
+      const result = await create(cfg, { data }, tx);
+      await tx.commit();
+      return result;
+    } catch (error) {
+      await tx.rollback();
+      throw error;
+    }
+  }
+  assertTenupId(data);
+  if (cfg.table === "contacts")
+    data = await prepareContactClubs(data, null, executor);
+  assertWritable(cfg);
+  assertChecklistWrite(cfg, data);
+  assertRequiredColumns(cfg, data, { requireAllPresent: true });
   const { columns, values } = prepareWrite(cfg, data);
   const table = quoteId(cfg.table);
   const sql =
@@ -372,6 +393,29 @@ export async function create(cfg, { data }, executor = db) {
 }
 
 export async function update(cfg, { id, data }, executor = db) {
+  if (
+    executor === db &&
+    cfg.table === "contacts" &&
+    ["company_ids", "company_id", "contact_type"].some((key) => key in data)
+  ) {
+    const tx = await db.transaction("write");
+    try {
+      const result = await update(cfg, { id, data }, tx);
+      await tx.commit();
+      return result;
+    } catch (error) {
+      await tx.rollback();
+      throw error;
+    }
+  }
+  assertTenupId(data);
+  if (
+    cfg.table === "contacts" &&
+    ["company_ids", "company_id", "contact_type"].some((key) => key in data)
+  ) {
+    const previous = (await getOne(cfg, { id }, executor)).data;
+    data = await prepareContactClubs(data, previous, executor);
+  }
   assertWritable(cfg);
   assertChecklistWrite(cfg, data);
   assertRequiredColumns(cfg, data, { requireAllPresent: false });
@@ -391,18 +435,15 @@ export async function update(cfg, { id, data }, executor = db) {
 export async function updateMany(cfg, { ids, data }) {
   assertWritable(cfg);
   const list = (ids ?? []).map(coerceId);
-  const { columns, values } = prepareWrite(cfg, data);
-  if (list.length === 0 || columns.length === 0) return { data: list };
-  const assignments = columns.map((c) => `${quoteId(c)} = ?`).join(",");
-  const ph = list.map(() => "?").join(",");
-  await db.execute({
-    sql: `UPDATE ${quoteId(cfg.table)} SET ${assignments} WHERE "id" IN (${ph})`,
-    args: [...values, ...list],
-  });
-  await Promise.all(
-    list.map((id) => logHistory(cfg.table, id, "update", data)),
-  );
-  return { data: list };
+  const tx = await db.transaction("write");
+  try {
+    for (const id of list) await update(cfg, { id, data }, tx);
+    await tx.commit();
+    return { data: list };
+  } catch (error) {
+    await tx.rollback();
+    throw error;
+  }
 }
 
 /** Recursively delete child rows for the ON DELETE CASCADE relationships. */

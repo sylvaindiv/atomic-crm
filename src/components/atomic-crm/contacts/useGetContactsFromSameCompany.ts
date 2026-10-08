@@ -3,7 +3,7 @@ import type { Identifier } from "ra-core";
 import type { Contact } from "../types";
 
 export const useGetContactsFromSameCompany = (
-  companyId: Identifier | null | undefined,
+  companyId: Identifier | Identifier[] | null | undefined,
   excludeContactId: Identifier,
   contactType: Contact["contact_type"] = "referee",
 ) => {
@@ -19,7 +19,9 @@ export const useGetContactsFromSameCompany = (
       },
     },
     {
-      enabled: !!companyId,
+      enabled: Array.isArray(companyId)
+        ? companyId.length > 0
+        : companyId != null,
     },
   );
 

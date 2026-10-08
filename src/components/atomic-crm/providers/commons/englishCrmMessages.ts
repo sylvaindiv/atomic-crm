@@ -426,6 +426,7 @@ export const englishCrmMessages = {
       },
     },
     follow_up: {
+      other_notes: "Other notes",
       title: "Follow-up",
       open_tasks: "Next actions",
       no_open_tasks: "No open actions",

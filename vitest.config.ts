@@ -56,6 +56,8 @@ export default defineConfig({
             "supabase/**",
             ".supabase-e2e/**",
             "server/**",
+            "db/**/*.test.mjs",
+            "scripts/**/*.test.mjs",
             "e2e/**/*.spec.{ts,tsx}",
             // Harness hook tests are Node-only (they import node:fs / node:path
             // and spawn subprocesses); they run under the "claude" project below.
@@ -86,8 +88,11 @@ export default defineConfig({
           include: [
             "server/auth.test.mjs",
             "server/query.test.mjs",
+            "server/multi-clubs.test.mjs",
             "db/migrate-client-checklist.test.mjs",
             "db/migrate-company-contact.test.mjs",
+            "db/migrate-multi-clubs.test.mjs",
+            "scripts/import-tenup.test.mjs",
           ],
           testTimeout: 30000,
         },

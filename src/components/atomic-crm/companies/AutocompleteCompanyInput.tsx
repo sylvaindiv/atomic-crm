@@ -9,6 +9,24 @@ export const AutocompleteCompanyInput = ({
   label,
   modal,
 }: Pick<InputProps, "validate" | "label"> & Pick<PopoverProps, "modal">) => {
+  const handleCreateCompany = useCreateCompany();
+  const isMobile = useIsMobile();
+
+  return (
+    <AutocompleteInput
+      label={label}
+      optionText="name"
+      helperText={false}
+      onCreate={handleCreateCompany}
+      createItemLabel="resources.companies.autocomplete.create_item"
+      createLabel="resources.companies.autocomplete.create_label"
+      validate={validate}
+      modal={modal ?? isMobile}
+    />
+  );
+};
+
+export function useCreateCompany() {
   const [create] = useCreate();
   const { identity } = useGetIdentity();
   const notify = useNotify();
@@ -36,18 +54,5 @@ export const AutocompleteCompanyInput = ({
       });
     }
   };
-  const isMobile = useIsMobile();
-
-  return (
-    <AutocompleteInput
-      label={label}
-      optionText="name"
-      helperText={false}
-      onCreate={handleCreateCompany}
-      createItemLabel="resources.companies.autocomplete.create_item"
-      createLabel="resources.companies.autocomplete.create_label"
-      validate={validate}
-      modal={modal ?? isMobile}
-    />
-  );
-};
+  return handleCreateCompany;
+}

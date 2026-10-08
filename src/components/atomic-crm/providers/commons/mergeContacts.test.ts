@@ -49,6 +49,33 @@ const buildDataProvider = (
 };
 
 describe("mergeContacts", () => {
+  it("unions all clubs without duplicates while retaining the winner's first club", async () => {
+    const winner = buildContact({
+      id: winnerId,
+      company_id: 2,
+      company_ids: [2, 3],
+    });
+    const loser = buildContact({
+      id: loserId,
+      company_id: 1,
+      company_ids: [1, 3],
+    });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    await mergeContacts(
+      loserId,
+      winnerId,
+      buildDataProvider({ getOne: vi.fn(getOneFor(winner, loser)), update }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({
+        id: winnerId,
+        data: expect.objectContaining({ company_ids: [2, 3, 1] }),
+      }),
+    );
+  });
   it("rejects a merge across referee and partner records before writing", async () => {
     const update = vi.fn();
     const provider = buildDataProvider({

@@ -1,3 +1,4 @@
+import { withClubMemberships } from "./internal/withClubMemberships";
 import {
   withLifecycleCallbacks,
   type CreateParams,
@@ -182,28 +183,15 @@ export const createDataProvider = ({
 }: CreateFakeRestDataProviderOptions = {}): CrmDataProvider => {
   db.contacts.forEach((contact) => {
     contact.contact_type ??= "referee";
+    contact.company_ids ??=
+      contact.company_id == null ? [] : [contact.company_id];
   });
-  const baseDataProvider = fakeRestDataProvider(db, !silent, latency);
+  const baseDataProvider = withClubMemberships(
+    fakeRestDataProvider(db, !silent, latency),
+  );
   let taskUpdateType = TASK_DONE_NOT_CHANGED;
   const getIdentity = async () =>
     authProvider?.getIdentity?.() ?? defaultAuthProvider.getIdentity?.();
-
-  const updateCompany = async (
-    companyId: Identifier,
-    updateFn: (company: Company) => Partial<Company>,
-  ) => {
-    const { data: company } = await dataProvider.getOne<Company>("companies", {
-      id: companyId,
-    });
-
-    return await dataProvider.update("companies", {
-      id: companyId,
-      data: {
-        ...updateFn(company),
-      },
-      previousData: company,
-    });
-  };
 
   const dataProviderWithCustomMethod: CrmDataProvider = {
     ...baseDataProvider,
@@ -345,7 +333,7 @@ export const createDataProvider = ({
       return mergeContacts(sourceId, targetId, baseDataProvider);
     },
     mergeCompanies: async (sourceId: Identifier, targetId: Identifier) => {
-      return mergeCompanies(sourceId, targetId, baseDataProvider);
+      return mergeCompanies(sourceId, targetId, dataProvider);
     },
     getConfiguration: async (): Promise<ConfigurationContextValue> => {
       const { data } = await baseDataProvider.getOne("configuration", {
@@ -477,33 +465,9 @@ export const createDataProvider = ({
           const newParams = await processContactAvatar(params);
           return fetchAndUpdateCompanyData(newParams, dataProvider);
         },
-        afterCreate: async (result) => {
-          if (
-            result.data.company_id != null &&
-            result.data.contact_type !== "partner"
-          ) {
-            await updateCompany(result.data.company_id, (company) => ({
-              nb_contacts: (company.nb_contacts ?? 0) + 1,
-            }));
-          }
-
-          return result;
-        },
         beforeUpdate: async (params) => {
           const newParams = await processContactAvatar(params);
           return fetchAndUpdateCompanyData(newParams, dataProvider);
-        },
-        afterDelete: async (result) => {
-          if (
-            result.data.company_id != null &&
-            result.data.contact_type !== "partner"
-          ) {
-            await updateCompany(result.data.company_id, (company) => ({
-              nb_contacts: (company.nb_contacts ?? 1) - 1,
-            }));
-          }
-
-          return result;
         },
       } satisfies ResourceCallbacks<Contact>,
       {
@@ -594,22 +558,6 @@ export const createDataProvider = ({
           return "logo" in params.data
             ? await processCompanyLogo(params)
             : params;
-        },
-        afterUpdate: async (result, dataProvider) => {
-          // get all contacts of the company and for each contact, update the company_name
-          const { id, name } = result.data;
-          const { data: contacts } = await dataProvider.getList("contacts", {
-            filter: { company_id: id },
-            pagination: { page: 1, perPage: 1000 },
-            sort: { field: "id", order: "ASC" },
-          });
-
-          const contactIds = contacts.map((contact) => contact.id);
-          await dataProvider.updateMany("contacts", {
-            ids: contactIds,
-            data: { company_name: name },
-          });
-          return result;
         },
       } satisfies ResourceCallbacks<Company>,
       {

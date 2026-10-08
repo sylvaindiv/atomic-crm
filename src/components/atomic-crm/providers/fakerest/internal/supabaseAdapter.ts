@@ -25,6 +25,18 @@ export function withSupabaseFilterAdapter<T extends DataProvider>(
       return dataProvider.getMany(removeSummarySuffix(resource), params);
     },
     getManyReference(resource, params) {
+      if (
+        removeSummarySuffix(resource) === "contacts" &&
+        params.target === "company_id"
+      ) {
+        return dataProvider.getList("contacts", {
+          ...params,
+          filter: {
+            ...transformFilter(params.filter),
+            company_ids_inc_any: [params.id],
+          },
+        });
+      }
       return dataProvider.getManyReference(removeSummarySuffix(resource), {
         ...params,
         filter: transformFilter(params.filter),

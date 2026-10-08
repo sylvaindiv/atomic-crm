@@ -1,3 +1,4 @@
+import { ContactClubs } from "../contacts/ContactClubs";
 import { useState } from "react";
 import {
   RecordRepresentation,
@@ -8,7 +9,6 @@ import {
 import type { ShowBaseProps } from "ra-core";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ReferenceField } from "@/components/admin/reference-field";
-import { TextField } from "@/components/admin/text-field";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -62,7 +62,7 @@ const ContactShowContentMobile = () => {
   const [noteCreateOpen, setNoteCreateOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const { contacts: otherContacts } = useGetContactsFromSameCompany(
-    record?.company_id ?? null,
+    record?.company_ids ?? record?.company_id ?? null,
     record?.id ?? 0,
     record?.contact_type ?? "referee",
   );
@@ -123,15 +123,7 @@ const ContactShowContentMobile = () => {
                       title: record.title,
                     })} `
                   : record.title}
-                {record.company_id != null && (
-                  <ReferenceField
-                    source="company_id"
-                    reference="companies"
-                    link="show"
-                  >
-                    <TextField source="name" className="underline" />
-                  </ReferenceField>
-                )}
+                {record.company_id != null && <ContactClubs />}
               </div>
             </div>
             <div>
@@ -156,9 +148,7 @@ const ContactShowContentMobile = () => {
             </TabsTrigger>
             {hasOtherJudges && (
               <TabsTrigger value="other_notes">
-                {translate(`resources.${resource}.other_judges_notes`, {
-                  smart_count: 1,
-                })}
+                {translate("crm.follow_up.other_notes")}
               </TabsTrigger>
             )}
             <TabsTrigger value="details">
@@ -236,7 +226,7 @@ export const ContactShowContent = () => {
   const resource = useContactResource();
   const { record, isPending } = useShowContext<Contact>();
   const { contacts: otherContacts } = useGetContactsFromSameCompany(
-    record?.company_id ?? null,
+    record?.company_ids ?? record?.company_id ?? null,
     record?.id ?? 0,
     record?.contact_type ?? "referee",
   );
@@ -273,16 +263,7 @@ export const ContactShowContent = () => {
                         title: record.title,
                       })} `
                     : record.title}
-                  {record.company_id != null && (
-                    <ReferenceField
-                      source="company_id"
-                      reference="companies"
-                      link="show"
-                    >
-                      &nbsp;
-                      <TextField source="name" />
-                    </ReferenceField>
-                  )}
+                  {record.company_id != null && <ContactClubs />}
                   {otherContacts.length > 0 && (
                     <button
                       type="button"

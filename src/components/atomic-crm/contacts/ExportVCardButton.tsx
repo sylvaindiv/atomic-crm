@@ -1,18 +1,18 @@
 import { Download } from "lucide-react";
-import { useGetOne, useRecordContext, useTranslate } from "ra-core";
+import { useGetMany, useRecordContext, useTranslate } from "ra-core";
 import { Button } from "@/components/ui/button";
 import type { Contact, Company } from "../types";
-import { contactFullName, exportToVCard } from "./contactModel";
+import { contactFullName, exportToVCard, contactClubIds } from "./contactModel";
 
 export const ExportVCardButton = () => {
   const contact = useRecordContext<Contact>();
   const translate = useTranslate();
 
   // Fetch the company data on mount
-  const { data: company } = useGetOne<Company>(
+  const { data: company } = useGetMany<Company>(
     "companies",
-    { id: contact?.company_id ?? undefined },
-    { enabled: !!contact?.company_id },
+    { ids: contactClubIds(contact) },
+    { enabled: contactClubIds(contact).length > 0 },
   );
 
   const handleExport = async () => {

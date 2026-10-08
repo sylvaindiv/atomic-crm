@@ -1,3 +1,4 @@
+import { migrateMultiClubs } from "./migrate-multi-clubs.mjs";
 // Apply db/schema.sql (and seed on first run) to the configured libSQL database.
 //
 // Usage:
@@ -30,6 +31,7 @@ const schema = readFileSync(join(here, "schema.sql"), "utf8");
 await migrateContactType(client);
 await migrateClientChecklist(client);
 await migrateCompanyContact(client);
+await migrateMultiClubs(client);
 await client.executeMultiple(schema);
 print(`Schema applied to ${url}`);
 

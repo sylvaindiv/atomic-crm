@@ -22,13 +22,27 @@ export const RESOURCES = {
   },
   contacts: {
     table: "contacts",
-    json: ["avatar", "email_jsonb", "phone_jsonb", "tags", "client_checklist"],
+    json: [
+      "avatar",
+      "email_jsonb",
+      "phone_jsonb",
+      "tags",
+      "client_checklist",
+      "company_ids",
+    ],
     bool: ["has_newsletter"],
   },
   contacts_summary: {
     table: "contacts_summary",
     readonly: true,
-    json: ["avatar", "email_jsonb", "phone_jsonb", "tags", "client_checklist"],
+    json: [
+      "avatar",
+      "email_jsonb",
+      "phone_jsonb",
+      "tags",
+      "client_checklist",
+      "company_ids",
+    ],
     bool: ["has_newsletter"],
   },
   contact_notes: {
@@ -71,9 +85,8 @@ export const RESOURCES = {
 
 // Parent -> [ [childTable, childForeignKeyColumn], ... ] for explicit cascade
 // deletes (mirrors the Postgres ON DELETE CASCADE relationships). Applied
-// recursively so deleting a company also removes its contacts' notes & tasks.
+// recursively for contact notes/tasks; clubs only detach their memberships.
 export const CASCADE = {
-  companies: [["contacts", "company_id"]],
   contacts: [
     ["contact_notes", "contact_id"],
     ["tasks", "contact_id"],

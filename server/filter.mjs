@@ -104,6 +104,23 @@ function condition(key, value, cfg) {
   const at = key.lastIndexOf("@");
   const field = at === -1 ? key : key.slice(0, at);
   const op = at === -1 ? "eq" : key.slice(at + 1);
+  if (
+    field === "company_id" &&
+    cfg?.table?.startsWith("contacts") &&
+    ["eq", "in"].includes(op)
+  ) {
+    const list =
+      op === "in"
+        ? toList(value, "(", ")")
+        : Array.isArray(value)
+          ? value
+          : [value];
+    if (!list.length) return { sql: "0 = 1", args: [] };
+    return {
+      sql: `EXISTS (SELECT 1 FROM json_each(company_ids) j WHERE j.value IN (${list.map(() => "?").join(",")}))`,
+      args: list.map(Number),
+    };
+  }
   const col = quoteId(field);
   const isBool = cfg?.bool?.includes(field);
   const coerce = (v) => (isBool ? toBool(v) : v);

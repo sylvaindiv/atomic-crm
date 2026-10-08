@@ -60,4 +60,6 @@ node_modules/
 .playwright-mcp/
 
 *.lock
- 
+
+# Private import sources, backups and validation artifacts
+.context/

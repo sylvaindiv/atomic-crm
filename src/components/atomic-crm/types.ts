@@ -47,6 +47,7 @@ export type Sale = {
 } & Pick<RaRecord, "id">;
 
 export type Company = {
+  tenup_id?: string | null;
   name: string;
   logo: RAFile;
   sector: string;
@@ -86,6 +87,8 @@ export type Contact = {
   last_name: string;
   title: string;
   company_id?: Identifier | null;
+  company_ids?: Identifier[];
+  tenup_id?: string | null;
   referred_by_id?: Identifier | null;
   email_jsonb: EmailAndType[];
   avatar?: Partial<RAFile>;

@@ -29,23 +29,37 @@ export const mergeCompanies = async (
     throw new Error("Could not fetch companies");
   }
 
-  // 1. Reassign all contacts from loser to winner
-  const { data: loserContacts } = await dataProvider.getManyReference<Contact>(
-    "contacts",
-    {
+  // Read every membership before writing, so pagination cannot skip moved rows.
+  const loserContacts: Contact[] = [];
+  for (let page = 1; ; page++) {
+    const result = await dataProvider.getManyReference<Contact>("contacts", {
       target: "company_id",
       id: loserId,
-      pagination: { page: 1, perPage: 1000 },
+      pagination: { page, perPage: 250 },
       sort: { field: "id", order: "ASC" },
       filter: {},
-    },
-  );
-
-  // The reassignment must settle before the loser company is deleted below.
-  await dataProvider.updateMany<Contact>("contacts", {
-    ids: (loserContacts || []).map((contact) => contact.id),
-    data: { company_id: winnerId },
-  });
+    });
+    loserContacts.push(...result.data);
+    if (
+      result.data.length < 250 ||
+      loserContacts.length >= (result.total ?? Infinity)
+    )
+      break;
+  }
+  for (const contact of loserContacts) {
+    const ids =
+      contact.company_ids ??
+      (contact.company_id == null ? [] : [contact.company_id]);
+    await dataProvider.update<Contact>("contacts", {
+      id: contact.id,
+      data: {
+        company_ids: [
+          ...new Set(ids.map((id) => (id === loserId ? winnerId : id))),
+        ],
+      },
+      previousData: contact,
+    });
+  }
 
   // 2. Update winner company with loser data: fields already set on the
   // winner are never overwritten.

@@ -80,6 +80,36 @@ const renderHarness = (
   );
 
 describe("useContactImport", () => {
+  it("imports portable club names as distinct memberships and keeps textual TenUp IDs", async () => {
+    let id = 0;
+    const createMock = vi.fn(async (_resource: string, params: any) => ({
+      data: { id: ++id, ...params.data },
+    }));
+    const screen = await renderHarness(
+      [buildRow({ companies: '["Acme","Second","Acme"]', tenup_id: "00123" })],
+      {
+        create: createMock,
+        getList: vi.fn(async () => ({ data: [], total: 0 })),
+      },
+    );
+    await screen.getByRole("button", { name: "Run import" }).click();
+    await expect
+      .poll(
+        () =>
+          createMock.mock.calls.filter(([resource]) => resource === "contacts")
+            .length,
+      )
+      .toBe(1);
+    expect(createMock).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({
+        data: expect.objectContaining({
+          company_ids: [1, 2],
+          tenup_id: "00123",
+        }),
+      }),
+    );
+  });
   it("forces partner type when importing from Partners", async () => {
     const createMock = vi.fn(async (_resource: string, params: any) => ({
       data: { id: 9, ...params.data },

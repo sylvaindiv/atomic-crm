@@ -123,9 +123,11 @@ function foldLine(line: string): string {
  */
 export function exportToVCard(
   contact: Contact,
-  company?: Company,
+  company?: Company | Company[],
   photoData?: { base64: string; mimeType: string },
 ): string {
+  const companies = Array.isArray(company) ? company : company ? [company] : [];
+  company = companies[0];
   const lines: string[] = [];
 
   // vCard header
@@ -145,7 +147,7 @@ export function exportToVCard(
 
   // Organization
   if (company?.name) {
-    lines.push(`ORG:${company.name}`);
+    lines.push(`ORG:${companies.map((club) => club.name).join(", ")}`);
   }
 
   // Emails
@@ -195,3 +197,7 @@ export function exportToVCard(
 
   return lines.join("\r\n");
 }
+
+export const contactClubIds = (contact?: Partial<Contact>) =>
+  contact?.company_ids ??
+  (contact?.company_id == null ? [] : [contact.company_id]);

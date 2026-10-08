@@ -232,6 +232,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/providers/fakerest/internal/withClubMemberships.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/providers/fakerest/internal/transformOrFilter.ts",
           "type": "registry:component"
         },
@@ -741,6 +745,10 @@
         },
         {
           "path": "src/components/atomic-crm/contacts/ContactCreate.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/contacts/ContactClubs.tsx",
           "type": "registry:component"
         },
         {

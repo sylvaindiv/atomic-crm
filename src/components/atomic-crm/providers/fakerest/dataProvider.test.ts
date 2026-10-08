@@ -238,3 +238,65 @@ describe("contact note next action creation", () => {
     expect(notes).toHaveLength(0);
   });
 });
+
+describe("multi-club parity", () => {
+  it("finds secondary memberships, updates counters and preserves contacts on club deletion", async () => {
+    const provider = createDataProvider({
+      db: createCrmDb({
+        companies: [
+          buildCompany({ id: 1 }),
+          buildCompany({ id: 2, name: "Club B" }),
+          buildCompany({ id: 3, name: "Club C" }),
+        ],
+        contacts: [buildContact({ id: 1, company_id: 1, company_ids: [1, 2] })],
+      }),
+      latency: 0,
+      silent: true,
+    });
+    const params = {
+      filter: { company_id: 2 },
+      pagination: { page: 1, perPage: 25 },
+      sort: { field: "id", order: "ASC" as const },
+    };
+    expect((await provider.getList("contacts", params)).total).toBe(1);
+    await provider.updateMany("contacts", {
+      ids: [1],
+      data: { company_id: 3 },
+    });
+    expect(
+      (await provider.getOne("contacts", { id: 1 })).data.company_ids,
+    ).toEqual([3, 2]);
+    expect(
+      (await provider.getOne("companies", { id: 2 })).data.nb_contacts,
+    ).toBe(1);
+    await provider.delete("companies", { id: 2 });
+    expect(
+      (await provider.getOne("contacts", { id: 1 })).data.company_ids,
+    ).toEqual([3]);
+    expect(
+      (await provider.getOne("contacts", { id: 1 })).data.company_name,
+    ).toBe("Club C");
+  });
+  it("rejects bulk changes before any write if a partner would gain multiple clubs", async () => {
+    const provider = createDataProvider({
+      db: createCrmDb({
+        companies: [buildCompany({ id: 1 }), buildCompany({ id: 2 })],
+        contacts: [
+          buildContact({ id: 1, company_id: 1 }),
+          buildContact({ id: 2, company_id: 1, contact_type: "partner" }),
+        ],
+      }),
+      latency: 0,
+      silent: true,
+    });
+    await expect(
+      provider.updateMany("contacts", {
+        ids: [1, 2],
+        data: { company_ids: [1, 2] },
+      }),
+    ).rejects.toThrow();
+    expect(
+      (await provider.getOne("contacts", { id: 1 })).data.company_ids,
+    ).toEqual([1]);
+  });
+});

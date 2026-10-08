@@ -269,8 +269,13 @@ const exporter: Exporter<Contact> = async (
   dataProvider,
 ) => {
   const companies = await fetchRelatedRecords<Company>(
-    records,
-    "company_id",
+    records.map((contact) => ({
+      ...contact,
+      company_ids:
+        contact.company_ids ??
+        (contact.company_id == null ? [] : [contact.company_id]),
+    })),
+    "company_ids",
     "companies",
   );
   const sales = await fetchRelatedRecords<Sale>(records, "sales_id", "sales");
@@ -310,6 +315,15 @@ const exporter: Exporter<Contact> = async (
     const recentNotes = notesByContact.get(contact.id) ?? [];
     const exportedContact = {
       ...contact,
+      company_ids: undefined,
+      companies: JSON.stringify(
+        (
+          contact.company_ids ??
+          (contact.company_id == null ? [] : [contact.company_id])
+        )
+          .map((id) => companies[id]?.name)
+          .filter(Boolean),
+      ),
       company:
         contact.company_id != null
           ? companies[contact.company_id].name

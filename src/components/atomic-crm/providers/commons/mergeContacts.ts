@@ -1,3 +1,4 @@
+import { contactClubIds } from "../../contacts/contactModel";
 import type { Identifier, DataProvider } from "ra-core";
 
 import type { Contact, Task, ContactNote } from "../../types";
@@ -124,7 +125,17 @@ export const mergeContacts = async (
       first_name: winnerContact.first_name ?? loserContact.first_name,
       last_name: winnerContact.last_name ?? loserContact.last_name,
       title: winnerContact.title ?? loserContact.title,
-      company_id: winnerContact.company_id ?? loserContact.company_id,
+      company_ids:
+        winnerContact.contact_type === "partner"
+          ? contactClubIds(winnerContact).length
+            ? contactClubIds(winnerContact)
+            : contactClubIds(loserContact)
+          : [
+              ...new Set([
+                ...contactClubIds(winnerContact),
+                ...contactClubIds(loserContact),
+              ]),
+            ],
       referred_by_id:
         winnerContact.referred_by_id ?? loserContact.referred_by_id,
       email_jsonb: mergedEmails,
