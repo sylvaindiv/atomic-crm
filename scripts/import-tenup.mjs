@@ -4,6 +4,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve, join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
+import { createHash } from "node:crypto";
 
 export const normalize = (value) =>
   String(value ?? "")
@@ -57,13 +58,18 @@ const idsFor = (row) =>
   row.company_ids ?? (row.company_id == null ? [] : [row.company_id]);
 
 export async function readSources(directory) {
-  const result = {};
+  const result = { directory: resolve(directory), files: [] };
   for (const [key, filename, required] of [
     ["clubs", "clubs.csv", ["club_id", "nom"]],
     ["judges", "juges_arbitres.csv", ["juge_id", "id_tenup", "prenom", "nom"]],
     ["links", "club_juge_tournois.csv", ["club_id", "juge_id", "tournoi_id"]],
   ]) {
-    const csv = Papa.parse(await readFile(join(directory, filename), "utf8"), {
+    const content = await readFile(join(directory, filename), "utf8");
+    result.files.push({
+      name: filename,
+      sha256: createHash("sha256").update(content).digest("hex"),
+    });
+    const csv = Papa.parse(content, {
       header: true,
       skipEmptyLines: true,
       delimiter: ";",
@@ -89,7 +95,93 @@ export async function readSources(directory) {
   return result;
 }
 
-export function planImport(snapshot, sources, salesId) {
+export function mergeSources(datasets) {
+  const result = { clubs: [], judges: [], links: [], manifests: [] };
+  for (const dataset of datasets) {
+    result.manifests.push({
+      directory: dataset.directory,
+      files: dataset.files,
+    });
+    for (const judge of dataset.judges) {
+      if (!judge.id_tenup || judge.juge_id !== `tenup:${judge.id_tenup}`)
+        throw new Error(`Invalid juge_id / id_tenup: ${judge.juge_id}`);
+    }
+    for (const link of dataset.links) {
+      if (
+        !dataset.clubs.some((c) => c.club_id === link.club_id) ||
+        !dataset.judges.some((j) => j.juge_id === link.juge_id)
+      )
+        throw new Error(
+          `Unknown source reference: ${link.club_id}/${link.juge_id}`,
+        );
+    }
+    for (const [kind, key] of [
+      ["clubs", "club_id"],
+      ["judges", "id_tenup"],
+    ]) {
+      for (const source of dataset[kind]) {
+        let row = result[kind].find((r) => r[key] === source[key]);
+        if (!row) {
+          row = { ...source, origins: [] };
+          result[kind].push(row);
+        }
+        for (const [field, value] of Object.entries(source)) {
+          if (["url_source", "collecte_le"].includes(field) || !value) continue;
+          const compare = field === "telephone" ? phone : normalize;
+          if (row[field] && compare(row[field]) !== compare(value))
+            throw new Error(`Conflicting ${kind} ${source[key]}: ${field}`);
+          if (!row[field]) row[field] = value;
+        }
+        row.origins.push({
+          directory: dataset.directory,
+          url_source: source.url_source,
+          collecte_le: source.collecte_le,
+        });
+      }
+    }
+    result.links.push(
+      ...dataset.links.map((link) => ({
+        ...link,
+        directory: dataset.directory,
+      })),
+    );
+  }
+  return result;
+}
+
+export function assertReviewedPlan(reviewed, current) {
+  for (const key of [
+    "sources",
+    "mappings",
+    "actions",
+    "expectedPairs",
+    "exclusions",
+    "ambiguities",
+  ]) {
+    if (JSON.stringify(reviewed[key]) !== JSON.stringify(current[key]))
+      throw new Error(`Reviewed import changed (${key}); run a new dry-run`);
+  }
+}
+
+export function planImport(
+  snapshot,
+  sources,
+  salesId,
+  { mappings = {}, now = new Date().toISOString() } = {},
+) {
+  for (const [kind, entries] of Object.entries(mappings)) {
+    if (
+      !["clubs", "judges"].includes(kind) ||
+      !entries ||
+      typeof entries !== "object" ||
+      Array.isArray(entries) ||
+      Object.entries(entries).some(
+        ([key, id]) =>
+          !/^\d+$/.test(key) || !Number.isSafeInteger(id) || id <= 0,
+      )
+    )
+      throw new Error("Invalid source-ID mappings");
+  }
   const companies = snapshot.companies.map((row) => ({ ...decode(row) }));
   const contacts = snapshot.contacts.map((row) => ({ ...decode(row) }));
   const report = {
@@ -100,6 +192,8 @@ export function planImport(snapshot, sources, salesId) {
     matches: [],
     expectedPairs: [],
     sources,
+    mappings,
+    plannedAt: now,
   };
   let nextCompany =
     Math.max(
@@ -194,7 +288,8 @@ export function planImport(snapshot, sources, salesId) {
       companies,
       source.club_id,
       companies.filter((row) => normalize(row.name) === normalize(source.nom)),
-      clubOverrides.get(normalize(source.nom)),
+      mappings.clubs?.[source.club_id] ??
+        clubOverrides.get(normalize(source.nom)),
       source,
     );
     if (row === false) continue;
@@ -235,6 +330,8 @@ export function planImport(snapshot, sources, salesId) {
       continue;
     }
     const key = identity(source.prenom, source.nom);
+    const override =
+      mappings.judges?.[source.id_tenup] ?? judgeOverrides.get(key);
     const candidates = contacts.filter(
       (row) =>
         identity(row.first_name, row.last_name) === key ||
@@ -247,10 +344,23 @@ export function planImport(snapshot, sources, salesId) {
       contacts,
       source.id_tenup || null,
       candidates,
-      judgeOverrides.get(key),
+      override,
       source,
     );
     if (row === false) continue;
+    if (
+      row &&
+      override == null &&
+      row.tenup_id !== source.id_tenup &&
+      identity(row.first_name, row.last_name) !== key
+    ) {
+      report.ambiguities.push({
+        source,
+        reason: "Email matches a different identity",
+        candidates: [row.id],
+      });
+      continue;
+    }
     if (row?.contact_type === "partner") {
       report.ambiguities.push({
         source,
@@ -260,6 +370,23 @@ export function planImport(snapshot, sources, salesId) {
       continue;
     }
     if (!row) {
+      const probableDuplicates = source.telephone
+        ? contacts.filter(
+            (other) =>
+              normalize(other.first_name) === normalize(source.prenom) &&
+              (other.phone_jsonb ?? []).some(
+                (item) => phone(item.number) === phone(source.telephone),
+              ),
+          )
+        : [];
+      if (probableDuplicates.length) {
+        report.ambiguities.push({
+          source,
+          reason: "Phone and first name suggest an existing person",
+          candidates: probableDuplicates.map((c) => c.id),
+        });
+        continue;
+      }
       row = { id: nextContact++, _new: true };
       contacts.push(row);
     } else
@@ -298,7 +425,7 @@ export function planImport(snapshot, sources, salesId) {
       Object.assign(patch, {
         contact_type: "referee",
         sales_id: salesId,
-        first_seen: new Date().toISOString(),
+        first_seen: now,
         tags: [],
         email_jsonb: [],
         phone_jsonb: [],
@@ -431,16 +558,30 @@ export async function applyPlan(tx, report) {
 async function main() {
   const { values } = parseArgs({
     options: {
-      source: { type: "string" },
+      source: { type: "string", multiple: true },
+      mappings: { type: "string" },
+      "expected-report": { type: "string" },
       report: { type: "string", default: ".context/tenup-import/report.json" },
       apply: { type: "boolean", default: false },
     },
   });
-  if (!values.source || !process.env.TURSO_DATABASE_URL)
+  if (!values.source?.length || !process.env.TURSO_DATABASE_URL)
     throw new Error(
       "Supply --source and TURSO_DATABASE_URL (dry-run by default)",
     );
-  const sources = await readSources(values.source);
+  if (values.apply && !values["expected-report"])
+    throw new Error(
+      "--apply requires --expected-report from a reviewed dry-run",
+    );
+  const sources = mergeSources(
+    await Promise.all(values.source.map(readSources)),
+  );
+  const mappings = values.mappings
+    ? JSON.parse(await readFile(values.mappings, "utf8"))
+    : {};
+  const reviewed = values["expected-report"]
+    ? JSON.parse(await readFile(values["expected-report"], "utf8"))
+    : null;
   const client = createClient({
     url: process.env.TURSO_DATABASE_URL,
     authToken: process.env.TURSO_AUTH_TOKEN,
@@ -455,12 +596,19 @@ async function main() {
     );
     if (sales.length !== 1)
       throw new Error("Expected one active Sylvain in sales");
-    const report = planImport(snapshot, sources, sales[0].id);
+    const options = {
+      mappings,
+      ...(reviewed ? { now: reviewed.plannedAt } : {}),
+    };
+    const report = planImport(snapshot, sources, sales[0].id, options);
+    if (reviewed) assertReviewedPlan(reviewed, report);
     await writeFile(reportPath, JSON.stringify(report, null, 2), {
       mode: 0o600,
     });
     process.stdout.write(JSON.stringify(report.counts) + "\n");
     if (tx) {
+      if (report.ambiguities.length)
+        throw new Error("Ambiguities must be resolved before applying");
       if (
         !(await tx.execute("PRAGMA table_info(contacts)")).rows.some(
           (r) => r.name === "company_ids",
@@ -486,19 +634,30 @@ async function main() {
         flag: "wx",
       });
       await applyPlan(tx, report);
-      const again = planImport(await readSnapshot(tx), sources, sales[0].id);
+      const again = planImport(
+        await readSnapshot(tx),
+        sources,
+        sales[0].id,
+        options,
+      );
       if (again.actions.length || again.ambiguities.length)
         throw new Error("Second run is not a no-op");
       await tx.commit();
-      await writeFile(
-        reportPath + ".applied.json",
-        JSON.stringify({
-          counts: report.counts,
-          appliedAt: new Date().toISOString(),
-          secondRun: again.counts,
-        }),
-        { mode: 0o600 },
-      );
+      try {
+        await writeFile(
+          reportPath + ".applied.json",
+          JSON.stringify({
+            counts: report.counts,
+            appliedAt: new Date().toISOString(),
+            secondRun: again.counts,
+          }),
+          { mode: 0o600 },
+        );
+      } catch (error) {
+        console.warn(
+          `Import committed; could not save applied report: ${error.message}`,
+        );
+      }
     }
   } catch (error) {
     if (tx && !tx.closed) await tx.rollback();

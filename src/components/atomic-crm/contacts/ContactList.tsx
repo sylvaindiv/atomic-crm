@@ -13,9 +13,7 @@ import {
 import { useSearchParams } from "react-router";
 import { BulkActionsToolbar } from "@/components/admin/bulk-actions-toolbar";
 import { BulkDeleteButton } from "@/components/admin/bulk-delete-button";
-import { BulkExportButton } from "@/components/admin/bulk-export-button";
 import { ColumnsButton } from "@/components/admin/columns-button";
-import { ExportButton } from "@/components/admin/export-button";
 import { List } from "@/components/admin/list";
 import { SelectAllButton } from "@/components/admin/select-all-button";
 import { SortButton } from "@/components/admin/sort-button";
@@ -33,7 +31,6 @@ import type { Company, Contact, ContactNote, Sale, Tag } from "../types";
 import { BulkTagButton } from "./BulkTagButton";
 import { ContactCreateSheet } from "./ContactCreateSheet";
 import { ContactEmpty } from "./ContactEmpty";
-import { ContactImportButton } from "./ContactImportButton";
 import { ContactListContentMobile } from "./ContactListContent";
 import {
   ContactListFilterSummary,
@@ -44,6 +41,7 @@ import { ContactShowSheet } from "./ContactShowSheet";
 import { TopToolbar } from "../layout/TopToolbar";
 import { InfinitePagination } from "../misc/InfinitePagination";
 import { ColumnPreferencesProvider } from "../misc/ColumnPreferencesProvider";
+import { AssignedToMeInput } from "../misc/AssignedToMeInput";
 import MobileHeader from "../layout/MobileHeader";
 import { MobileContent } from "../layout/MobileContent";
 import { ContactKanban } from "./kanban/ContactKanban";
@@ -147,7 +145,6 @@ const ContactBulkActionButtons = () => (
   <>
     <SelectAllButton />
     <BulkTagButton />
-    <BulkExportButton />
     <BulkDeleteButton />
   </>
 );
@@ -166,6 +163,7 @@ const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
 
   return (
     <TopToolbar>
+      {resource === "contacts" && <AssignedToMeInput />}
       {viewMode === "table" && <NeedsActionInput />}
       <ToggleGroup
         type="single"
@@ -207,8 +205,6 @@ const ContactListActions = ({ onCreate }: { onCreate: () => void }) => {
           <PanelLeftOpen className="size-4" />
         )}
       </Button>
-      <ContactImportButton />
-      <ExportButton exporter={exporter} />
       <Button onClick={onCreate}>
         {translate(`resources.${resource}.action.new`)}
       </Button>
@@ -239,6 +235,7 @@ export const ContactListMobile = () => {
 };
 
 const ContactListLayoutMobile = () => {
+  const resource = useContactResource();
   const { isPending, data, error, filterValues } = useListContext();
 
   const hasFilters = !!filterValues && Object.keys(filterValues).length > 0;
@@ -251,6 +248,7 @@ const ContactListLayoutMobile = () => {
         <ContactListFilter />
       </MobileHeader>
       <MobileContent>
+        {resource === "contacts" && <AssignedToMeInput />}
         <ContactListFilterSummary />
         <ContactListContentMobile />
         {!error && (
