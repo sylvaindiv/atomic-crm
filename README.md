@@ -61,6 +61,26 @@ the CRM. Public signup is unavailable.
 
 The local API listens on [http://localhost:3001/api/health](http://localhost:3001/api/health).
 
+### Importing Ten'Up CSV datasets
+
+The multi-club schema must already be applied. Import one or more directories
+containing `clubs.csv`, `juges_arbitres.csv`, and `club_juge_tournois.csv`:
+
+```sh
+node --env-file=.env scripts/import-tenup.mjs --source /path/to/11 --source /path/to/81 --mappings /path/to/mappings.json --report .context/tenup/dry-run.json
+```
+
+This command only prepares a report. Repeated identities are combined across
+directories. Optional mappings use source IDs, for example
+`{"clubs":{"60340270":116},"judges":{"6135552187":638}}`.
+Review the actions and resolve every ambiguity, then repeat the command with
+`--apply --expected-report .context/tenup/dry-run.json --report .context/tenup/applied.json`.
+Application refuses changed sources or actions, saves a private database backup,
+and writes records and audit entries in one transaction. It verifies that a
+second import makes no changes before committing. Use a fresh report path for
+each application; existing backups are never overwritten. Reports and backups
+contain personal data and must remain outside version control.
+
 ## Documentation
 
 The user and developer documentation for this project is available [in the `doc/` directory](./doc/). You can also read it online at [https://marmelab.com/atomic-crm/doc/](https://marmelab.com/atomic-crm/doc/).

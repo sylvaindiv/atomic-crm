@@ -396,6 +396,7 @@ export const englishCrmMessages = {
     common: {
       activity: "Activity",
       added: "added",
+      assigned_to_me: "Assigned to me",
       details: "Details",
       last_activity_with_date: "last activity %{date}",
       load_more: "Load more",

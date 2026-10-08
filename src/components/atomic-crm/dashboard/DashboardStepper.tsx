@@ -10,7 +10,6 @@ import { Link } from "react-router";
 
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ContactCreateSheet } from "../contacts/ContactCreateSheet";
-import { ContactImportButton } from "../contacts/ContactImportButton";
 import useAppBarHeight from "../misc/useAppBarHeight";
 import { NoteCreateSheet } from "../notes/NoteCreateSheet";
 
@@ -97,13 +96,10 @@ export const DashboardStepper = ({
                         })}
                       </Button>
                     ) : (
-                      <>
-                        <CreateButton
-                          label="resources.contacts.action.new"
-                          resource="contacts"
-                        />
-                        <ContactImportButton />
-                      </>
+                      <CreateButton
+                        label="resources.contacts.action.new"
+                        resource="contacts"
+                      />
                     )}
                   </div>
                 </div>
