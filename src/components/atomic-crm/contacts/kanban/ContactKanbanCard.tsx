@@ -8,9 +8,7 @@ import type { CSSProperties } from "react";
 import { Link, useSearchParams } from "react-router";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { formatDealAmount } from "../../misc/formatAmount";
 import { NextActionChip } from "../../misc/NextActionChip";
-import { useConfigurationContext } from "../../root/ConfigurationContext";
 import type { Contact } from "../../types";
 
 export const ContactKanbanCard = ({
@@ -44,7 +42,6 @@ const ContactKanbanCardContent = ({
   snapshot: DraggableStateSnapshot;
   contact: Contact;
 }) => {
-  const { currency } = useConfigurationContext();
   const [searchParams] = useSearchParams();
 
   // Opens the contact through the same `?show=<id>` sheet the table view's
@@ -80,10 +77,7 @@ const ContactKanbanCardContent = ({
             {contact.company_name && (
               <ContactCompanySubRow companyName={contact.company_name} />
             )}
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs text-muted-foreground">
-                {formatDealAmount(contact.amount, currency)}
-              </p>
+            <div className="flex items-center justify-end">
               <NextActionChip dueDate={contact.next_action_due_date} />
             </div>
           </CardContent>
