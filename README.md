@@ -59,6 +59,14 @@ the terminal with `node --env-file=.env server/manage-auth.mjs prepare --sales-i
 an owner automatically. The owner creates, disables, and resets user accounts from
 the CRM. Public signup is unavailable.
 
+Regular sessions persist for one year and renew on authenticated activity, at
+most once per day. Valid sessions created before this change renew on their next
+request. Logout, account disabling, and credential changes still revoke access;
+temporary-password sessions expire after 15 minutes without renewal. An open tab
+keeps its verified identity during temporary network or server outages, while
+the API continues to validate every request. Clearing browser cookies requires
+signing in again.
+
 The local API listens on [http://localhost:3001/api/health](http://localhost:3001/api/health).
 
 ### Importing Ten'Up CSV datasets
