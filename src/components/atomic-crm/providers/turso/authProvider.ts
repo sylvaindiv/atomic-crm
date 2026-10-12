@@ -78,7 +78,16 @@ export const getAuthProvider = (): AuthProvider => ({
     }
   },
   checkAuth: async () => {
-    session = await apiFetch<Session>("auth/me");
+    try {
+      session = await apiFetch<Session>("auth/me");
+    } catch (error: any) {
+      // A temporary outage must not log out an already verified session.
+      if (session && (error instanceof TypeError || error?.status >= 500)) {
+        return;
+      }
+      clearAuthState();
+      throw error;
+    }
   },
   canAccess: async (params: any) => {
     const current = session ?? (await apiFetch<Session>("auth/me"));

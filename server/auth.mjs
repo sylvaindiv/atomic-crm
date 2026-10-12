@@ -12,7 +12,8 @@ const COOKIE = "atomic_crm_session";
 const SCRYPT = { N: 131072, r: 8, p: 1, maxmem: 256 * 1024 * 1024 };
 const PASSWORD_MIN = 15;
 const PASSWORD_MAX = 128;
-const SESSION_MS = 12 * 60 * 60 * 1000;
+const SESSION_MS = 365 * 24 * 60 * 60 * 1000;
+const SESSION_RENEWAL_MS = 24 * 60 * 60 * 1000;
 const LIMITED_SESSION_MS = 15 * 60 * 1000;
 const TEMPORARY_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -156,6 +157,19 @@ export async function getSession(c, db) {
       });
     return null;
   }
+  // Renew at most daily, using the same token so concurrent tabs stay signed in.
+  if (
+    !user.must_change_password &&
+    Date.parse(user.expires_at) <= Date.now() + SESSION_MS - SESSION_RENEWAL_MS
+  ) {
+    const expiresAt = iso(new Date(Date.now() + SESSION_MS));
+    await db.execute({
+      sql: "UPDATE auth_sessions SET expires_at = ? WHERE token_hash = ? AND expires_at < ?",
+      args: [expiresAt, tokenHash(token), expiresAt],
+    });
+    setCookie(c, COOKIE, token, cookieOptions());
+    user.expires_at = expiresAt;
+  }
   return user;
 }
 
@@ -255,7 +269,7 @@ export function mountAuth(app, { db, appOrigin = getAppOrigin() }) {
   });
 
   app.get("/api/auth/me", async (c) => {
-    const user = await getSession(c, db);
+    const user = currentSession(c);
     return user
       ? c.json(sessionResponse(user))
       : jsonError(c, 401, "Unauthorized");
