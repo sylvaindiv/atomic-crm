@@ -41,6 +41,8 @@ import type { CrmDataProvider } from "../providers/types";
 import { waitForColumnPreferences } from "../misc/columnPreferenceWrites";
 import {
   defaultClientChecklist,
+  defaultClubChecklist,
+  defaultRefereeChecklist,
   defaultCompanySectors,
   defaultCurrency,
   defaultDarkModeLogo,
@@ -113,6 +115,8 @@ export type CRMProps = {
  */
 export const CRM = ({
   clientChecklist = defaultClientChecklist,
+  clubChecklist = defaultClubChecklist,
+  refereeChecklist = defaultRefereeChecklist,
   companySectors = defaultCompanySectors,
   currency = defaultCurrency,
   darkModeLogo = defaultDarkModeLogo,
@@ -166,6 +170,8 @@ export const CRM = ({
     if (!store.getItem(CONFIGURATION_STORE_KEY)) {
       store.setItem(CONFIGURATION_STORE_KEY, {
         clientChecklist,
+        clubChecklist,
+        refereeChecklist,
         companySectors,
         currency,
         noteStatuses,
@@ -271,6 +277,10 @@ const DesktopAdmin = (
         <Route path={ProfilePage.path} element={<ProfilePage />} />
         <Route path={SettingsPage.path} element={<SettingsPage />} />
         <Route path="/clients" element={<ClientsPage />} />
+        <Route
+          path={ClientChecklistSettingsPage.path}
+          element={<ClientChecklistSettingsPage />}
+        />
         <Route path={ImportPage.path} element={<ImportPage />} />
         <Route path={ChangelogPage.path} element={<ChangelogPage />} />
         <Route path={MapPage.path} element={<MapPage />} />
@@ -279,6 +289,7 @@ const DesktopAdmin = (
       <Resource name="contacts" {...contacts} />
       <Resource name="partners" {...contacts} />
       <Resource name="companies" {...companies} />
+      <Resource name="club_referees" />
       <Resource name="contact_notes" />
       <Resource name="tasks" />
       <Resource name="sales" {...sales} />
@@ -336,6 +347,7 @@ const MobileAdmin = (
         <Route path=":id/notes/:noteId" element={<NoteShowPage />} />
       </Resource>
       <Resource name="companies" {...companies} />
+      <Resource name="club_referees" />
       <Resource name="tasks" list={MobileTasksList} />
       <Resource name="sales" {...sales} />
     </Admin>

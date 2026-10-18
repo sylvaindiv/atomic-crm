@@ -74,7 +74,16 @@ const CompanyShowContentMobile = () => {
           <div className="flex items-center mb-4">
             <CompanyAvatar />
             <div className="mx-3 flex-1">
-              <h2 className="text-2xl font-bold">{record.name}</h2>
+              <div>
+                <h2 className="text-2xl font-bold">{record.name}</h2>
+                {record.is_client && (
+                  <p className="text-sm text-muted-foreground">
+                    {translate("resources.companies.fields.is_client", {
+                      _: "Client",
+                    })}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -114,7 +123,16 @@ const CompanyShowContent = () => {
           <CardContent>
             <div className="flex mb-3 items-center">
               <CompanyAvatar />
-              <h5 className="text-xl ml-2 flex-1">{record.name}</h5>
+              <div className="ml-2 flex-1">
+                <h5 className="text-xl">{record.name}</h5>
+                {record.is_client && (
+                  <p className="text-sm text-muted-foreground">
+                    {translate("resources.companies.fields.is_client", {
+                      _: "Client",
+                    })}
+                  </p>
+                )}
+              </div>
             </div>
             <Tabs defaultValue={currentTab} onValueChange={handleTabChange}>
               <TabsList className="grid w-full grid-cols-2">

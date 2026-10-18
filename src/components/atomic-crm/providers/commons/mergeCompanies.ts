@@ -61,6 +61,58 @@ export const mergeCompanies = async (
     });
   }
 
+  // Merge the new club-specific referee links without combining progress
+  // across different clubs or creating duplicate club/referee pairs.
+  const { data: sourceLinks = [] } = await dataProvider.getManyReference<any>(
+    "club_referees",
+    {
+      target: "company_id",
+      id: loserId,
+      pagination: { page: 1, perPage: 1000 },
+      sort: { field: "id", order: "ASC" },
+      filter: {},
+    },
+  );
+  const { data: targetLinks = [] } = await dataProvider.getManyReference<any>(
+    "club_referees",
+    {
+      target: "company_id",
+      id: winnerId,
+      pagination: { page: 1, perPage: 1000 },
+      sort: { field: "id", order: "ASC" },
+      filter: {},
+    },
+  );
+  for (const source of sourceLinks) {
+    const target = targetLinks.find(
+      (link: any) => String(link.contact_id) === String(source.contact_id),
+    );
+    if (target) {
+      await dataProvider.update("club_referees", {
+        id: target.id,
+        data: {
+          client_checklist: [
+            ...new Set([
+              ...(target.client_checklist ?? []),
+              ...(source.client_checklist ?? []),
+            ]),
+          ],
+        },
+        previousData: target,
+      });
+      await dataProvider.delete("club_referees", {
+        id: source.id,
+        previousData: source,
+      });
+    } else {
+      await dataProvider.update("club_referees", {
+        id: source.id,
+        data: { company_id: winnerId },
+        previousData: source,
+      });
+    }
+  }
+
   // 2. Update winner company with loser data: fields already set on the
   // winner are never overwritten.
   await dataProvider.update<Company>("companies", {
@@ -88,6 +140,13 @@ export const mergeCompanies = async (
       revenue: winnerCompany.revenue || loserCompany.revenue,
       tax_identifier:
         winnerCompany.tax_identifier || loserCompany.tax_identifier,
+      is_client: Boolean(winnerCompany.is_client || loserCompany.is_client),
+      client_checklist: [
+        ...new Set([
+          ...(winnerCompany.client_checklist ?? []),
+          ...(loserCompany.client_checklist ?? []),
+        ]),
+      ],
       logo:
         winnerCompany.logo && winnerCompany.logo.src
           ? winnerCompany.logo

@@ -18,7 +18,7 @@ export function withSupabaseFilterAdapter<T extends DataProvider>(
     getList(resource, params) {
       return dataProvider.getList(removeSummarySuffix(resource), {
         ...params,
-        filter: transformFilter(params.filter),
+        filter: transformFilter(params.filter, removeSummarySuffix(resource)),
       });
     },
     getMany(resource, params) {
@@ -32,14 +32,14 @@ export function withSupabaseFilterAdapter<T extends DataProvider>(
         return dataProvider.getList("contacts", {
           ...params,
           filter: {
-            ...transformFilter(params.filter),
+            ...transformFilter(params.filter, removeSummarySuffix(resource)),
             company_ids_inc_any: [params.id],
           },
         });
       }
       return dataProvider.getManyReference(removeSummarySuffix(resource), {
         ...params,
-        filter: transformFilter(params.filter),
+        filter: transformFilter(params.filter, removeSummarySuffix(resource)),
       });
     },
     create(resource, params) {

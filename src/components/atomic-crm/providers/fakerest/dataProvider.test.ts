@@ -240,6 +240,56 @@ describe("contact note next action creation", () => {
 });
 
 describe("multi-club parity", () => {
+  it.each(["delete", "deleteMany"] as const)(
+    "%s removes only the deleted club's progress and membership",
+    async (method) => {
+      const provider = createDataProvider({
+        db: createCrmDb({
+          companies: [
+            buildCompany({ id: 1 }),
+            buildCompany({ id: 2, name: "Club B" }),
+          ],
+          contacts: [
+            buildContact({ id: 1, company_id: 1, company_ids: [1, 2] }),
+          ],
+          club_referees: [
+            {
+              id: 1,
+              company_id: 1,
+              contact_id: 1,
+              client_checklist: ["first-tournament"],
+            },
+            {
+              id: 2,
+              company_id: 2,
+              contact_id: 1,
+              client_checklist: ["mouja-installed"],
+            },
+          ],
+        }),
+        latency: 0,
+        silent: true,
+      });
+      if (method === "delete") await provider.delete("companies", { id: 1 });
+      else await provider.deleteMany("companies", { ids: [1] });
+      expect((await provider.getOne("contacts", { id: 1 })).data).toMatchObject(
+        { company_id: 2, company_ids: [2], company_name: "Club B" },
+      );
+      const { data } = await provider.getList("club_referees", {
+        filter: {},
+        pagination: { page: 1, perPage: 10 },
+        sort: { field: "id", order: "ASC" },
+      });
+      expect(data).toEqual([
+        {
+          id: 2,
+          company_id: 2,
+          contact_id: 1,
+          client_checklist: ["mouja-installed"],
+        },
+      ]);
+    },
+  );
   it("finds secondary memberships, updates counters and preserves contacts on club deletion", async () => {
     const provider = createDataProvider({
       db: createCrmDb({

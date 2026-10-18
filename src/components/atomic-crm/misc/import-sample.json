@@ -19,7 +19,9 @@
       "linkedin_url": "https://linkedin.com/company/black-mesa",
       "phone_number": "+1-505-555-0001",
       "revenue": "$500M",
-      "tax_identifier": "12-3456789"
+      "tax_identifier": "12-3456789",
+      "is_client": true,
+      "client_checklist": ["stripe-connected"]
     },
     {
       "id": 345,
@@ -112,6 +114,13 @@
       "text": "Schedule moon rock conversion demo",
       "due_date": "2025-03-26T16:15:00Z",
       "done_date": "2025-04-01T09:00:00"
+    }
+  ],
+  "club_referees": [
+    {
+      "company_id": 234,
+      "contact_id": 456,
+      "client_checklist": ["mouja-installed"]
     }
   ]
 }

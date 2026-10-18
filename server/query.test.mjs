@@ -4,7 +4,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { RESOURCES } from "./resources.mjs";
-import { create, update } from "./query.mjs";
+import { create, del, update } from "./query.mjs";
 
 // `vi.mock` factories are hoisted above the rest of the file, so the mocks
 // they reference must be created via `vi.hoisted` (see
@@ -55,6 +55,13 @@ describe("query.mjs required-column validation", () => {
     requiredColumnsFixture.tasks = ["contact_id"];
     tableColumnsFixture.configuration = ["id", "config"];
     requiredColumnsFixture.configuration = [];
+    tableColumnsFixture.club_referees = [
+      "id",
+      "company_id",
+      "contact_id",
+      "client_checklist",
+    ];
+    requiredColumnsFixture.club_referees = ["company_id", "contact_id"];
     mockTxExecute.mockReset();
     mockCommit.mockReset();
     mockRollback.mockReset();
@@ -431,6 +438,27 @@ describe("query.mjs required-column validation", () => {
   });
 
   describe("client checklist write validation", () => {
+    it("rejects checklist IDs with duplicates for club follow-ups", async () => {
+      await expect(
+        create(RESOURCES.club_referees, {
+          data: { company_id: 1, contact_id: 2, client_checklist: ["a", "a"] },
+        }),
+      ).rejects.toThrow("client_checklist");
+      expect(mockExecute).not.toHaveBeenCalled();
+    });
+
+    it("rejects linking contacts that are not judge-referees", async () => {
+      mockExecute.mockResolvedValueOnce({
+        columns: ["contact_type"],
+        rows: [["partner"]],
+      });
+      await expect(
+        create(RESOURCES.club_referees, {
+          data: { company_id: 1, contact_id: 2, client_checklist: [] },
+        }),
+      ).rejects.toThrow("judge-referee");
+    });
+
     it.each([null, ["id", " "], ["same", "same"]])(
       "rejects invalid contact checklist values",
       async (client_checklist) => {
@@ -470,6 +498,37 @@ describe("query.mjs required-column validation", () => {
           data: { config: { clientChecklist: [] } },
         }),
       ).resolves.toMatchObject({ data: { config: { clientChecklist: [] } } });
+    });
+  });
+
+  describe("club deletion", () => {
+    it("detaches contacts and removes club progress without deleting people or their data", async () => {
+      mockExecute.mockImplementation(async ({ sql }) => {
+        if (sql.includes('SELECT "id" FROM "club_referees"')) {
+          return { columns: ["id"], rows: [[11]] };
+        }
+        if (sql.includes('DELETE FROM "companies"')) {
+          return { columns: ["id", "name"], rows: [[1, "Club"]] };
+        }
+        return { columns: [], rows: [] };
+      });
+      await del(RESOURCES.companies, { id: 1 });
+      const statements = mockExecute.mock.calls.map(([query]) => query.sql);
+      expect(statements).toContain(
+        "UPDATE contacts SET company_id = NULL WHERE company_id = ?",
+      );
+      expect(statements).toContain(
+        'DELETE FROM "club_referees" WHERE "id" IN (?)',
+      );
+      expect(
+        statements.some((sql) => sql.includes('DELETE FROM "contacts"')),
+      ).toBe(false);
+      expect(
+        statements.some((sql) => sql.includes('DELETE FROM "contact_notes"')),
+      ).toBe(false);
+      expect(
+        statements.some((sql) => sql.includes('DELETE FROM "tasks"')),
+      ).toBe(false);
     });
   });
 });

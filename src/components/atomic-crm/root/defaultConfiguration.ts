@@ -78,16 +78,49 @@ export const defaultTaskTypes = [
 export const defaultClientChecklist = [
   { value: "first-tournament", label: "Premier tournoi créé ensemble" },
   { value: "stripe-connected", label: "Compte Stripe connecté" },
-  { value: "mouja-installed", label: "Extension Mouja installée" },
+  { value: "mouja-installed", label: "Extension MOJA installée" },
   {
     value: "advantage-system-configured",
     label: "Explication et paramétrage du système d’avantage",
   },
 ];
 
+export const defaultClubChecklist = defaultClientChecklist.filter((item) =>
+  ["stripe-connected", "advantage-system-configured"].includes(item.value),
+);
+export const defaultRefereeChecklist = defaultClientChecklist.filter((item) =>
+  ["mouja-installed", "first-tournament"].includes(item.value),
+);
+
+export const splitLegacyClientChecklist = (
+  items: typeof defaultClientChecklist,
+) => ({
+  clubChecklist: items.filter((item) =>
+    ["stripe-connected", "advantage-system-configured"].includes(item.value),
+  ),
+  refereeChecklist: items.filter(
+    (item) =>
+      !["stripe-connected", "advantage-system-configured"].includes(item.value),
+  ),
+});
+
+export const normalizeClientChecklist = <
+  T extends { value?: string; label: string },
+>(
+  items: T[] | undefined,
+) =>
+  items?.map((item) =>
+    item.value === "mouja-installed" &&
+    item.label === "Extension Mouja installée"
+      ? { ...item, label: "Extension MOJA installée" }
+      : item,
+  ) ?? [];
+
 export const defaultConfiguration: ConfigurationContextValue = {
   companySectors: defaultCompanySectors,
   clientChecklist: defaultClientChecklist,
+  clubChecklist: defaultClubChecklist,
+  refereeChecklist: defaultRefereeChecklist,
   currency: defaultCurrency,
   noteStatuses: defaultNoteStatuses,
   taskTypes: defaultTaskTypes,

@@ -2,13 +2,17 @@ import { transformContainsFilter } from "./transformContainsFilter";
 import { transformInFilter } from "./transformInFilter";
 import { transformOrFilter } from "./transformOrFilter";
 
-export function transformFilter(filter: Record<string, any>) {
+export function transformFilter(
+  filter: Record<string, any>,
+  resource?: string,
+) {
   if (!filter) {
     return undefined;
   }
   const transformedFilters: Record<string, any> = {};
   for (const [key, value] of Object.entries(filter)) {
     if (
+      resource === "contacts" &&
       ["company_id", "company_id@eq", "company_id@in"].includes(key) &&
       value != null
     ) {

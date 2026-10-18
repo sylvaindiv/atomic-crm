@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import { migrateContactType } from "./migrate-contact-type.mjs";
 import { migrateClientChecklist } from "./migrate-client-checklist.mjs";
 import { migrateCompanyContact } from "./migrate-company-contact.mjs";
+import { migrateClubClientChecklists } from "./migrate-club-client-checklists.mjs";
 
 const url = process.env.TURSO_DATABASE_URL;
 if (!url) {
@@ -31,6 +32,9 @@ const schema = readFileSync(join(here, "schema.sql"), "utf8");
 await migrateContactType(client);
 await migrateClientChecklist(client);
 await migrateCompanyContact(client);
+const migration = await migrateClubClientChecklists(client);
+if (migration.orphaned.length)
+  print(`Legacy clients without clubs: ${migration.orphaned.join(", ")}`);
 await migrateMultiClubs(client);
 await client.executeMultiple(schema);
 print(`Schema applied to ${url}`);

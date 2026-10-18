@@ -170,6 +170,58 @@ export const mergeContacts = async (
     winnerUpdate,
   ]);
 
+  // Preserve club-specific progress when referee records are merged. Links
+  // for different clubs remain independent; duplicate club links are united.
+  if ((winnerContact.contact_type ?? "referee") === "referee") {
+    const { data: sourceLinks = [] } = await dataProvider.getManyReference<any>(
+      "club_referees",
+      {
+        target: "contact_id",
+        id: loserId,
+        pagination: { page: 1, perPage: 1000 },
+        sort: { field: "id", order: "ASC" },
+        filter: {},
+      },
+    );
+    const { data: targetLinks = [] } = await dataProvider.getManyReference<any>(
+      "club_referees",
+      {
+        target: "contact_id",
+        id: winnerId,
+        pagination: { page: 1, perPage: 1000 },
+        sort: { field: "id", order: "ASC" },
+        filter: {},
+      },
+    );
+    for (const source of sourceLinks) {
+      const target = targetLinks.find(
+        (link: any) => String(link.company_id) === String(source.company_id),
+      );
+      if (target) {
+        await dataProvider.update("club_referees", {
+          id: target.id,
+          data: {
+            client_checklist: mergeArraysUnique(
+              target.client_checklist ?? [],
+              source.client_checklist ?? [],
+            ),
+          },
+          previousData: target,
+        });
+        await dataProvider.delete("club_referees", {
+          id: source.id,
+          previousData: source,
+        });
+      } else {
+        await dataProvider.update("club_referees", {
+          id: source.id,
+          data: { contact_id: winnerId },
+          previousData: source,
+        });
+      }
+    }
+  }
+
   // 5. Delete the loser contact
   await dataProvider.delete<Contact>("contacts", {
     id: loserId,

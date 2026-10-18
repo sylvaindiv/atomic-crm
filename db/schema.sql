@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS companies (
     description    TEXT,
     revenue        TEXT,
     tax_identifier TEXT,
-    logo           TEXT           -- JSON object (RAFile)
+    logo           TEXT,          -- JSON object (RAFile)
+    is_client      INTEGER NOT NULL DEFAULT 0,
+    client_checklist TEXT NOT NULL DEFAULT '[]'
 );
 
 -- Contacts --------------------------------------------------------------------
@@ -73,6 +75,15 @@ CREATE TABLE IF NOT EXISTS contacts (
     description    TEXT,
     client_checklist TEXT NOT NULL DEFAULT '[]', -- JSON array of completed checklist item ids
     "index"        INTEGER
+);
+
+-- A referee may have independent onboarding progress with multiple clubs.
+CREATE TABLE IF NOT EXISTS club_referees (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    company_id INTEGER NOT NULL REFERENCES companies(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    contact_id INTEGER NOT NULL REFERENCES contacts(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    client_checklist TEXT NOT NULL DEFAULT '[]',
+    UNIQUE(company_id, contact_id)
 );
 
 -- Contact notes ---------------------------------------------------------------
@@ -181,6 +192,8 @@ CREATE TABLE IF NOT EXISTS record_history (
 CREATE INDEX IF NOT EXISTS contact_notes_contact_id_idx ON contact_notes (contact_id);
 CREATE INDEX IF NOT EXISTS contacts_company_id_idx      ON contacts (company_id);
 CREATE INDEX IF NOT EXISTS contacts_type_idx            ON contacts (contact_type);
+CREATE INDEX IF NOT EXISTS club_referees_company_id_idx ON club_referees (company_id);
+CREATE INDEX IF NOT EXISTS club_referees_contact_id_idx ON club_referees (contact_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq__sales__email       ON sales (email);
 CREATE INDEX IF NOT EXISTS auth_sessions_sales_id_idx ON auth_sessions (sales_id);
 CREATE INDEX IF NOT EXISTS auth_sessions_expires_at_idx ON auth_sessions (expires_at);

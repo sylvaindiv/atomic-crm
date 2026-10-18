@@ -21,6 +21,7 @@ export type ImportFromJsonStats = {
   contacts: number;
   notes: number;
   tasks: number;
+  clubReferees: number;
 };
 
 export type ImportFromJsonFailures = {
@@ -29,6 +30,9 @@ export type ImportFromJsonFailures = {
   contacts: Array<JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined>;
   notes: Array<JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined>;
   tasks: Array<JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined>;
+  clubReferees: Array<
+    JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined
+  >;
 };
 
 export type ImportFromJsonIdleState = {
@@ -76,6 +80,7 @@ const defaultFailedImports = {
   contacts: [],
   notes: [],
   tasks: [],
+  clubReferees: [],
 };
 
 const defaultStats = {
@@ -84,6 +89,7 @@ const defaultStats = {
   contacts: 0,
   notes: 0,
   tasks: 0,
+  clubReferees: 0,
 };
 
 /**
@@ -290,6 +296,10 @@ export const useImportFromJson = (): [
               ? idsMaps.sales[dataToImport.sales_id]
               : currentSale.id,
             created_at: dataToImport.created_at,
+            is_client: !!dataToImport.is_client,
+            client_checklist: Array.isArray(dataToImport.client_checklist)
+              ? dataToImport.client_checklist
+              : [],
           }),
         });
 
@@ -416,6 +426,9 @@ export const useImportFromJson = (): [
             tags: tagsIds,
             first_seen: dataToImport.created_at,
             last_seen: dataToImport.updated_at,
+            client_checklist: Array.isArray(dataToImport.client_checklist)
+              ? dataToImport.client_checklist
+              : [],
           },
         });
         idsMaps.contacts[dataToImport.id] = data.id;
@@ -440,6 +453,49 @@ export const useImportFromJson = (): [
             contacts: [
               ...old.failedImports.contacts,
               { ...(dataToImport as any), error: (err as Error).message },
+            ],
+          },
+        }));
+      }
+    };
+
+    const importClubReferee = async (
+      value: JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined,
+    ) => {
+      try {
+        if (!value || typeof value !== "object" || Array.isArray(value))
+          throw new Error("Invalid format");
+        const item = value as any;
+        const companyId = idsMaps.companies[item.company_id];
+        const contactId = idsMaps.contacts[item.contact_id];
+        if (companyId == null || contactId == null)
+          throw new Error("Club or judge-referee was not imported");
+        const { data: contact } = await dataProvider.getOne("contacts", {
+          id: contactId,
+        });
+        if (contact.contact_type !== "referee")
+          throw new Error("Linked contact is not a judge-referee");
+        await dataProvider.create("club_referees", {
+          data: {
+            company_id: companyId,
+            contact_id: contactId,
+            client_checklist: Array.isArray(item.client_checklist)
+              ? item.client_checklist
+              : [],
+          },
+        });
+        setState((old) => ({
+          ...old,
+          stats: { ...old.stats, clubReferees: old.stats.clubReferees + 1 },
+        }));
+      } catch (err) {
+        setState((old) => ({
+          ...old,
+          failedImports: {
+            ...old.failedImports,
+            clubReferees: [
+              ...old.failedImports.clubReferees,
+              { ...(value as any), error: (err as Error).message },
             ],
           },
         }));
@@ -631,6 +687,7 @@ export const useImportFromJson = (): [
         "$.contacts.*",
         "$.notes.*",
         "$.tasks.*",
+        "$.club_referees.*",
       ],
       keepStack: false,
     });
@@ -648,6 +705,9 @@ export const useImportFromJson = (): [
       }
     };
     let currentType: Types = "sales";
+    const pendingClubReferees: Array<
+      JsonTypes.JsonPrimitive | JsonTypes.JsonStruct | undefined
+    > = [];
     while (true) {
       const { done, value: parsedElementInfo } = await reader.read();
       if (done) {
@@ -689,6 +749,10 @@ export const useImportFromJson = (): [
           currentBatch.push(importTask(value));
           break;
         }
+        case "club_referees": {
+          pendingClubReferees.push(value);
+          break;
+        }
       }
       try {
         await proccesBatchIfPossible();
@@ -698,6 +762,8 @@ export const useImportFromJson = (): [
         await reader.cancel();
       }
     }
+
+    await Promise.all(pendingClubReferees.map(importClubReferee));
 
     setState((old) => {
       if (old.status === "error") {
@@ -716,7 +782,14 @@ export const useImportFromJson = (): [
   return [state, importFile, reset];
 };
 
-const TYPES = ["sales", "companies", "contacts", "notes", "tasks"] as const;
+const TYPES = [
+  "sales",
+  "companies",
+  "contacts",
+  "notes",
+  "tasks",
+  "club_referees",
+] as const;
 type Types = (typeof TYPES)[number];
 
 const getType = (value: string | undefined): Types | undefined => {
@@ -762,6 +835,8 @@ type CompanyImport = {
   tax_identifier?: string;
   tenup_id?: string;
   context_links?: string[];
+  is_client?: boolean;
+  client_checklist?: string[];
   created_at?: string;
   updated_at?: string;
 };
@@ -790,6 +865,7 @@ type ContactImport = {
   emails: Array<{ email: string; type: string }>;
   phones: Array<{ number: string; type: string }>;
   tags: Array<string>;
+  client_checklist?: string[];
   created_at?: string;
   updated_at?: string;
 };

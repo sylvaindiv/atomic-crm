@@ -1,13 +1,17 @@
 import { describe, it, expect } from "vitest";
 import { createClient } from "@libsql/client";
-import { readFileSync } from "node:fs";
+import { readFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { migrateMultiClubs } from "./migrate-multi-clubs.mjs";
+import { migrateClubClientChecklists } from "./migrate-club-client-checklists.mjs";
 import { prepareContactClubs } from "../server/contact-clubs.mjs";
 
 const schema = readFileSync(new URL("./schema.sql", import.meta.url), "utf8");
 describe("multi-clubs integrity", () => {
   it("migrates twice without losing contacts, children or memberships; deleting a club detaches", async () => {
-    const db = createClient({ url: "file::memory:" });
+    const directory = mkdtempSync(join(tmpdir(), "crm-combined-migrations-"));
+    const db = createClient({ url: `file:${join(directory, "test.db")}` });
     const old = schema
       .replaceAll("    tenup_id       TEXT,\n", "")
       .replace("    company_ids    TEXT NOT NULL DEFAULT '[]',\n", "")
@@ -20,8 +24,22 @@ describe("multi-clubs integrity", () => {
     await db.executeMultiple(
       "INSERT INTO companies(id,name) VALUES (1,'A'),(2,'B'); INSERT INTO contacts(id,company_id,status) VALUES (1,1,'mort'); INSERT INTO contact_notes(id,contact_id,text) VALUES(1,1,'history'); INSERT INTO tasks(id,contact_id,text) VALUES(1,1,'keep');",
     );
+    await migrateClubClientChecklists(db);
+    await db.execute(
+      "UPDATE club_referees SET client_checklist='[\"mouja-installed\"]'",
+    );
     await migrateMultiClubs(db);
     await db.executeMultiple(schema);
+    await migrateClubClientChecklists(db);
+    expect(
+      (
+        await db.execute(
+          "SELECT company_id, contact_id, client_checklist FROM club_referees",
+        )
+      ).rows,
+    ).toEqual([
+      { company_id: 1, contact_id: 1, client_checklist: '["mouja-installed"]' },
+    ]);
     await migrateMultiClubs(db);
     expect(
       (await db.execute("SELECT company_ids,status FROM contacts")).rows[0],
@@ -44,6 +62,7 @@ describe("multi-clubs integrity", () => {
     );
     expect((await db.execute("PRAGMA foreign_key_check")).rows).toEqual([]);
     db.close();
+    rmSync(directory, { recursive: true, force: true });
   });
   it("preserves secondary clubs for legacy writes, rejects invalid lists and partner multiplicity", async () => {
     const db = createClient({ url: "file::memory:" });

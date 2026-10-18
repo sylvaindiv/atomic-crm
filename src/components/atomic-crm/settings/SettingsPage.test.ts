@@ -76,6 +76,36 @@ describe("transformFormValues", () => {
     );
   });
 
+  it("normalizes only the legacy MOJA checklist label", () => {
+    const result = transformFormValues({
+      clientChecklist: [
+        { value: "mouja-installed", label: "Extension Mouja installée" },
+        { value: "custom-mouja", label: "Extension Mouja installée" },
+        { value: "mouja-installed", label: "Mon intitulé personnalisé" },
+      ],
+    });
+
+    expect(result.config.clientChecklist).toEqual([
+      { value: "mouja-installed", label: "Extension MOJA installée" },
+      { value: "custom-mouja", label: "Extension Mouja installée" },
+      { value: "mouja-installed", label: "Mon intitulé personnalisé" },
+    ]);
+  });
+
+  it("keeps IDs and order when checklist steps are renamed or removed", () => {
+    const result = transformFormValues({
+      clientChecklist: [
+        { value: "step-b", label: "Renamed B" },
+        { value: "step-a", label: "A" },
+      ],
+    });
+
+    expect(result.config.clientChecklist).toEqual([
+      { value: "step-b", label: "Renamed B" },
+      { value: "step-a", label: "A" },
+    ]);
+  });
+
   it("preserves an explicitly empty checklist and the other configuration", () => {
     const result = transformFormValues({
       title: "CRM test",

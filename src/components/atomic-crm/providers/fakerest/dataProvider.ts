@@ -143,7 +143,10 @@ const preserveAttachmentMimeType = <
 });
 
 const validateChecklistWrite = (resource: string, data: any) => {
-  if (resource === "contacts" && "client_checklist" in (data ?? {})) {
+  if (
+    ["contacts", "companies", "club_referees"].includes(resource) &&
+    "client_checklist" in (data ?? {})
+  ) {
     const ids = data.client_checklist;
     if (
       !Array.isArray(ids) ||
@@ -153,24 +156,28 @@ const validateChecklistWrite = (resource: string, data: any) => {
       throw new Error("client_checklist must be a unique array of IDs");
     }
   }
-  if (
-    resource === "configuration" &&
-    data?.config?.clientChecklist !== undefined
-  ) {
-    const items = data.config.clientChecklist;
-    if (
-      !Array.isArray(items) ||
-      items.some(
-        (item: any) =>
-          !item ||
-          typeof item.value !== "string" ||
-          !item.value.trim() ||
-          typeof item.label !== "string" ||
-          !item.label.trim(),
-      ) ||
-      new Set(items.map((item: any) => item.value)).size !== items.length
-    ) {
-      throw new Error("clientChecklist must contain unique IDs and labels");
+  if (resource === "configuration") {
+    for (const field of [
+      "clientChecklist",
+      "clubChecklist",
+      "refereeChecklist",
+    ]) {
+      const items = data?.config?.[field];
+      if (items === undefined) continue;
+      if (
+        !Array.isArray(items) ||
+        items.some(
+          (item: any) =>
+            !item ||
+            typeof item.value !== "string" ||
+            !item.value.trim() ||
+            typeof item.label !== "string" ||
+            !item.label.trim(),
+        ) ||
+        new Set(items.map((item: any) => item.value)).size !== items.length
+      ) {
+        throw new Error(`${field} must contain unique IDs and labels`);
+      }
     }
   }
 };
@@ -559,6 +566,41 @@ export const createDataProvider = ({
             ? await processCompanyLogo(params)
             : params;
         },
+        beforeDelete: async (params, dataProvider) => {
+          const { data: links } = await dataProvider.getManyReference(
+            "club_referees",
+            {
+              target: "company_id",
+              id: params.id,
+              pagination: { page: 1, perPage: 10000 },
+              sort: { field: "id", order: "ASC" },
+              filter: {},
+            },
+          );
+          await dataProvider.deleteMany("club_referees", {
+            ids: links.map((link: any) => link.id),
+          });
+          return params;
+        },
+        beforeDeleteMany: async (params, dataProvider) => {
+          const links = await Promise.all(
+            params.ids.map((id) =>
+              dataProvider.getManyReference("club_referees", {
+                target: "company_id",
+                id,
+                pagination: { page: 1, perPage: 10000 },
+                sort: { field: "id", order: "ASC" },
+                filter: {},
+              }),
+            ),
+          );
+          await dataProvider.deleteMany("club_referees", {
+            ids: links.flatMap((result) =>
+              result.data.map((link: any) => link.id),
+            ),
+          });
+          return params;
+        },
       } satisfies ResourceCallbacks<Company>,
       {
         resource: "contact_notes",
@@ -573,6 +615,33 @@ export const createDataProvider = ({
     ...lifecycleDataProvider,
     async create(resource, params) {
       validateChecklistWrite(resource, params.data);
+      if (
+        resource === "club_referees" &&
+        !db.contacts.some(
+          (contact) =>
+            String(contact.id) === String(params.data.contact_id) &&
+            contact.contact_type === "referee",
+        )
+      ) {
+        throw new Error(
+          "club_referees contact_id must reference a judge-referee",
+        );
+      }
+      if (
+        resource === "club_referees" &&
+        (!db.companies.some(
+          (company) => String(company.id) === String(params.data.company_id),
+        ) ||
+          db.club_referees.some(
+            (link) =>
+              String(link.company_id) === String(params.data.company_id) &&
+              String(link.contact_id) === String(params.data.contact_id),
+          ))
+      ) {
+        throw new Error(
+          "club_referees requires an existing club and a unique club/referee pair",
+        );
+      }
       if (
         !params.data ||
         !Object.prototype.hasOwnProperty.call(params.data, "next_action")
@@ -705,6 +774,37 @@ export const createDataProvider = ({
     },
     async update(resource, params) {
       validateChecklistWrite(resource, params.data);
+      if (
+        resource === "club_referees" &&
+        params.data.contact_id !== undefined &&
+        !db.contacts.some(
+          (contact) =>
+            String(contact.id) === String(params.data.contact_id) &&
+            contact.contact_type === "referee",
+        )
+      ) {
+        throw new Error(
+          "club_referees contact_id must reference a judge-referee",
+        );
+      }
+      if (resource === "club_referees") {
+        const { data: current } = await baseDataProvider.getOne(
+          "club_referees",
+          { id: params.id },
+        );
+        const companyId = params.data.company_id ?? current.company_id;
+        const contactId = params.data.contact_id ?? current.contact_id;
+        if (
+          db.club_referees.some(
+            (link) =>
+              String(link.id) !== String(params.id) &&
+              String(link.company_id) === String(companyId) &&
+              String(link.contact_id) === String(contactId),
+          )
+        ) {
+          throw new Error("club_referees requires a unique club/referee pair");
+        }
+      }
       return update(resource, params);
     },
   };

@@ -11,13 +11,18 @@
 export const RESOURCES = {
   companies: {
     table: "companies",
-    json: ["logo", "context_links", "social_links"],
-    bool: [],
+    json: ["logo", "context_links", "social_links", "client_checklist"],
+    bool: ["is_client"],
   },
   companies_summary: {
     table: "companies_summary",
     readonly: true,
-    json: ["logo", "context_links", "social_links"],
+    json: ["logo", "context_links", "social_links", "client_checklist"],
+    bool: ["is_client"],
+  },
+  club_referees: {
+    table: "club_referees",
+    json: ["client_checklist"],
     bool: [],
   },
   contacts: {
@@ -87,6 +92,7 @@ export const RESOURCES = {
 // deletes (mirrors the Postgres ON DELETE CASCADE relationships). Applied
 // recursively for contact notes/tasks; clubs only detach their memberships.
 export const CASCADE = {
+  companies: [["club_referees", "company_id"]],
   contacts: [
     ["contact_notes", "contact_id"],
     ["tasks", "contact_id"],
