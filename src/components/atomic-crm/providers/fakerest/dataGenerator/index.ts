@@ -12,6 +12,7 @@ export default (): Db => {
   db.sales = generateSales(db);
   db.tags = generateTags(db);
   db.companies = generateCompanies(db);
+  db.club_referees = [];
   db.contacts = generateContacts(db);
   db.contact_notes = generateContactNotes(db);
   db.tasks = generateTasks(db);

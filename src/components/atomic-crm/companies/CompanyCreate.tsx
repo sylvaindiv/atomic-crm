@@ -13,7 +13,13 @@ export const CompanyCreate = () => {
     <CreateBase redirect="show" transform={normalizeCompanyLinks}>
       <div className="mt-2 flex pb-20 sm:pb-0 lg:mr-72">
         <div className="flex-1">
-          <Form defaultValues={{ sales_id: identity?.id }}>
+          <Form
+            defaultValues={{
+              sales_id: identity?.id,
+              is_client: false,
+              client_checklist: [],
+            }}
+          >
             <Card>
               <CardContent>
                 <CompanyInputs />

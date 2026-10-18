@@ -3,6 +3,7 @@ import { ReferenceInput } from "@/components/admin/reference-input";
 import { TextInput } from "@/components/admin/text-input";
 import { SelectInput } from "@/components/admin/select-input";
 import { ArrayInput } from "@/components/admin/array-input";
+import { BooleanInput } from "@/components/admin/boolean-input";
 import { SimpleFormIterator } from "@/components/admin/simple-form-iterator";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -57,6 +58,11 @@ const CompanyDisplayInputs = () => {
         placeholder={translate("resources.companies.fields.name", {
           _: "Club name",
         })}
+      />
+      <BooleanInput
+        source="is_client"
+        label="resources.companies.fields.is_client"
+        helperText={false}
       />
     </div>
   );

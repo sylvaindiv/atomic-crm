@@ -8,6 +8,7 @@ import { RESOURCES } from "./resources.mjs";
 import { migrateContactType } from "../db/migrate-contact-type.mjs";
 import { migrateClientChecklist } from "../db/migrate-client-checklist.mjs";
 import { migrateCompanyContact } from "../db/migrate-company-contact.mjs";
+import { migrateClubClientChecklists } from "../db/migrate-club-client-checklists.mjs";
 
 const url = process.env.TURSO_DATABASE_URL;
 if (!url) {
@@ -40,11 +41,17 @@ export async function initSchema() {
     await migrateContactType(db);
     await migrateClientChecklist(db);
     await migrateCompanyContact(db);
+    const migrated = await migrateClubClientChecklists(db);
+    if (migrated.orphaned.length)
+      process.stdout.write(
+        `Legacy clients without clubs: ${migrated.orphaned.join(", ")}\n`,
+      );
     // Refresh views/indexes after a migration, including contacts_summary.
     await db.executeMultiple(schema);
     return;
   }
   await db.executeMultiple(schema);
+  await migrateClubClientChecklists(db);
   const seed = readFileSync(join(repoRoot, "db", "seed.sql"), "utf8");
   await db.executeMultiple(seed);
   // no-console only permits warn/error, so write the startup notice to stdout directly.

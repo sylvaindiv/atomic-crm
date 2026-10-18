@@ -18,7 +18,11 @@ import {
   useConfigurationUpdater,
   type ConfigurationContextValue,
 } from "../root/ConfigurationContext";
-import { defaultConfiguration } from "../root/defaultConfiguration";
+import {
+  defaultConfiguration,
+  normalizeClientChecklist,
+  splitLegacyClientChecklist,
+} from "../root/defaultConfiguration";
 
 const SECTIONS = [
   {
@@ -52,18 +56,40 @@ const ensureChecklistIds = (
     value: item.value || crypto.randomUUID(),
   })) ?? [];
 
-export const transformFormValues = (data: Record<string, any>) => ({
-  config: {
-    title: data.title,
-    lightModeLogo: data.lightModeLogo,
-    darkModeLogo: data.darkModeLogo,
-    currency: data.currency,
-    companySectors: ensureValues(data.companySectors),
-    taskTypes: ensureValues(data.taskTypes),
-    noteStatuses: ensureValues(data.noteStatuses),
-    clientChecklist: ensureChecklistIds(data.clientChecklist),
-  } as ConfigurationContextValue,
-});
+export const transformFormValues = (data: Record<string, any>) => {
+  const legacy = normalizeClientChecklist(
+    ensureChecklistIds(data.clientChecklist),
+  );
+  const split = splitLegacyClientChecklist(
+    data.clientChecklist === undefined
+      ? defaultConfiguration.clientChecklist
+      : legacy,
+  );
+  const clubChecklist = normalizeClientChecklist(
+    ensureChecklistIds(data.clubChecklist ?? split.clubChecklist),
+  );
+  const refereeChecklist = normalizeClientChecklist(
+    ensureChecklistIds(data.refereeChecklist ?? split.refereeChecklist),
+  );
+  const clientChecklist =
+    data.clientChecklist === undefined
+      ? [...clubChecklist, ...refereeChecklist]
+      : legacy;
+  return {
+    config: {
+      title: data.title,
+      lightModeLogo: data.lightModeLogo,
+      darkModeLogo: data.darkModeLogo,
+      currency: data.currency,
+      companySectors: ensureValues(data.companySectors),
+      taskTypes: ensureValues(data.taskTypes),
+      noteStatuses: ensureValues(data.noteStatuses),
+      clientChecklist,
+      clubChecklist,
+      refereeChecklist,
+    } as ConfigurationContextValue,
+  };
+};
 
 export const SettingsPage = () => {
   const updateConfiguration = useConfigurationUpdater();
@@ -107,7 +133,8 @@ const SettingsForm = () => {
       companySectors: config.companySectors,
       taskTypes: config.taskTypes,
       noteStatuses: config.noteStatuses,
-      clientChecklist: config.clientChecklist,
+      clubChecklist: config.clubChecklist,
+      refereeChecklist: config.refereeChecklist,
     }),
     [config],
   );
@@ -263,7 +290,11 @@ const SettingsFormFields = () => {
             <h2 className="text-xl font-semibold text-muted-foreground">
               {translate("crm.clients.title", { _: "Clients" })}
             </h2>
-            <ClientChecklistFields />
+            <ClientChecklistFields source="clubChecklist" title="Étapes club" />
+            <ClientChecklistFields
+              source="refereeChecklist"
+              title="Étapes juge-arbitre"
+            />
           </CardContent>
         </Card>
       </div>

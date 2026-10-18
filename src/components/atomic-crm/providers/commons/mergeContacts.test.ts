@@ -49,6 +49,73 @@ const buildDataProvider = (
 };
 
 describe("mergeContacts", () => {
+  it("unites club referee links when merging referee contacts", async () => {
+    const winner = buildContact({ id: winnerId });
+    const loser = buildContact({ id: loserId });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    const del = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.previousData }),
+    );
+    const getManyReference = vi.fn((resource: string, params: any) => {
+      if (
+        resource === "club_referees" &&
+        String(params.id) === String(loserId)
+      ) {
+        return Promise.resolve({
+          data: [
+            {
+              id: 9,
+              company_id: 50,
+              contact_id: loserId,
+              client_checklist: ["mouja-installed"],
+            },
+          ],
+          total: 1,
+        });
+      }
+      if (
+        resource === "club_referees" &&
+        String(params.id) === String(winnerId)
+      ) {
+        return Promise.resolve({
+          data: [
+            {
+              id: 8,
+              company_id: 50,
+              contact_id: winnerId,
+              client_checklist: ["first-tournament"],
+            },
+          ],
+          total: 1,
+        });
+      }
+      return Promise.resolve({ data: [], total: 0 });
+    });
+    await mergeContacts(
+      loserId,
+      winnerId,
+      buildDataProvider({
+        getOne: vi.fn(getOneFor(winner, loser)),
+        getManyReference,
+        update,
+        delete: del,
+      }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      "club_referees",
+      expect.objectContaining({
+        id: 8,
+        data: { client_checklist: ["first-tournament", "mouja-installed"] },
+      }),
+    );
+    expect(del).toHaveBeenCalledWith(
+      "club_referees",
+      expect.objectContaining({ id: 9 }),
+    );
+  });
+
   it("rejects a merge across referee and partner records before writing", async () => {
     const update = vi.fn();
     const provider = buildDataProvider({

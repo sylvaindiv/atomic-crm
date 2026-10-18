@@ -68,6 +68,8 @@ export type Company = {
   country: string;
   context_links?: string[];
   nb_contacts?: number;
+  is_client?: boolean;
+  client_checklist?: string[];
 } & Pick<RaRecord, "id">;
 
 export type EmailAndType = {

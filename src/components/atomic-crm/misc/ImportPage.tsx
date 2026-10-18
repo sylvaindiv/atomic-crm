@@ -207,7 +207,8 @@ const hasFailedImports = (failedImports: ImportFromJsonFailures) => {
     failedImports.companies.length > 0 ||
     failedImports.contacts.length > 0 ||
     failedImports.notes.length > 0 ||
-    failedImports.tasks.length > 0
+    failedImports.tasks.length > 0 ||
+    failedImports.clubReferees.length > 0
   );
 };
 
@@ -268,6 +269,13 @@ const ImportStats = ({
       entity: "tasks",
       imported: stats.tasks,
       failed: failedImports.tasks.length,
+    },
+    {
+      entity: translate("crm.clients.import_followups", {
+        _: "Club referee links",
+      }),
+      imported: stats.clubReferees,
+      failed: failedImports.clubReferees.length,
     },
   ];
   return (

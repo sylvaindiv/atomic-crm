@@ -74,25 +74,51 @@ function assertChecklistWrite(cfg, data) {
     }
   }
 
+  if (cfg.table === "companies" && "client_checklist" in (data ?? {})) {
+    assertChecklistIds(data.client_checklist, "client_checklist");
+  }
+  if (cfg.table === "club_referees" && "client_checklist" in (data ?? {})) {
+    assertChecklistIds(data.client_checklist, "client_checklist");
+  }
+
   if (
     cfg.table === "configuration" &&
-    data?.config?.clientChecklist !== undefined
+    (data?.config?.clientChecklist !== undefined ||
+      data?.config?.clubChecklist !== undefined ||
+      data?.config?.refereeChecklist !== undefined)
   ) {
-    const items = data.config.clientChecklist;
-    if (
-      !Array.isArray(items) ||
-      items.some(
-        (item) =>
-          !item ||
-          typeof item.value !== "string" ||
-          !item.value.trim() ||
-          typeof item.label !== "string" ||
-          !item.label.trim(),
-      ) ||
-      new Set(items.map((item) => item.value)).size !== items.length
-    ) {
-      throw new Error("clientChecklist must contain unique IDs and labels");
+    for (const field of [
+      "clientChecklist",
+      "clubChecklist",
+      "refereeChecklist",
+    ]) {
+      const items = data.config[field];
+      if (items === undefined) continue;
+      if (
+        !Array.isArray(items) ||
+        items.some(
+          (item) =>
+            !item ||
+            typeof item.value !== "string" ||
+            !item.value.trim() ||
+            typeof item.label !== "string" ||
+            !item.label.trim(),
+        ) ||
+        new Set(items.map((item) => item.value)).size !== items.length
+      ) {
+        throw new Error(`${field} must contain unique IDs and labels`);
+      }
     }
+  }
+}
+
+function assertChecklistIds(ids, field) {
+  if (
+    !Array.isArray(ids) ||
+    ids.some((id) => typeof id !== "string" || !id.trim()) ||
+    new Set(ids).size !== ids.length
+  ) {
+    throw new Error(`${field} must be a unique array of IDs`);
   }
 }
 
@@ -351,6 +377,7 @@ export async function create(cfg, { data }, executor = db) {
   assertWritable(cfg);
   assertChecklistWrite(cfg, data);
   assertRequiredColumns(cfg, data, { requireAllPresent: true });
+  await assertClubRefereeContact(cfg, data, executor);
   if (
     executor === db &&
     Object.prototype.hasOwnProperty.call(data ?? {}, "next_action")
@@ -375,6 +402,7 @@ export async function update(cfg, { id, data }, executor = db) {
   assertWritable(cfg);
   assertChecklistWrite(cfg, data);
   assertRequiredColumns(cfg, data, { requireAllPresent: false });
+  await assertClubRefereeContact(cfg, data, executor);
   const { columns, values } = prepareWrite(cfg, data);
   if (columns.length === 0) return getOne(cfg, { id }, executor);
   const assignments = columns.map((c) => `${quoteId(c)} = ?`).join(",");
@@ -386,6 +414,16 @@ export async function update(cfg, { id, data }, executor = db) {
   if (rows.length === 0) throw new Error(`${cfg.table} #${id} not found`);
   await logHistory(cfg.table, rows[0].id, "update", data, executor);
   return { data: rows[0] };
+}
+
+async function assertClubRefereeContact(cfg, data, executor) {
+  if (cfg.table !== "club_referees" || data?.contact_id === undefined) return;
+  const res = await executor.execute({
+    sql: "SELECT contact_type FROM contacts WHERE id = ?",
+    args: [coerceId(data.contact_id)],
+  });
+  if (toObjects(res)[0]?.contact_type !== "referee")
+    throw new Error("club_referees contact_id must reference a judge-referee");
 }
 
 export async function updateMany(cfg, { ids, data }) {
@@ -429,6 +467,11 @@ async function cascadeDelete(table, ids) {
 export async function del(cfg, { id }) {
   assertWritable(cfg);
   const realId = coerceId(id);
+  if (cfg.table === "companies")
+    await db.execute({
+      sql: "UPDATE contacts SET company_id = NULL WHERE company_id = ?",
+      args: [realId],
+    });
   await cascadeDelete(cfg.table, [realId]);
   const res = await db.execute({
     sql: `DELETE FROM ${quoteId(cfg.table)} WHERE "id" = ? RETURNING *`,
@@ -441,6 +484,13 @@ export async function deleteMany(cfg, { ids }) {
   assertWritable(cfg);
   const list = (ids ?? []).map(coerceId);
   if (list.length === 0) return { data: [] };
+  if (cfg.table === "companies") {
+    const phContacts = list.map(() => "?").join(",");
+    await db.execute({
+      sql: `UPDATE contacts SET company_id = NULL WHERE company_id IN (${phContacts})`,
+      args: list,
+    });
+  }
   await cascadeDelete(cfg.table, list);
   const ph = list.map(() => "?").join(",");
   await db.execute({

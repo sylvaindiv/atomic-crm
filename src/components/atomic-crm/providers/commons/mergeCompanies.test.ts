@@ -70,6 +70,91 @@ const buildDataProvider = (
 };
 
 describe("mergeCompanies", () => {
+  it("keeps client state and merges independent referee progress by club", async () => {
+    const winner = buildCompany({
+      id: winnerId,
+      is_client: false,
+      client_checklist: ["stripe-connected"],
+    });
+    const loser = buildCompany({
+      id: loserId,
+      is_client: true,
+      client_checklist: ["advantage-system-configured"],
+    });
+    const update = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.data }),
+    );
+    const del = vi.fn((_resource: string, params: any) =>
+      Promise.resolve({ data: params.previousData }),
+    );
+    const getManyReference = vi.fn((resource: string, params: any) => {
+      if (
+        resource === "club_referees" &&
+        String(params.id) === String(loserId)
+      ) {
+        return Promise.resolve({
+          data: [
+            {
+              id: 9,
+              company_id: loserId,
+              contact_id: 50,
+              client_checklist: ["mouja-installed"],
+            },
+          ],
+          total: 1,
+        });
+      }
+      if (
+        resource === "club_referees" &&
+        String(params.id) === String(winnerId)
+      ) {
+        return Promise.resolve({
+          data: [
+            {
+              id: 8,
+              company_id: winnerId,
+              contact_id: 50,
+              client_checklist: ["first-tournament"],
+            },
+          ],
+          total: 1,
+        });
+      }
+      return Promise.resolve({ data: [], total: 0 });
+    });
+    await mergeCompanies(
+      loserId,
+      winnerId,
+      buildDataProvider({
+        getOne: vi.fn(getOneFor(winner, loser)),
+        getManyReference,
+        update,
+        delete: del,
+      }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      "club_referees",
+      expect.objectContaining({
+        id: 8,
+        data: { client_checklist: ["first-tournament", "mouja-installed"] },
+      }),
+    );
+    expect(del).toHaveBeenCalledWith(
+      "club_referees",
+      expect.objectContaining({ id: 9 }),
+    );
+    expect(update).toHaveBeenCalledWith(
+      "companies",
+      expect.objectContaining({
+        id: winnerId,
+        data: expect.objectContaining({
+          is_client: true,
+          client_checklist: ["stripe-connected", "advantage-system-configured"],
+        }),
+      }),
+    );
+  });
+
   it("keeps the target email and unites social links without duplicates", async () => {
     const winner = buildCompany({
       id: winnerId,
