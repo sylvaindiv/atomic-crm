@@ -1,3 +1,4 @@
+import { migrateMultiClubs } from "./migrate-multi-clubs.mjs";
 // Apply db/schema.sql (and seed on first run) to the configured libSQL database.
 //
 // Usage:
@@ -34,6 +35,7 @@ await migrateCompanyContact(client);
 const migration = await migrateClubClientChecklists(client);
 if (migration.orphaned.length)
   print(`Legacy clients without clubs: ${migration.orphaned.join(", ")}`);
+await migrateMultiClubs(client);
 await client.executeMultiple(schema);
 print(`Schema applied to ${url}`);
 

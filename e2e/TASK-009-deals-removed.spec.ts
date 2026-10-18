@@ -29,9 +29,7 @@ test.describe("deals resource removed", () => {
   test("has no Affaires navigation entry and /deals renders the missing-page view", async ({
     page,
   }) => {
-    await expect(page.getByRole("link", { name: /affaires/i })).toHaveCount(
-      0,
-    );
+    await expect(page.getByRole("link", { name: /affaires/i })).toHaveCount(0);
     await expect(page.locator('a[href*="/deals"]')).toHaveCount(0);
 
     await page.goto("http://localhost:5175/#/deals");

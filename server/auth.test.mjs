@@ -55,12 +55,99 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  vi.useRealTimers();
   vi.unstubAllEnvs();
   db.close();
   await rm(directory, { recursive: true, force: true });
 });
 
 describe("auth API", () => {
+  it("keeps sessions across restarts and renews both database and cookie on activity", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
+    const cookie = await ownerCookie();
+    const initial = await request("/api/auth/me", { headers: { cookie } });
+    expect(initial.status).toBe(200);
+    expect(initial.headers.get("set-cookie")).toBeNull();
+
+    vi.setSystemTime(new Date("2026-12-01T00:00:00Z"));
+    db.close();
+    db = createClient({ url: `file:${join(directory, "auth.db")}` });
+    const renewed = await request("/api/sales/getList", {
+      method: "POST",
+      body: "{}",
+      headers: { cookie },
+    });
+    expect(renewed.status).toBe(200);
+    expect(renewed.headers.get("set-cookie")).toContain(cookie);
+    expect(renewed.headers.get("set-cookie")).toContain("Max-Age=31536000");
+    expect(renewed.headers.get("set-cookie")).toContain("HttpOnly");
+    expect(renewed.headers.get("set-cookie")).toContain("SameSite=Strict");
+    const stored = await db.execute("SELECT expires_at FROM auth_sessions");
+    expect(stored.rows[0][0]).toBe("2027-12-01T00:00:00.000Z");
+
+    vi.setSystemTime(new Date("2027-06-01T00:00:00Z"));
+    app = new Hono();
+    mountAuth(app, { db, appOrigin: ORIGIN });
+    expect(
+      (await request("/api/auth/me", { headers: { cookie } })).status,
+    ).toBe(200);
+  });
+
+  it("upgrades a still-valid legacy session and keeps logout effective", async () => {
+    const cookie = await ownerCookie();
+    await db.execute({
+      sql: "UPDATE auth_sessions SET expires_at = ?",
+      args: [new Date(Date.now() + 60 * 60 * 1000).toISOString()],
+    });
+    const renewed = await request("/api/auth/me", { headers: { cookie } });
+    expect(renewed.status).toBe(200);
+    expect(renewed.headers.get("set-cookie")).toContain("Max-Age=31536000");
+    await request("/api/auth/logout", {
+      method: "POST",
+      body: "{}",
+      headers: { cookie },
+    });
+    expect(
+      (await request("/api/auth/me", { headers: { cookie } })).status,
+    ).toBe(401);
+  });
+
+  it.each(["expired", "disabled", "revoked"])(
+    "does not renew a %s session",
+    async (reason) => {
+      const cookie = await ownerCookie();
+      if (reason === "expired")
+        await db.execute(
+          "UPDATE auth_sessions SET expires_at = '2000-01-01T00:00:00.000Z'",
+        );
+      if (reason === "disabled")
+        await db.execute("UPDATE sales SET disabled = 1");
+      if (reason === "revoked")
+        await db.execute(
+          "UPDATE auth_credentials SET credential_version = credential_version + 1",
+        );
+      const response = await request("/api/auth/me", { headers: { cookie } });
+      expect(response.status).toBe(401);
+      expect(response.headers.get("set-cookie")).toBeNull();
+    },
+  );
+
+  it("does not extend temporary-password sessions", async () => {
+    await db.execute("UPDATE auth_credentials SET must_change_password = 1");
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));
+    const cookie = await ownerCookie();
+    vi.setSystemTime(new Date("2026-01-01T00:10:00Z"));
+    const response = await request("/api/auth/me", { headers: { cookie } });
+    expect(response.status).toBe(200);
+    expect(response.headers.get("set-cookie")).toBeNull();
+    vi.setSystemTime(new Date("2026-01-01T00:15:00Z"));
+    expect(
+      (await request("/api/auth/me", { headers: { cookie } })).status,
+    ).toBe(401);
+  });
+
   it("accepts the production app origin without APP_ORIGIN and rejects localhost", async () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("APP_ORIGIN", undefined);

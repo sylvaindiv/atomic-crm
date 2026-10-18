@@ -1,3 +1,4 @@
+import { migrateMultiClubs } from "../db/migrate-multi-clubs.mjs";
 // libSQL / Turso client + one-time schema provisioning.
 import { createClient } from "@libsql/client";
 import { readFileSync } from "node:fs";
@@ -46,6 +47,7 @@ export async function initSchema() {
       process.stdout.write(
         `Legacy clients without clubs: ${migrated.orphaned.join(", ")}\n`,
       );
+    await migrateMultiClubs(db);
     // Refresh views/indexes after a migration, including contacts_summary.
     await db.executeMultiple(schema);
     return;

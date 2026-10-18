@@ -1,3 +1,4 @@
+import { page } from "vitest/browser";
 import { RecordContextProvider } from "ra-core";
 import { render } from "vitest-browser-react";
 import { buildContact, StoryWrapper } from "@/test/StoryWrapper";
@@ -16,16 +17,29 @@ describe("EditableCompanyCell", () => {
     });
 
     const screen = await render(
-      <StoryWrapper dataProvider={{ create: createMock, update: updateMock }}>
+      <StoryWrapper
+        data={{ contacts: [contact] }}
+        dataProvider={{
+          create: createMock,
+          update: updateMock,
+          getMany: vi
+            .fn()
+            .mockResolvedValue({ data: [{ id: 9, name: "New Padel Club" }] }),
+        }}
+      >
         <RecordContextProvider value={contact}>
           <EditableCompanyCell />
         </RecordContextProvider>
       </StoryWrapper>,
     );
 
-    await screen.getByRole("button", { name: "Club" }).click();
-    await screen.getByPlaceholder("Search...").fill("New Padel Club");
-    await screen.getByText("Create New Padel Club").click();
+    await screen.getByRole("button", { name: "Modifier les clubs" }).click();
+    await page
+      .getByPlaceholder("Search", { exact: true })
+      .fill("New Padel Club");
+    await page.getByText("Create New Padel Club").click();
+
+    await page.getByRole("button", { name: "Enregistrer" }).click();
 
     await expect.poll(() => updateMock).toBeCalledTimes(1);
 
@@ -39,7 +53,7 @@ describe("EditableCompanyCell", () => {
       "contacts",
       expect.objectContaining({
         id: 1,
-        data: { company_id: 9 },
+        data: expect.objectContaining({ company_ids: [9] }),
       }),
     );
   });

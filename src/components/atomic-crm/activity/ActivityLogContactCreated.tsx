@@ -1,7 +1,8 @@
 import { useGetIdentity, useTranslate } from "ra-core";
 import { Link } from "react-router";
 
-import { ReferenceField } from "@/components/admin/reference-field";
+import { RecordContextProvider } from "ra-core";
+import { ContactClubs } from "../contacts/ContactClubs";
 import { Avatar } from "../contacts/Avatar";
 import { RelativeDate } from "../misc/RelativeDate";
 import type { ActivityContactCreated } from "../types";
@@ -43,12 +44,9 @@ export function ActivityLogContactCreated({
                 <>
                   {" "}
                   {translate("crm.activity.to")}{" "}
-                  <ReferenceField
-                    source="company_id"
-                    reference="companies"
-                    record={activity}
-                    link="show"
-                  />
+                  <RecordContextProvider value={contact}>
+                    <ContactClubs />
+                  </RecordContextProvider>
                 </>
               )}{" "}
               <RelativeDate date={activity.date} />

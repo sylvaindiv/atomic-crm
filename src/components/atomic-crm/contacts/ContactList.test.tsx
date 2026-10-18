@@ -1,6 +1,8 @@
 import { render } from "vitest-browser-react";
 import { page } from "vitest/browser";
+import { ResourceContextProvider } from "ra-core";
 import { buildContact, StoryWrapper } from "@/test/StoryWrapper";
+import { ContactList } from "./ContactList";
 
 import {
   DesktopEmpty,
@@ -42,6 +44,52 @@ describe("ContactList", () => {
     await expect
       .element(screen.getByRole("button", { name: "New Partner" }))
       .toBeVisible();
+    await expect
+      .element(screen.getByRole("switch", { name: "Assigned to me" }))
+      .not.toBeInTheDocument();
+  });
+
+  it("filters referees assigned to the current user without clearing search", async () => {
+    page.viewport(1600, 900);
+    const screen = await render(
+      <StoryWrapper
+        data={{
+          contacts: [
+            buildContact({ id: 1, first_name: "Mine", sales_id: 0 }),
+            buildContact({ id: 2, first_name: "Other", sales_id: 1 }),
+            buildContact({
+              id: 3,
+              first_name: "Unassigned",
+              sales_id: undefined,
+            }),
+          ],
+        }}
+      >
+        <ResourceContextProvider value="contacts">
+          <ContactList />
+        </ResourceContextProvider>
+      </StoryWrapper>,
+    );
+
+    await screen.getByPlaceholder("Search name, club...").fill("Other");
+    await expect.element(screen.getByText("Other Lovelace")).toBeVisible();
+
+    const assignedToMe = screen.getByRole("switch", {
+      name: "Assigned to me",
+    });
+    await assignedToMe.click();
+    await expect.element(assignedToMe).toBeChecked();
+    await expect
+      .element(screen.getByText("Other Lovelace"))
+      .not.toBeInTheDocument();
+    await expect.element(assignedToMe).toBeVisible();
+
+    await assignedToMe.click();
+    await expect.element(assignedToMe).not.toBeChecked();
+    await expect.element(screen.getByText("Other Lovelace")).toBeVisible();
+    await expect
+      .element(screen.getByText("Mine Lovelace"))
+      .not.toBeInTheDocument();
   });
 
   it("opens partners on the partner route on mobile", async () => {
@@ -77,6 +125,9 @@ describe("ContactList", () => {
     await expect
       .element(screen.getByText("It seems your judge-referee list is empty."))
       .toBeVisible();
+    await expect
+      .element(screen.getByRole("button", { name: "Import CSV" }))
+      .not.toBeInTheDocument();
   });
 
   it("renders contacts in a list", async () => {
@@ -84,6 +135,12 @@ describe("ContactList", () => {
 
     await expect.element(screen.getByText("Ada Lovelace")).toBeVisible();
     await expect.element(screen.getByText("Grace Hopper")).toBeVisible();
+    await expect
+      .element(screen.getByRole("button", { name: "Import CSV" }))
+      .not.toBeInTheDocument();
+    await expect
+      .element(screen.getByRole("button", { name: "Export" }))
+      .not.toBeInTheDocument();
     await expect
       .element(
         screen.getByRole("heading", { name: "No judges-referees found" }),
@@ -128,6 +185,9 @@ describe("ContactList", () => {
     await expect
       .element(screen.getByRole("button", { name: /^tag$/i }))
       .toBeVisible();
+    await expect
+      .element(screen.getByRole("button", { name: "Export" }))
+      .not.toBeInTheDocument();
   });
 
   it("adds an existing tag to selected contacts without duplicating it", async () => {

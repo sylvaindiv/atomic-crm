@@ -61,4 +61,40 @@ describe("turso authProvider", () => {
     ).rejects.toEqual({ redirectTo: "/change-password" });
     expect(apiPost).not.toHaveBeenCalled();
   });
+
+  it.each([new TypeError("Failed to fetch"), { status: 503 }])(
+    "keeps a previously verified session during a temporary outage: %s",
+    async (error) => {
+      const auth = getAuthProvider();
+      apiFetch.mockResolvedValue({ ...session, must_change_password: false });
+      await auth.checkAuth({});
+      apiFetch.mockRejectedValue(error);
+      await expect(auth.checkAuth({})).resolves.toBeUndefined();
+      await expect(auth.getIdentity?.()).resolves.toMatchObject({ id: 7 });
+      apiFetch.mockResolvedValue({
+        ...session,
+        user: { ...session.user, first_name: "Janet" },
+      });
+      await auth.checkAuth({});
+      await expect(auth.getIdentity?.()).resolves.toMatchObject({
+        fullName: "Janet Doe",
+      });
+    },
+  );
+
+  it("clears a revoked session instead of reusing its cached identity", async () => {
+    const auth = getAuthProvider();
+    apiFetch.mockResolvedValue(session);
+    await auth.checkAuth({});
+    apiFetch.mockRejectedValue({ status: 401 });
+    await expect(auth.checkAuth({})).rejects.toMatchObject({ status: 401 });
+    await expect(auth.getIdentity?.()).rejects.toMatchObject({ status: 401 });
+  });
+
+  it("does not authenticate an unknown user during a network outage", async () => {
+    apiFetch.mockRejectedValue(new TypeError("Failed to fetch"));
+    await expect(getAuthProvider().checkAuth({})).rejects.toThrow(
+      "Failed to fetch",
+    );
+  });
 });

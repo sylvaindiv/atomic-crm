@@ -18,7 +18,6 @@ import type { ReactElement, ReactNode } from "react";
 import { Link } from "react-router";
 import { cn } from "@/lib/utils";
 import { CreateButton } from "@/components/admin/create-button";
-import { ExportButton } from "@/components/admin/export-button";
 import { ListPagination } from "@/components/admin/list-pagination";
 import { FilterButton, FilterForm } from "@/components/admin/filter-form";
 
@@ -153,7 +152,6 @@ export const ListView = <RecordType extends RaRecord = RaRecord>(
               <div className="flex items-center gap-2">
                 {filters && filters.length > 0 ? <FilterButton /> : null}
                 {hasCreate ? <CreateButton /> : null}
-                {<ExportButton />}
               </div>
             )}
           </div>

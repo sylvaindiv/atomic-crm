@@ -16,7 +16,7 @@ describe("migrateCompanyContact", () => {
         args: ["A", "a@example.org", '["https://example.org"]'],
       });
       await client.execute(
-        "INSERT INTO contacts (company_id, contact_type) VALUES (1, 'partner'), (1, 'referee')",
+        "INSERT INTO contacts (company_id, company_ids, contact_type) VALUES (1, '[1]', 'partner'), (1, '[1]', 'referee')",
       );
       await migrateCompanyContact(client);
       await client.executeMultiple(

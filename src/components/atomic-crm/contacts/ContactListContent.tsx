@@ -6,8 +6,6 @@ import {
   useTranslate,
 } from "ra-core";
 import { Link } from "react-router";
-import { ReferenceField } from "@/components/admin/reference-field";
-import { TextField } from "@/components/admin/text-field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { RotateCcw } from "lucide-react";
@@ -116,13 +114,7 @@ const ContactItemContentMobile = ({ contact }: { contact: Contact }) => {
                     })} `
                   : contact.title}
                 {contact.company_id != null && (
-                  <ReferenceField
-                    source="company_id"
-                    reference="companies"
-                    link={false}
-                  >
-                    <TextField source="name" />
-                  </ReferenceField>
+                  <span>{contact.company_name}</span>
                 )}
               </span>
               {contact.nb_tasks ? (

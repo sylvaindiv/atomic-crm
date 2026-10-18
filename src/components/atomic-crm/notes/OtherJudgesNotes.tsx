@@ -22,7 +22,7 @@ export const OtherJudgesNotes = ({ contact }: { contact: Contact }) => {
 
   const { contacts, isPending: isContactsPending } =
     useGetContactsFromSameCompany(
-      contact.company_id,
+      contact.company_ids ?? contact.company_id,
       contact.id,
       contact.contact_type,
     );

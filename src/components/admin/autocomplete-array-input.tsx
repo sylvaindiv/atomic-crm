@@ -66,6 +66,8 @@ export const AutocompleteArrayInput = (
   props: Omit<InputProps, "source"> &
     Partial<Pick<InputProps, "source">> &
     ChoicesProps & {
+      onCreate?: (name: string) => Promise<any>;
+      createItemLabel?: string;
       className?: string;
       disableValue?: string;
       filterToQuery?: (searchText: string) => any;
@@ -101,6 +103,7 @@ export const AutocompleteArrayInput = (
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
+  const [creating, setCreating] = React.useState(false);
 
   const handleUnselect = useEvent((choice: any) => {
     field.onChange(
@@ -194,6 +197,11 @@ export const AutocompleteArrayInput = (
               ))}
               {/* Avoid having the "Search" Icon by not using CommandInput */}
               <CommandPrimitive.Input
+                aria-label={
+                  typeof props.label === "string"
+                    ? translate(props.label)
+                    : source
+                }
                 ref={inputRef}
                 value={filterValue}
                 onValueChange={(filter) => {
@@ -216,8 +224,10 @@ export const AutocompleteArrayInput = (
           </div>
           <div className="relative">
             <CommandList ref={listRef}>
-              {open && availableChoices.length > 0 ? (
-                <div className="absolute top-2 z-10 w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
+              {open &&
+              (availableChoices.length > 0 ||
+                (props.onCreate && filterValue.trim())) ? (
+                <div className="absolute top-2 z-10 max-h-48 overflow-y-auto w-full rounded-md border bg-popover text-popover-foreground shadow-md outline-none animate-in">
                   <CommandGroup className="h-full overflow-auto">
                     {availableChoices.map((choice) => {
                       const choiceText = getChoiceText(choice);
@@ -250,6 +260,39 @@ export const AutocompleteArrayInput = (
                         </CommandItem>
                       );
                     })}
+                    {props.onCreate && filterValue.trim() && (
+                      <CommandItem
+                        disabled={creating}
+                        value={`create-${filterValue}`}
+                        onMouseDown={(event) => event.preventDefault()}
+                        onSelect={async () => {
+                          setCreating(true);
+                          try {
+                            const choice = await props.onCreate!(
+                              filterValue.trim(),
+                            );
+                            if (choice) {
+                              field.onChange([
+                                ...new Set([
+                                  ...field.value,
+                                  getChoiceValue(choice),
+                                ]),
+                              ]);
+                              setFilterValue("");
+                              if (isFromReference)
+                                setFilters(filterToQuery(""));
+                            }
+                          } finally {
+                            setCreating(false);
+                          }
+                        }}
+                      >
+                        {translate(
+                          props.createItemLabel ?? "ra.action.create_item",
+                          { item: filterValue },
+                        )}
+                      </CommandItem>
+                    )}
                   </CommandGroup>
                 </div>
               ) : null}

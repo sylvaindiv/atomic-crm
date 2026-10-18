@@ -5,10 +5,9 @@ import { Button } from "@/components/ui/button";
 import { BulkDeleteButton } from "@/components/admin/bulk-delete-button";
 import { SelectAllButton } from "@/components/admin/select-all-button";
 import { X } from "lucide-react";
-import { BulkExportButton } from "./bulk-export-button";
 
 /**
- * Default children for BulkActionsToolbar. Renders SelectAllButton, BulkExportButton, and BulkDeleteButton.
+ * Default children for BulkActionsToolbar. Renders SelectAllButton and BulkDeleteButton.
  *
  * @internal
  */
@@ -16,7 +15,6 @@ export function BulkActionsToolbarChildren() {
   return (
     <>
       <SelectAllButton />
-      <BulkExportButton />
       <BulkDeleteButton />
     </>
   );

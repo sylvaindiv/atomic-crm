@@ -22,6 +22,7 @@ export const generateCompanies = (db: Db, size = 55): Required<Company>[] => {
     const name = company.companyName();
     return {
       id,
+      tenup_id: null,
       name: name,
       logo: {
         title: lorem.text(1),

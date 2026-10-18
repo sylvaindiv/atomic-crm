@@ -22,7 +22,7 @@ import { contactOptionText } from "../misc/ContactOption";
 import ImageEditorField from "../misc/ImageEditorField";
 import { StatusSelector } from "../notes";
 import type { Sale, Contact } from "../types";
-import { AutocompleteCompanyInput } from "../companies/AutocompleteCompanyInput.tsx";
+import { ContactClubsInput } from "./ContactClubs";
 
 export const ContactInputs = () => {
   const isMobile = useIsMobile();
@@ -80,9 +80,7 @@ const ContactPositionInputs = () => {
         {translate("resources.contacts.field_categories.position")}
       </h6>
       <TextInput source="title" helperText={false} />
-      <ReferenceInput source="company_id" reference="companies" perPage={10}>
-        <AutocompleteCompanyInput label="resources.contacts.fields.company_id" />
-      </ReferenceInput>
+      <ContactClubsInput />
       <ReferenceInput
         source="referred_by_id"
         reference={record?.contact_type === "partner" ? "partners" : "contacts"}

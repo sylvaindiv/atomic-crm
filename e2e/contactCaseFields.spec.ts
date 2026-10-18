@@ -47,9 +47,7 @@ test("user sets a contact's budget and case description, then edits both", async
     page.getByRole("heading", { name: "Ada Lovelace" }),
   ).toBeVisible();
   await expect(page.getByText("$500")).toBeVisible();
-  await expect(
-    page.getByText("Padel Masters vs Riviera Open"),
-  ).toBeVisible();
+  await expect(page.getByText("Padel Masters vs Riviera Open")).toBeVisible();
 
   // Edit both fields and confirm the show page reflects the new values.
   await page.getByRole("link", { name: "Edit judge-referee" }).click();

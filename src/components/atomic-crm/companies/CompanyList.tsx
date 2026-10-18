@@ -5,7 +5,6 @@ import {
   useTranslate,
 } from "ra-core";
 import { CreateButton } from "@/components/admin/create-button";
-import { ExportButton } from "@/components/admin/export-button";
 import { ColumnsButton } from "@/components/admin/columns-button";
 import { List } from "@/components/admin/list";
 import { ListPagination } from "@/components/admin/list-pagination";
@@ -15,6 +14,7 @@ import { Card } from "@/components/ui/card";
 
 import { TopToolbar } from "../layout/TopToolbar";
 import { ColumnPreferencesProvider } from "../misc/ColumnPreferencesProvider";
+import { AssignedToMeInput } from "../misc/AssignedToMeInput";
 import { CompanyEmpty } from "./CompanyEmpty";
 import { CompanyTable } from "./table/CompanyTable";
 
@@ -72,10 +72,10 @@ const CompanyListActions = () => {
           <SearchInput source="q" />
         </FilterLiveForm>
       </div>
+      <AssignedToMeInput />
       <TopToolbar className="ml-auto min-w-0 max-w-full overflow-x-auto">
         <SortButton fields={["name", "created_at", "nb_contacts"]} />
         <ColumnsButton />
-        <ExportButton />
         <CreateButton
           label={translate("resources.companies.action.new", {
             _: "New Club",

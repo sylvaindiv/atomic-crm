@@ -402,6 +402,7 @@ export const frenchCrmMessages = {
     common: {
       activity: "Activité",
       added: "ajoutée",
+      assigned_to_me: "Attribué à moi",
       details: "Détails",
       last_activity_with_date: "dernière activité %{date}",
       load_more: "Charger plus",
@@ -447,6 +448,7 @@ export const frenchCrmMessages = {
       },
     },
     follow_up: {
+      other_notes: "Autres notes",
       title: "Suivi",
       open_tasks: "Prochaines actions",
       no_open_tasks: "Aucune action ouverte",

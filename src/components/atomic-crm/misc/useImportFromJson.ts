@@ -269,6 +269,7 @@ export const useImportFromJson = (): [
         const { data } = await dataProvider.create("companies", {
           data: normalizeCompanyLinks({
             name: dataToImport.name.trim(),
+            tenup_id: dataToImport.tenup_id ?? null,
             description: dataToImport.description?.trim(),
             city: dataToImport.city?.trim(),
             country: dataToImport.country?.trim(),
@@ -399,6 +400,17 @@ export const useImportFromJson = (): [
             linkedin_url: dataToImport.linkedin_url?.trim(),
             gender: gender || undefined,
             has_newsletter: !!dataToImport.has_newsletter,
+            ...(dataToImport.company_ids
+              ? {
+                  company_ids: dataToImport.company_ids.map((id) => {
+                    const mapped = idsMaps.companies[id];
+                    if (mapped == null)
+                      throw new Error(`Unknown company ${id}`);
+                    return mapped;
+                  }),
+                }
+              : {}),
+            tenup_id: dataToImport.tenup_id ?? null,
             company_id: dataToImport.company_id
               ? idsMaps.companies[dataToImport.company_id]
               : undefined,
@@ -821,6 +833,7 @@ type CompanyImport = {
   phone_number?: string;
   revenue?: string;
   tax_identifier?: string;
+  tenup_id?: string;
   context_links?: string[];
   is_client?: boolean;
   client_checklist?: string[];
@@ -839,6 +852,8 @@ type ContactImport = {
   id: number;
   sales_id: number;
   company_id?: number;
+  company_ids?: number[];
+  tenup_id?: string;
   first_name: string;
   last_name: string;
   title?: string;

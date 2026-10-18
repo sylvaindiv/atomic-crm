@@ -11,6 +11,8 @@ export type ContactImportSchema = {
   gender: string;
   title: string;
   company: string;
+  companies?: string;
+  tenup_id?: string;
   zipcode: string;
   city: string;
   email_work: string;
@@ -165,11 +167,19 @@ export function useContactImport(
       const [companies, tags, referrers] = await Promise.all([
         getCompanies(
           batch
-            .map((contact) => ({
-              name: contact.company?.trim(),
-              zipcode: contact.zipcode?.trim(),
-              city: contact.city?.trim(),
-            }))
+            .flatMap((contact) =>
+              parseCompanyNames(contact).map((name) => ({
+                name,
+                zipcode:
+                  name === contact.company?.trim()
+                    ? contact.zipcode?.trim()
+                    : undefined,
+                city:
+                  name === contact.company?.trim()
+                    ? contact.city?.trim()
+                    : undefined,
+              })),
+            )
             .filter((company) => company.name),
         ),
         getTags(batch.flatMap((batch) => parseTags(batch.tags))),
@@ -199,6 +209,8 @@ export function useContactImport(
             has_newsletter,
             status,
             company: companyName,
+            companies: companyNames,
+            tenup_id,
             tags: tagNames,
             linkedin_url,
             known_via,
@@ -247,7 +259,15 @@ export function useContactImport(
                   // arrives as the literal string "true"/"false", not a boolean.
                   has_newsletter: has_newsletter === "true",
                   status,
-                  company_id: company?.id,
+                  ...(companyNames
+                    ? {
+                        company_ids: parseCompanyNames({
+                          company: companyName,
+                          companies: companyNames,
+                        }).map((name) => companies.get(name)!.id),
+                      }
+                    : { company_id: company?.id }),
+                  tenup_id: tenup_id || null,
                   referred_by_id: referrer?.id,
                   tags: tagList.map((tag) => tag.id),
                   sales_id: user?.identity?.id,
@@ -340,3 +360,17 @@ const parseTags = (tags: string) =>
     ?.split(",")
     ?.map((tag: string) => tag.trim())
     ?.filter((tag: string) => tag) ?? [];
+
+function parseCompanyNames(row: {
+  company?: string;
+  companies?: string;
+}): string[] {
+  if (!row.companies) return row.company?.trim() ? [row.company.trim()] : [];
+  const names: unknown = JSON.parse(row.companies);
+  if (
+    !Array.isArray(names) ||
+    names.some((name) => typeof name !== "string" || !name.trim())
+  )
+    throw new Error("Invalid companies JSON array");
+  return [...new Set(names.map((name) => name.trim()))];
+}

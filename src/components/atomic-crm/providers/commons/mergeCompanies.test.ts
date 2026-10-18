@@ -190,7 +190,10 @@ describe("mergeCompanies", () => {
       getManyReference: vi.fn((resource: string, params: any) =>
         resource === "contacts" && params.target === "company_id"
           ? Promise.resolve({
-              data: [{ id: 10 }, { id: 11 }],
+              data: [
+                { id: 10, company_ids: [3, loserId] },
+                { id: 11, company_ids: [loserId, winnerId] },
+              ],
               total: 2,
             })
           : Promise.resolve({ data: [], total: 0 }),
@@ -202,10 +205,14 @@ describe("mergeCompanies", () => {
     await mergeCompanies(loserId, winnerId, dataProvider);
 
     // Assert
-    expect(updateMany).toHaveBeenCalledWith("contacts", {
-      ids: [10, 11],
-      data: { company_id: winnerId },
-    });
+    expect(dataProvider.update).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({ id: 10, data: { company_ids: [3, winnerId] } }),
+    );
+    expect(dataProvider.update).toHaveBeenCalledWith(
+      "contacts",
+      expect.objectContaining({ id: 11, data: { company_ids: [winnerId] } }),
+    );
   });
 
   it("fills fields empty on the winner from the loser", async () => {
@@ -290,10 +297,13 @@ describe("mergeCompanies", () => {
     );
     const dataProvider = buildDataProvider({
       getOne: vi.fn(getOneFor(winner, loser)),
-      getManyReference: vi.fn().mockResolvedValue({
-        data: [{ id: 10 }],
-        total: 1,
-      }),
+      getManyReference: vi.fn((resource: string) =>
+        Promise.resolve({
+          data:
+            resource === "contacts" ? [{ id: 10, company_id: loserId }] : [],
+          total: resource === "contacts" ? 1 : 0,
+        }),
+      ),
       updateMany,
       update,
     });
@@ -301,12 +311,12 @@ describe("mergeCompanies", () => {
     // Act
     await mergeCompanies(loserId, winnerId, dataProvider);
 
-    // Assert: the contacts updateMany call resolves before the winner
+    // Assert: the contact update resolves before the winner
     // `companies` update starts.
-    expect(updateMany).toHaveBeenCalledTimes(1);
-    expect(update.mock.invocationCallOrder[0]).toBeGreaterThan(
-      updateMany.mock.invocationCallOrder[0],
-    );
+    expect(update.mock.calls.map(([resource]) => resource)).toEqual([
+      "contacts",
+      "companies",
+    ]);
   });
 
   it("deletes the loser company only after all reassignments succeed", async () => {
@@ -322,10 +332,13 @@ describe("mergeCompanies", () => {
     );
     const dataProvider = buildDataProvider({
       getOne: vi.fn(getOneFor(winner, loser)),
-      getManyReference: vi.fn().mockResolvedValue({
-        data: [{ id: 10 }],
-        total: 1,
-      }),
+      getManyReference: vi.fn((resource: string) =>
+        Promise.resolve({
+          data:
+            resource === "contacts" ? [{ id: 10, company_id: loserId }] : [],
+          total: resource === "contacts" ? 1 : 0,
+        }),
+      ),
       updateMany,
       update,
       delete: del,
@@ -339,7 +352,7 @@ describe("mergeCompanies", () => {
       "companies",
       expect.objectContaining({ id: loserId }),
     );
-    expect(updateMany.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(update.mock.invocationCallOrder[0]).toBeLessThan(
       del.mock.invocationCallOrder[0],
     );
     expect(update.mock.invocationCallOrder[0]).toBeLessThan(

@@ -397,6 +397,7 @@ export const englishCrmMessages = {
     common: {
       activity: "Activity",
       added: "added",
+      assigned_to_me: "Assigned to me",
       details: "Details",
       last_activity_with_date: "last activity %{date}",
       load_more: "Load more",
@@ -443,6 +444,7 @@ export const englishCrmMessages = {
       },
     },
     follow_up: {
+      other_notes: "Other notes",
       title: "Follow-up",
       open_tasks: "Next actions",
       no_open_tasks: "No open actions",
