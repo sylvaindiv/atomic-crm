@@ -360,6 +360,10 @@
           "type": "registry:component"
         },
         {
+          "path": "src/components/atomic-crm/notes/noteContent.ts",
+          "type": "registry:component"
+        },
+        {
           "path": "src/components/atomic-crm/notes/index.ts",
           "type": "registry:component"
         },
@@ -393,6 +397,10 @@
         },
         {
           "path": "src/components/atomic-crm/notes/NoteInputs.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/atomic-crm/notes/NoteEditor.tsx",
           "type": "registry:component"
         },
         {
