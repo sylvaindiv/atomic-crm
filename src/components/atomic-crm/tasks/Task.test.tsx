@@ -15,6 +15,44 @@ vi.mock("@/hooks/use-mobile", () => ({
 }));
 
 describe("Task", () => {
+  it("shows bare deadlines without a time or timezone shift and keeps timed deadlines", async () => {
+    const base = {
+      id: 7,
+      contact_id: 1,
+      type: "none",
+      text: "Suivi",
+      due_date: "2026-10-25",
+      done_date: null,
+      sales_id: 0,
+    };
+    const screen = await render(
+      <StoryWrapper>
+        <ResourceContextProvider value="tasks">
+          <Task task={base} />
+          <Task
+            task={{
+              ...base,
+              id: 8,
+              due_date: "2026-10-25T12:30:00.000Z",
+              text: "Ancienne échéance",
+            }}
+          />
+        </ResourceContextProvider>
+      </StoryWrapper>,
+    );
+    await expect
+      .element(screen.getByText("10/25/2026", { exact: true }))
+      .toBeVisible();
+    await expect
+      .element(
+        screen.getByText(
+          new Date("2026-10-25T12:30:00.000Z").toLocaleString(),
+          { exact: true },
+        ),
+      )
+      .toBeVisible();
+  });
+
   it("completes a mobile task with one update", async () => {
     mockIsMobile.mockReturnValue(true);
     const contact = buildContact({ id: 1 });

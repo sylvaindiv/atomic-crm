@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { required, useGetOne, useTranslate } from "ra-core";
-import { TextInput } from "@/components/admin/text-input";
+import { NoteEditor } from "./NoteEditor";
+import { NextActionInputs } from "./NextActionInputs";
 import { FileInput } from "@/components/admin/file-input";
 import { SelectInput } from "@/components/admin/select-input";
 import { DateTimeInput } from "@/components/admin/date-time-input";
@@ -16,14 +17,15 @@ import { AttachmentField } from "./AttachmentField";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { AutocompleteInput, ReferenceInput } from "@/components/admin";
 import { contactOptionText } from "../misc/ContactOption";
-import { validateNoteOrAttachmentRequired } from "./noteModel";
 
 export const NoteInputs = ({
   defaultStatus,
   showStatus,
   selectReference,
   reference,
+  creating = false,
 }: {
+  creating?: boolean;
   defaultStatus?: string;
   showStatus?: boolean;
   selectReference?: boolean;
@@ -32,7 +34,6 @@ export const NoteInputs = ({
   const { noteStatuses } = useConfigurationContext();
   const translate = useTranslate();
   const [displayMore, setDisplayMore] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
   const { control, formState, setValue } = useFormContext<ContactNote>();
   const selectedContactId = useWatch({ control, name: "contact_id" });
   const selectedStatus = useWatch({ control, name: "status" });
@@ -76,25 +77,9 @@ export const NoteInputs = ({
   // the resource from the context ("contact_notes"), but we want it to be
   // "notes" regardless of the context
   return (
-    <div ref={containerRef} className="space-y-2">
-      <TextInput
-        source="text"
-        label={false}
-        multiline
-        helperText={false}
-        placeholder={translate("resources.notes.inputs.add_note")}
-        rows={2}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            const form = containerRef.current?.closest("form");
-            form?.dispatchEvent(
-              new Event("submit", { cancelable: true, bubbles: true }),
-            );
-          }
-        }}
-        validate={validateNoteOrAttachmentRequired}
-      />
+    <div className="space-y-2">
+      <NoteEditor required={creating} />
+      {creating && <NextActionInputs />}
 
       {selectReference && reference && (
         <ReferenceInput
@@ -114,6 +99,7 @@ export const NoteInputs = ({
       {!displayMore && (
         <div className="flex justify-end items-center gap-2">
           <Button
+            type="button"
             variant="link"
             size="sm"
             onClick={() => {

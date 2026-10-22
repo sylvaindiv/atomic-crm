@@ -285,6 +285,16 @@ export const frenchCrmMessages = {
       validation: {
         note_or_attachment_required: "Une note ou une pièce jointe est requise",
       },
+      editor: {
+        bold: "Gras",
+        italic: "Italique",
+        underline: "Souligné",
+        heading: "Titre",
+        bullet_list: "Liste à puces",
+        ordered_list: "Liste numérotée",
+        link: "Lien",
+        formatting: "Mise en forme",
+      },
       next_action: {
         title: "Prochaine action datée",
         create: "Créer une tâche",

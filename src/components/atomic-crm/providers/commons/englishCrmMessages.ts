@@ -282,6 +282,16 @@ export const englishCrmMessages = {
       validation: {
         note_or_attachment_required: "A note or an attachment is required",
       },
+      editor: {
+        bold: "Bold",
+        italic: "Italic",
+        underline: "Underline",
+        heading: "Heading",
+        bullet_list: "Bullet list",
+        ordered_list: "Numbered list",
+        link: "Link",
+        formatting: "Formatting",
+      },
       next_action: {
         title: "Dated next action",
         create: "Create a task",

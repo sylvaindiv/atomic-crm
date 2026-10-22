@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 import type { Contact } from "../../types";
 import { NoteCreate, NotesIterator } from "../../notes";
+import { noteToText } from "../../notes/noteContent";
 import { resourceForContact } from "../contactResource";
 
 export const LatestNoteCell = () => {
@@ -13,7 +14,7 @@ export const LatestNoteCell = () => {
 
   if (!record) return null;
 
-  const latestText = record.latest_note_text;
+  const latestText = noteToText(record.latest_note_text);
 
   return (
     <div onClick={(event) => event.stopPropagation()}>

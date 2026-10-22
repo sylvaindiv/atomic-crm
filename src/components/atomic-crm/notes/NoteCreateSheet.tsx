@@ -12,6 +12,7 @@ import { CreateSheet } from "../misc/CreateSheet";
 import { foreignKeyMapping } from "./foreignKeyMapping";
 import { NoteInputsMobile } from "./NoteInputsMobile";
 import { getCurrentDate } from "./utils";
+import { buildNoteNextAction } from "./noteModel";
 
 export interface NoteCreateSheetProps {
   open: boolean;
@@ -72,6 +73,7 @@ export const NoteCreateSheet = ({
       defaultValues={{ sales_id: identity?.id }}
       transform={(data: any) => ({
         ...data,
+        next_action: buildNoteNextAction(data),
         [foreignKeyMapping["contacts"]]:
           contact_id ?? data[foreignKeyMapping["contacts"]],
         sales_id: identity.id,
@@ -89,7 +91,7 @@ export const NoteCreateSheet = ({
           : undefined
       }
     >
-      <NoteInputsMobile selectContact={selectContact} contactId={contact_id} />
+      <NoteInputsMobile creating selectContact={selectContact} />
     </CreateSheet>
   );
 };

@@ -1,3 +1,4 @@
+import { noteToText } from "./noteContent";
 import type { Identifier } from "ra-core";
 import {
   useGetIdentity,
@@ -126,7 +127,7 @@ export const NoteMobile = ({
       </div>
       {note.text && (
         <p className="pt-2 text-sm line-clamp-3">
-          {note.text.replace(/\s+/g, " ").trim()}
+          {noteToText(note.text).replace(/\s+/g, " ").trim()}
         </p>
       )}
     </Link>
