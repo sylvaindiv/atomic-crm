@@ -1,4 +1,5 @@
 import type { Identifier } from "ra-core";
+import { noteToText } from "./noteContent";
 
 export type NextActionInput =
   | { mode: "create"; text: string; due_date: string }
@@ -47,11 +48,30 @@ export const validateNoteOrAttachmentRequired = (
   value: string | null | undefined,
   values: { attachments?: unknown[] | null },
 ) => {
-  const hasText = typeof value === "string" && value.trim().length > 0;
+  const hasText = typeof value === "string" && noteToText(value).length > 0;
   const hasAttachments =
     Array.isArray(values?.attachments) && values.attachments.length > 0;
 
   return hasText || hasAttachments
     ? undefined
     : "resources.notes.validation.note_or_attachment_required";
+};
+
+export const validateNoteTextRequired = (value: string | null | undefined) =>
+  noteToText(value) ? undefined : "ra.validation.required";
+
+export const buildNoteNextAction = (data: {
+  text?: string | null;
+  next_action?: { due_date?: string };
+}): NextActionInput => {
+  const text = noteToText(data.text);
+  const due_date = data.next_action?.due_date ?? "";
+  if (
+    !text ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(due_date) ||
+    !isValidDueDate(due_date)
+  ) {
+    throw new Error("Note et échéance requises");
+  }
+  return { mode: "create", text, due_date };
 };

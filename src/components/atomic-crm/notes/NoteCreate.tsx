@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { NoteInputs } from "./NoteInputs";
 import { getCurrentDate } from "./utils";
 import { foreignKeyMapping } from "./foreignKeyMapping";
-import { NextActionInputs } from "./NextActionInputs";
+import { buildNoteNextAction } from "./noteModel";
 
 export const NoteCreate = ({
   reference,
@@ -38,6 +38,7 @@ export const NoteCreate = ({
       redirect={false}
       transform={(data: any) => ({
         ...data,
+        next_action: buildNoteNextAction(data),
         [foreignKeyMapping[reference]]: record.id,
         sales_id: identity.id,
         date: new Date(data.date || getCurrentDate()).toISOString(),
@@ -45,8 +46,11 @@ export const NoteCreate = ({
     >
       <Form>
         <div className={cn("space-y-3", className)}>
-          <NoteInputs defaultStatus={defaultStatus} showStatus={showStatus} />
-          <NextActionInputs defaultContactId={record.id} />
+          <NoteInputs
+            creating
+            defaultStatus={defaultStatus}
+            showStatus={showStatus}
+          />
           <NoteCreateButton defaultStatus={defaultStatus} />
         </div>
       </Form>
@@ -67,11 +71,13 @@ const NoteCreateButton = ({ defaultStatus }: { defaultStatus?: string }) => {
     date: string;
     text: null;
     attachments: null;
+    next_action: { due_date: string };
     status?: string;
   } = {
     date: getCurrentDate(),
     text: null,
     attachments: null,
+    next_action: { due_date: "" },
   };
 
   const handleSuccess = (data: any) => {

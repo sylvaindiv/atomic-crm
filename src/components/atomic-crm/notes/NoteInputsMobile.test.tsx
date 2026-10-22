@@ -6,10 +6,12 @@ const { Default, WithAttachmentDefault, WithSelectContact } =
   composeStories(stories);
 
 describe("NoteInputsMobile", () => {
-  it("renders the note textarea", async () => {
+  it("renders the note editor", async () => {
     const screen = await render(<Default />);
 
-    await expect.element(screen.getByPlaceholder("Add a note")).toBeVisible();
+    await expect
+      .element(screen.getByRole("textbox", { name: "Add a note" }))
+      .toBeVisible();
   });
 
   it("renders the attach document button", async () => {
@@ -47,7 +49,7 @@ describe("NoteInputsMobile", () => {
   it("treats whitespace-only note text as empty", async () => {
     const screen = await render(<Default />);
 
-    await screen.getByPlaceholder("Add a note").fill("   ");
+    await screen.getByRole("textbox", { name: "Add a note" }).fill("   ");
     await screen.getByRole("button", { name: "Save" }).click();
 
     await expect
@@ -58,7 +60,9 @@ describe("NoteInputsMobile", () => {
   it("allows submitting a note with text only", async () => {
     const screen = await render(<Default />);
 
-    await screen.getByPlaceholder("Add a note").fill("Call summary");
+    await screen
+      .getByRole("textbox", { name: "Add a note" })
+      .fill("Call summary");
     await screen.getByRole("button", { name: "Save" }).click();
 
     await expect
@@ -79,7 +83,9 @@ describe("NoteInputsMobile", () => {
   it("shows a validation error when submitting the contact selector without a choice", async () => {
     const screen = await render(<WithSelectContact />);
 
-    await screen.getByPlaceholder("Add a note").fill("Call summary");
+    await screen
+      .getByRole("textbox", { name: "Add a note" })
+      .fill("Call summary");
     await screen.getByRole("button", { name: "Save" }).click();
 
     await expect.element(screen.getByText("Required").first()).toBeVisible();

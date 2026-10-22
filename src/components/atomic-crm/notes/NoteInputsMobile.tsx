@@ -1,12 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Paperclip } from "lucide-react";
-import {
-  required,
-  useInput,
-  useTranslate,
-  ValidationError,
-  RecordContextProvider,
-} from "ra-core";
+import { required, useTranslate, RecordContextProvider } from "ra-core";
 import { AutocompleteInput, ReferenceInput } from "@/components/admin";
 import { FileInputPreview } from "@/components/admin/file-input";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -14,55 +8,30 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { contactOptionText } from "../misc/ContactOption";
 import { AttachmentField } from "./AttachmentField";
 import { foreignKeyMapping } from "./foreignKeyMapping";
-import { validateNoteOrAttachmentRequired } from "./noteModel";
+import { NoteEditor } from "./NoteEditor";
 import { NextActionInputs } from "./NextActionInputs";
 import type { ContactNote } from "../types";
-import type { Identifier } from "ra-core";
 import { useContactResource } from "../contacts/contactResource";
 
 export const NoteInputsMobile = ({
   selectContact,
-  contactId,
+  creating = false,
 }: {
   selectContact?: boolean;
-  contactId?: Identifier;
+  creating?: boolean;
 }) => {
-  const translate = useTranslate();
   const contactResource = useContactResource();
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const { field, fieldState } = useInput({
-    source: "text",
-    validate: validateNoteOrAttachmentRequired,
-  });
-
-  useEffect(() => {
-    const node = textareaRef.current;
-    if (!node) return;
-    requestAnimationFrame(() => {
-      node.focus();
-      // move cursor to end of text
-      node.setSelectionRange(node.value.length, node.value.length);
-    });
-  }, []);
 
   return (
     <div className="flex flex-col flex-1 -m-4">
-      <div className="flex-1 flex flex-col">
-        <textarea
-          {...field}
-          ref={(node) => {
-            field.ref(node);
-            textareaRef.current = node;
-          }}
-          placeholder={translate("resources.notes.inputs.add_note")}
-          className="flex-1 min-h-0 resize-none bg-background p-4 outline-none text-base"
-        />
-        {fieldState.error && (
-          <p className="px-4 text-sm text-destructive">
-            <ValidationError error={fieldState.error.message ?? ""} />
-          </p>
-        )}
+      <div className="px-4 pt-4">
+        <NoteEditor required={creating} />
       </div>
+      {creating && (
+        <div className="px-4 pt-3">
+          <NextActionInputs />
+        </div>
+      )}
       {selectContact && (
         <div className="px-4 py-4">
           <ReferenceInput
@@ -79,9 +48,6 @@ export const NoteInputsMobile = ({
           </ReferenceInput>
         </div>
       )}
-      <div className="px-4">
-        <NextActionInputs defaultContactId={contactId} />
-      </div>
       <div className="px-4">
         <AttachmentPreviewsMobile />
         <AttachButton />

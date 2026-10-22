@@ -7,10 +7,12 @@ const { Default, WithAttachmentDefault, WithSaveButton } =
   composeStories(stories);
 
 describe("NoteInputs", () => {
-  it("renders the note textarea", async () => {
+  it("renders the note editor", async () => {
     const screen = await render(<Default />);
 
-    await expect.element(screen.getByPlaceholder("Add a note")).toBeVisible();
+    await expect
+      .element(screen.getByRole("textbox", { name: "Add a note" }))
+      .toBeVisible();
   });
 
   it("shows the 'Show options' button on desktop when displayMore is false", async () => {
@@ -119,7 +121,7 @@ describe("NoteInputs", () => {
   it("treats whitespace-only note text as empty", async () => {
     const screen = await render(<WithSaveButton />);
 
-    await screen.getByPlaceholder("Add a note").fill("   ");
+    await screen.getByRole("textbox", { name: "Add a note" }).fill("   ");
     await screen.getByRole("button", { name: "Save" }).click();
 
     await expect
@@ -130,7 +132,9 @@ describe("NoteInputs", () => {
   it("allows submitting a note with text only", async () => {
     const screen = await render(<WithSaveButton />);
 
-    await screen.getByPlaceholder("Add a note").fill("Call summary");
+    await screen
+      .getByRole("textbox", { name: "Add a note" })
+      .fill("Call summary");
     await screen.getByRole("button", { name: "Save" }).click();
 
     await expect

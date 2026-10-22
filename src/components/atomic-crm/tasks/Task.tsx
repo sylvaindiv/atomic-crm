@@ -98,7 +98,7 @@ export const Task = ({
           <div className="flex-grow">
             <label
               htmlFor={labelId}
-              className={`text-sm cursor-pointer ${task.done_date ? "line-through" : ""}`}
+              className={`whitespace-pre-line text-sm cursor-pointer ${task.done_date ? "line-through" : ""}`}
             >
               {task.type && task.type !== "none" && (
                 <>
@@ -120,7 +120,12 @@ export const Task = ({
             <div className="text-sm text-muted-foreground">
               {translate("resources.tasks.fields.due_short")}
               &nbsp;
-              <DateField source="due_date" record={task} showDate showTime />
+              <DateField
+                source="due_date"
+                record={task}
+                showDate
+                showTime={!/^\d{4}-\d{2}-\d{2}$/.test(task.due_date)}
+              />
               {showContact && (
                 <ReferenceField<TData, Contact>
                   source="contact_id"
